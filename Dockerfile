@@ -16,5 +16,6 @@ COPY --from=src-build /app/build /usr/share/nginx/html
 # Copy the nginx config files:
 COPY nginx /etc/nginx
 COPY ./test.sh ./test.sh
+# Make the test file executable:
 RUN chmod +x ./test.sh
 EXPOSE 80/tcp
