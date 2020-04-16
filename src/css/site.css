@@ -366,6 +366,10 @@ body {
   min-height: 100vh;
 }
 
+body > main {
+  background-color: var(--color-primary-neutral-200);
+}
+
 body > main > header :first-child {
   margin-top: 0;
 }
@@ -824,6 +828,10 @@ body > footer p {
 /*            Article           */
 /********************************/
 
+main > article {
+  padding: var(--space-4);
+}
+
 main > article > * {
   max-width: var(--width-article-body);
   margin-left: auto;
@@ -838,6 +846,18 @@ main > article > :first-child {
 
 main > article > :last-child {
   margin-bottom: 0;
+}
+
+@media (min-width: 768px) {
+  main > article {
+    padding: var(--space-6);
+  }
+}
+
+@media (min-width: 992px) {
+  main > article {
+    padding: var(--space-7);
+  }
 }
 
 /********************************/
