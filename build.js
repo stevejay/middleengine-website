@@ -74,10 +74,27 @@ const processLegalFile = async (globalContext) => {
   );
 
   const template = Handlebars.compile(layoutContent);
-  const context = { ...globalContext, title: "Terms & Privacy Policy" };
+  const context = { ...globalContext, title: "Terms & Conditions" };
   const html = template(context);
 
   await writeFile(path.join(BUILD_DIR, "legal.html"), html, {
+    encoding: "utf-8",
+  });
+};
+
+const processPrivacyFile = async (globalContext) => {
+  const layoutContent = await readFile(
+    path.join(TEMPLATES_SRC_DIR, "privacy.hbs"),
+    {
+      encoding: "utf-8",
+    }
+  );
+
+  const template = Handlebars.compile(layoutContent);
+  const context = { ...globalContext, title: "Privacy Policy" };
+  const html = template(context);
+
+  await writeFile(path.join(BUILD_DIR, "privacy.html"), html, {
     encoding: "utf-8",
   });
 };
@@ -170,6 +187,7 @@ const generateDynamicFiles = async (staticFiles) => {
   const globalContext = { header: { staticFiles } };
   await processIndexHtmlFile(globalContext);
   await processLegalFile(globalContext);
+  await processPrivacyFile(globalContext);
 };
 
 // MAIN ENTRY POINT:
