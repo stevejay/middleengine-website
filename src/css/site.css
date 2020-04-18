@@ -148,6 +148,36 @@ h6 {
 }
 
 /********************************/
+/*         Header anchor        */
+/********************************/
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+  position: relative;
+}
+
+.header-anchor {
+  color: var(--color-neutral-400);
+}
+
+.header-anchor:hover {
+  color: var(--color-primary);
+  border: none;
+}
+
+@media (min-width: 768px) {
+  .header-anchor {
+    position: absolute;
+    left: -1.5ch;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+/********************************/
 /*         Link styling         */
 /********************************/
 
@@ -195,15 +225,30 @@ h6 {
   margin-bottom: var(--space-1);
 }
 
+figure {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
 pre {
   margin-top: var(--space-5);
   margin-bottom: var(--space-5);
+}
+
+table {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-6);
 }
 
 p,
 figcaption {
   margin-top: var(--space-4);
   margin-bottom: var(--space-4);
+}
+
+table caption {
+  margin-top: var(--space-3);
+  margin-bottom: 0;
 }
 
 ul,
@@ -297,6 +342,90 @@ blockquote p {
 
 .byline a {
   border-bottom: none;
+}
+
+/********************************/
+/*              Table           */
+/********************************/
+
+/* From: https://codepen.io/geoffyuen/pen/FCBEg */
+
+table {
+  background: var(--color-neutral-200);
+  color: var(--color-black);
+  border-radius: var(--radius-2);
+  border-collapse: collapse;
+  overflow: hidden;
+  font-size: var(--font-size-1);
+}
+
+table thead tr {
+  border-bottom: var(--width-hair) solid var(--color-neutral-50);
+}
+
+table tbody tr + tr {
+  border-top: var(--width-hair) solid var(--color-neutral-50);
+}
+
+table th,
+table td {
+  text-align: left;
+}
+
+table th {
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+table th,
+table td {
+  padding: var(--space-2) var(--space-4);
+  display: table-cell;
+}
+
+table td:before {
+  display: none;
+}
+
+table caption {
+  color: var(--color-neutral-600);
+  font-size: var(--font-size-1);
+  font-style: italic;
+  text-align: center;
+  caption-side: bottom;
+}
+
+/********************************/
+/*             Code             */
+/********************************/
+
+code {
+  font-size: var(--font-size-1);
+  line-height: 1.4;
+}
+
+pre {
+  background-color: var(--color-neutral-100); /* TODO */
+  overflow-x: scroll;
+}
+
+pre code {
+  margin: var(--space-2);
+  display: inline-block;
+}
+
+@media (min-width: 768px) {
+  pre code {
+    margin: var(--space-4);
+  }
+}
+
+/* Code embedded in body text */
+p code,
+li code {
+  padding: 0.05em 0.25em;
+  border-radius: var(--radius-1);
+  background-color: var(--color-neutral-200); /* TODO */
 }
 
 /********************************/
@@ -960,8 +1089,9 @@ body.index header.hero h1 strong {
   margin-top: var(--space-3);
 }
 
-#recent-blog-posts-section h3 {
+#recent-blog-posts-section h3 a {
   color: var(--color-primary);
+  border: none;
 }
 
 #recent-blog-posts-section li > a {

@@ -76,84 +76,20 @@
                 <p>To see all blog posts, visit <a href="/blog">this page</a>.</p>
             </header>
             <ul>
+                {{#each latestPosts}}
                 <li>
-                    <h3>Using Styled Components in your apps</h3>
+                    <h3><a href="{{absPath}}">{{meta.title}}</a></h3>
                     <div class="byline">
                         By&nbsp;
-                        <address class="author"><a rel="author"
-                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
+                        <address class="author"><a rel="author" href="{{meta.author.url}}">{{meta.author.name}}</a>
                         </address>
-                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
-                            title="12 October 2019">12 October 2019</time>
+                        <time pubdate datetime="{{meta.date}}"
+                            title="{{formatDate meta.date "short"}}">{{formatDate meta.date "short"}}</time>
                     </div>
-                    <p>Working out how to use the popular CSS-in-JS library.</p>
-                    <a href="/blog/whatever">Read more...</a>
+                    <p>{{meta.summary}}</p>
+                    <a href="{{absPath}}">Read more...</a>
                 </li>
-                <li>
-                    <h3>Using Styled Components in your apps</h3>
-                    <div class="byline">
-                        By&nbsp;
-                        <address class="author"><a rel="author"
-                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
-                        </address>
-                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
-                            title="12 October 2019">12 October 2019</time>
-                    </div>
-                    <p>Working out how to use the popular CSS-in-JS library.</p>
-                    <a href="/blog/whatever">Read more...</a>
-                </li>
-                <li>
-                    <h3>Using Styled Components in your apps</h3>
-                    <div class="byline">
-                        By&nbsp;
-                        <address class="author"><a rel="author"
-                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
-                        </address>
-                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
-                            title="12 October 2019">12 October 2019</time>
-                    </div>
-                    <p>Working out how to use the popular CSS-in-JS library.</p>
-                    <a href="/blog/whatever">Read more...</a>
-                </li>
-                <li>
-                    <h3>Using Styled Components in your apps</h3>
-                    <div class="byline">
-                        By&nbsp;
-                        <address class="author"><a rel="author"
-                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
-                        </address>
-                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
-                            title="12 October 2019">12 October 2019</time>
-                    </div>
-                    <p>Working out how to use the popular CSS-in-JS library.</p>
-                    <a href="/blog/whatever">Read more...</a>
-                </li>
-                <li>
-                    <h3>Using Styled Components in your apps</h3>
-                    <div class="byline">
-                        By&nbsp;
-                        <address class="author"><a rel="author"
-                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
-                        </address>
-                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
-                            title="12 October 2019">12 October 2019</time>
-                    </div>
-                    <p>Working out how to use the popular CSS-in-JS library.</p>
-                    <a href="/blog/whatever">Read more...</a>
-                </li>
-                <li>
-                    <h3>Using Styled Components in your apps</h3>
-                    <div class="byline">
-                        By&nbsp;
-                        <address class="author"><a rel="author"
-                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
-                        </address>
-                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
-                            title="12 October 2019">12 October 2019</time>
-                    </div>
-                    <p>Working out how to use the popular CSS-in-JS library.</p>
-                    <a href="/blog/whatever">Read more...</a>
-                </li>
+                {{/each}}
             </ul>
         </section>
     </main>

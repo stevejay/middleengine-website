@@ -3,6 +3,14 @@
 # Use a node docker image:
 FROM node:13.12.0-stretch AS src-build
 
+ARG UNSPLASH_APP_NAME
+ARG UNSPLASH_APP_ACCESS_KEY
+ARG UNSPLASH_APP_SECRET_KEY
+
+ENV UNSPLASH_APP_NAME $UNSPLASH_APP_NAME
+ENV UNSPLASH_APP_ACCESS_KEY $UNSPLASH_APP_ACCESS_KEY
+ENV UNSPLASH_APP_SECRET_KEY $UNSPLASH_APP_SECRET_KEY
+
 COPY package.json package-lock.json /tmp/
 RUN cd /tmp && npm ci
 RUN mkdir -p /app && cp -a /tmp/node_modules /app/

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{> head }}
+
+<body>
+    {{> header }}
+    <main>
+        <article>
+            <header>
+                <h1>{{title}}</h1>
+                <p>{{summary}}</p>
+                <div class="byline">
+                    By&nbsp;
+                    <address class="author"><a rel="author" href="{{author.url}}">{{author.name}}</a>
+                    </address>
+                    <time pubdate datetime="{{date}}"
+                        title="{{formatDate date "short"}}">{{formatDate date "short"}}</time>
+                </div>
+            </header>
+            {{#if heroImage}}
+            <figure class="hero">
+                <div class="hero-img-wrap">
+                    <picture>
+                        <source srcset="{{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=1600&h=800&q=80&dpi=1 1x,
+            {{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=1600&h=800&q=80&dpi=2 2x" media="(min-width: 768px)">
+                        <img src="{{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=600&q=80&dpi=1 1x,
+            {{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=600&q=80&dpi=2 2x">
+                    </picture>
+                </div>
+                <figcaption>
+                    Photo by <a
+                        href="{{heroImage.creditUrl}}?utm_source={{heroImage.appName}}&utm_medium=referral">{{heroImage.creditName}}</a>
+                    on <a href="https://unsplash.com/?utm_source={{heroImage.appName}}&utm_medium=referral">Unsplash</a>
+                </figcaption>
+            </figure>
+            {{/if}}
+            {{{content}}}
+        </article>
+    </main>
+    {{> footer }}
+</body>
+
+</html>
