@@ -7,7 +7,7 @@
     {{> header }}
     <main>
         <header class="hero">
-            <figure>
+            <figure role="presentation" aria-hidden="true">
                 <div class="hero-img-wrap">
                     <picture>
                         <source
@@ -24,7 +24,7 @@
                     </picture>
                 </div>
                 <figcaption>
-                    <a style="background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px"
+                    <a style="border: none;background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px"
                         href="https://unsplash.com/@lozt?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge"
                         target="_blank" rel="noopener noreferrer"
                         title="Download free do whatever you want high-resolution photos from Hoover Tung"><span
@@ -36,29 +36,31 @@
                             </svg></span><span style="display:inline-block;padding:2px 3px">Hoover Tung</span></a>
                 </figcaption>
             </figure>
-            <h1>
-                Software development services
-                by <strong>Middle Engine Software</strong>
-            </h1>
+            <div class="hero-text-wrap">
+                <h1>
+                    Software development services
+                    by <strong>Middle Engine Software</strong>
+                </h1>
+            </div>
         </header>
         <section id="services-section">
             <ul>
                 <li id="d3-service">
                     <img src="/images/d3-icon-v1.svg" alt="" role="presentation">
-                    <h3>For custom<br /><strong>D3</strong><br />data visualisations</h3>
+                    <p>For custom <strong>D3</strong> data visualisations</p>
                 </li>
                 <li id="react-service">
                     <img src="/images/react-icon-v1.svg" alt="" role="presentation">
-                    <h3>For complex<br /><strong>React.js</strong><br />Web applications</h3>
+                    <p>For complex <strong>React.js</strong> Web applications</p>
                 </li>
                 <li id="performance-service">
                     <img src="/images/speedometer-v1.svg" alt="" role="presentation">
-                    <h3>For improving the<br /><strong>performance</strong><br />of existing sites</h3>
+                    <p>For improved <strong>performance</strong> of existing sites</p>
                 </li>
                 </li>
                 <li id="start-up-service">
                     <img src="/images/start-button-v1.svg" alt="" role="presentation">
-                    <h3>For<br /><strong>start-up</strong><br />experience</h3>
+                    <p>For <strong>start-up</strong> experience</p>
                 </li>
             </ul>
         </section>
@@ -68,11 +70,94 @@
             </p>
             <a href="mailto:hello@middle-engine.com">Get in touch</a>
         </section>
+        <section id="recent-blog-posts-section">
+            <header>
+                <h2>Latest blog posts</h2>
+                <p>To see all blog posts, visit <a href="/blog">this page</a>.</p>
+            </header>
+            <ul>
+                <li>
+                    <h3>Using Styled Components in your apps</h3>
+                    <div class="byline">
+                        By&nbsp;
+                        <address class="author"><a rel="author"
+                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
+                        </address>
+                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
+                            title="12 October 2019">12 October 2019</time>
+                    </div>
+                    <p>Working out how to use the popular CSS-in-JS library.</p>
+                    <a href="/blog/whatever">Read more...</a>
+                </li>
+                <li>
+                    <h3>Using Styled Components in your apps</h3>
+                    <div class="byline">
+                        By&nbsp;
+                        <address class="author"><a rel="author"
+                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
+                        </address>
+                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
+                            title="12 October 2019">12 October 2019</time>
+                    </div>
+                    <p>Working out how to use the popular CSS-in-JS library.</p>
+                    <a href="/blog/whatever">Read more...</a>
+                </li>
+                <li>
+                    <h3>Using Styled Components in your apps</h3>
+                    <div class="byline">
+                        By&nbsp;
+                        <address class="author"><a rel="author"
+                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
+                        </address>
+                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
+                            title="12 October 2019">12 October 2019</time>
+                    </div>
+                    <p>Working out how to use the popular CSS-in-JS library.</p>
+                    <a href="/blog/whatever">Read more...</a>
+                </li>
+                <li>
+                    <h3>Using Styled Components in your apps</h3>
+                    <div class="byline">
+                        By&nbsp;
+                        <address class="author"><a rel="author"
+                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
+                        </address>
+                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
+                            title="12 October 2019">12 October 2019</time>
+                    </div>
+                    <p>Working out how to use the popular CSS-in-JS library.</p>
+                    <a href="/blog/whatever">Read more...</a>
+                </li>
+                <li>
+                    <h3>Using Styled Components in your apps</h3>
+                    <div class="byline">
+                        By&nbsp;
+                        <address class="author"><a rel="author"
+                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
+                        </address>
+                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
+                            title="12 October 2019">12 October 2019</time>
+                    </div>
+                    <p>Working out how to use the popular CSS-in-JS library.</p>
+                    <a href="/blog/whatever">Read more...</a>
+                </li>
+                <li>
+                    <h3>Using Styled Components in your apps</h3>
+                    <div class="byline">
+                        By&nbsp;
+                        <address class="author"><a rel="author"
+                                href="https://www.linkedin.com/in/stephen-johns-47a7568/">Steve Johns</a>
+                        </address>
+                        <time pubdate="" datetime="Sat Oct 12 2019 00:00:00 GMT+0000 (Coordinated Universal Time)"
+                            title="12 October 2019">12 October 2019</time>
+                    </div>
+                    <p>Working out how to use the popular CSS-in-JS library.</p>
+                    <a href="/blog/whatever">Read more...</a>
+                </li>
+            </ul>
+        </section>
     </main>
     {{> footer }}
 </body>
 
 </html>
-
-
-{{!-- https://images.unsplash.com/photo-1551609189-eba71b3a8566?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80 --}}
