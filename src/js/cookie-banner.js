@@ -1,11 +1,11 @@
 if (!window.cookieBannerClick) {
-  window.cookieBannerClick = function() {
+  window.cookieBannerClick = function () {
     window.localStorage.setItem("acceptedCookies", "true");
     document.documentElement.classList.remove("show-cookie-banner");
   };
 }
 
-window.addEventListener("load", function() {
+window.addEventListener("load", function () {
   var element = document.getElementById("accept-cookies-button");
   element.addEventListener("click", window.cookieBannerClick);
 
