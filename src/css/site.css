@@ -109,7 +109,7 @@ h1 {
   font-family: var(--font-family-main-heading);
   font-weight: var(--font-weight-main-heading-regular);
   font-style: italic;
-  line-height: 1.3;
+  line-height: 1.2;
 }
 
 h2,
@@ -161,6 +161,7 @@ h6 {
 
 .header-anchor {
   color: var(--color-neutral-400);
+  border: none;
 }
 
 .header-anchor:hover {
@@ -387,6 +388,11 @@ table td:before {
   display: none;
 }
 
+/********************************/
+/*       Figure captions        */
+/********************************/
+
+.article-image figcaption,
 table caption {
   color: var(--color-neutral-600);
   font-size: var(--font-size-1);
@@ -787,13 +793,15 @@ header.hero .hero-img-wrap {
 
 header.hero img {
   width: 100%;
+  filter: grayscale(100%);
+  mix-blend-mode: multiply;
 }
 
 header.hero figcaption {
   position: absolute;
   top: 0;
   right: 5px;
-  opacity: 0.5;
+  opacity: 0.66;
   z-index: 1;
 }
 
@@ -812,12 +820,16 @@ header.hero .hero-text-wrap {
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: var(--width-main);
+  max-width: var(--width-article-body);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
-  padding: 0 var(--space-4) var(--space-5);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+header.hero .hero-text-wrap > * + * {
+  margin-top: var(--space-3);
 }
 
 header.hero h1,
@@ -842,19 +854,19 @@ header.hero h1 {
     padding: 0 var(--space-5) var(--space-5);
   }
 
-  header.hero h1,
-  header.hero p {
-    width: 60%;
-  }
-
   header.hero h1 {
     font-size: var(--font-size-6);
+  }
+
+  body.index header.hero h1,
+  body.index header.hero p {
+    width: 60%;
   }
 }
 
 @media (min-width: 992px) {
   header.hero .hero-text-wrap {
-    padding: 0 var(--space-6) var(--space-6);
+    padding: 0 0 var(--space-6);
   }
 
   header.hero h1 {
