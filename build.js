@@ -28,6 +28,7 @@ const writeFile = util.promisify(fs.writeFile);
 const copyFile = util.promisify(fs.copyFile);
 const copy = util.promisify(fs.copy);
 
+const DOMAIN = "https://middle-engine.com";
 const BUILD_DIR = "./build";
 const CSS_BUILD_DIR = path.join(BUILD_DIR, "css");
 const JS_BUILD_DIR = path.join(BUILD_DIR, "js");
@@ -240,6 +241,28 @@ const processBlogFile = async (postsData, globalContext) => {
   });
 };
 
+const createSitemapFile = async (postsData) => {
+  const sortedPostsData = _.orderBy(
+    postsData,
+    ["meta.date", "meta.title"],
+    ["desc", "asc"]
+  );
+
+  const sitemapEntries = [`${DOMAIN}/`, `${DOMAIN}/blog`];
+
+  sortedPostsData.forEach((postData) => {
+    sitemapEntries.push(`${DOMAIN}${postData.absPath}`);
+  });
+
+  await writeFile(
+    path.join(BUILD_DIR, "sitemap.txt"),
+    sitemapEntries.join("\n"),
+    {
+      encoding: "utf-8",
+    }
+  );
+};
+
 const processLegalFile = async (globalContext) => {
   const layoutContent = await readFile(
     path.join(TEMPLATES_SRC_DIR, "legal.hbs"),
@@ -380,6 +403,7 @@ const generateDynamicFiles = async (staticFiles) => {
   await processBlogFile(postsData, globalContext);
   await processLegalFile(globalContext);
   await processPrivacyFile(globalContext);
+  await createSitemapFile(postsData);
 };
 
 // MAIN ENTRY POINT:

@@ -35,6 +35,7 @@ filelist="\
   /usr/share/nginx/html/favicon.ico \
   /usr/share/nginx/html/site.webmanifest \
   /usr/share/nginx/html/robots.txt \
+  /usr/share/nginx/html/sitemap.txt \
   /etc/nginx/nginx.conf \
   /etc/nginx/conf.d/default.conf";
 
