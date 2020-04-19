@@ -574,6 +574,13 @@ body > footer p:before {
   background-repeat: no-repeat;
 }
 
+body > footer p a {
+  color: var(--color-white);
+  border-bottom: none;
+  font-size: var(--font-size-1);
+  color: var(--color-neutral-600);
+}
+
 body > footer ul {
   list-style-type: none;
   padding: 0;
