@@ -31,7 +31,7 @@ const copy = util.promisify(fs.copy);
 const BUILD_DIR = "./build";
 const CSS_BUILD_DIR = path.join(BUILD_DIR, "css");
 const JS_BUILD_DIR = path.join(BUILD_DIR, "js");
-const POSTS_BUILD_DIR = path.join(BUILD_DIR, "posts");
+const POSTS_BUILD_DIR = path.join(BUILD_DIR, "blog/posts");
 const IMAGES_BUILD_DIR = path.join(BUILD_DIR, "images");
 
 const SRC_DIR = "./src";
@@ -177,7 +177,7 @@ const processPostFile = async (postFile, globalContext) => {
   await writeFile(filePath, html, { encoding: "utf-8" });
 
   return {
-    absPath: `/posts/${buildPostDir}/${buildPostName}`,
+    absPath: `/blog/posts/${buildPostDir}/${buildPostName}`,
     meta: md.meta,
   };
 };
@@ -199,7 +199,7 @@ const processIndexHtmlFile = async (postsData, globalContext) => {
   const template = Handlebars.compile(layoutContent);
   const context = {
     ...globalContext,
-    title: "Home Page",
+    title: "Home",
     latestPosts: sortedPostsData.slice(0, 6),
     olderPosts: sortedPostsData.slice(6),
   };
@@ -207,6 +207,35 @@ const processIndexHtmlFile = async (postsData, globalContext) => {
   const html = template(context, options);
 
   await writeFile(path.join(BUILD_DIR, "index.html"), html, {
+    encoding: "utf-8",
+  });
+};
+
+const processBlogFile = async (postsData, globalContext) => {
+  const layoutContent = await readFile(
+    path.join(TEMPLATES_SRC_DIR, "blog.hbs"),
+    {
+      encoding: "utf-8",
+    }
+  );
+
+  const sortedPostsData = _.orderBy(
+    postsData,
+    ["meta.date", "meta.title"],
+    ["desc", "asc"]
+  );
+
+  const template = Handlebars.compile(layoutContent);
+  const context = {
+    ...globalContext,
+    title: "Blog",
+    latestPosts: sortedPostsData.slice(0, 6),
+    olderPosts: sortedPostsData.slice(6),
+  };
+  const options = { data: { intl: handlebarsIntlData } };
+  const html = template(context, options);
+
+  await writeFile(path.join(BUILD_DIR, "blog.html"), html, {
     encoding: "utf-8",
   });
 };
@@ -348,6 +377,7 @@ const generateDynamicFiles = async (staticFiles) => {
   );
 
   await processIndexHtmlFile(postsData, globalContext);
+  await processBlogFile(postsData, globalContext);
   await processLegalFile(globalContext);
   await processPrivacyFile(globalContext);
 };

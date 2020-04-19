@@ -27,8 +27,9 @@ fi
 
 filelist="\
   /usr/share/nginx/html/images/logo-v1.svg
-  /usr/share/nginx/html/posts/2019/11/10/tips-for-using-styled-components.html \
   /usr/share/nginx/html/index.html \
+  /usr/share/nginx/html/blog.html \
+  /usr/share/nginx/html/blog/posts/2019/11/10/tips-for-using-styled-components.html \
   /usr/share/nginx/html/legal.html \
   /usr/share/nginx/html/privacy.html \
   /usr/share/nginx/html/favicon.ico \

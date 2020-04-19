@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{> head }}
+
+<body class="blog">
+    {{> header }}
+    <main>
+        <section id="blog-posts-listing">
+            <header>
+                <h1>Blog posts</h1>
+            </header>
+            <ul>
+                {{#each latestPosts}}
+                <li>
+                    <figure class="hero" role="presentation" aria-hidden="true">
+                        <div class="hero-img-wrap">
+                            <picture>
+                                <img src="{{meta.heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=400&q=80&dpi=1 1x,
+            {{meta.heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=400&q=80&dpi=2 2x">
+                            </picture>
+                        </div>
+                    </figure>
+                    <h3><a href="{{absPath}}">{{meta.title}}</a></h3>
+                    <div class="byline">
+                        By&nbsp;
+                        <address class="author"><a rel="author" href="{{meta.author.url}}">{{meta.author.name}}</a>
+                        </address>
+                        <time pubdate datetime="{{meta.date}}"
+                            title="{{formatDate meta.date "short"}}">{{formatDate meta.date "short"}}</time>
+                    </div>
+                    <p>{{meta.summary}}</p>
+                    <a href="{{absPath}}">Read more...</a>
+                </li>
+                {{/each}}
+                {{#each olderPosts}}
+                <li>
+                    <h3><a href="{{absPath}}">{{meta.title}}</a></h3>
+                    <div class="byline">
+                        By&nbsp;
+                        <address class="author"><a rel="author" href="{{meta.author.url}}">{{meta.author.name}}</a>
+                        </address>
+                        <time pubdate datetime="{{meta.date}}"
+                            title="{{formatDate meta.date "short"}}">{{formatDate meta.date "short"}}</time>
+                    </div>
+                    <p>{{meta.summary}}</p>
+                    <a href="{{absPath}}">Read more...</a>
+                </li>
+                {{/each}}
+            </ul>
+        </section>
+    </main>
+    {{> footer }}
+</body>
+
+</html>
