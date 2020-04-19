@@ -57,29 +57,29 @@ with-theme.jsx
 ... other files
 ```
 
-Some components, like _PageHeader_ are single independent components and are located at the root level of the _shared_ directory. Others like _EntityImage_ consist of a main component and a number of additional child components, so I encapsulate these in their own directory. The basic approach is to use nesting only when it assists in understanding the file structure.
+Some components, like PageHeader are single independent components and are located at the root level of the _shared_ directory. Others like EntityImage consist of a main component and a number of additional child components, so I encapsulate these in their own directory. The basic approach is to use nesting only when it assists in understanding the file structure.
 
 The _modules_ directory contains a subdirectory for each independent module in the application. Think of these as standalone, independent parts of the app. They could be parts of the basic app structure, like the header or the footer, they could be distinct sections of the app, like a dashboard page, or they could encapsulate all of a particular type of functionality, like authentication.
 
-A module has a top-level _index.js_ file that exports the few components and/or helper functions that are required by the high-level app code to bootstrap the app. For example, the dashboard module exports the _DashboardPage_ component and that component is used by the top-level _app.js_ file to display that component when the user views the root page ('/') of the app.
+A module has a top-level _index.js_ file that exports the few components and/or helper functions that are required by the high-level app code to bootstrap the app. For example, the dashboard module exports the DashboardPage component and that component is used by the top-level _app.js_ file to display that component when the user views the root page ('/') of the app.
 
 One very important feature of this structure is that **there are no dependencies between modules**. The only dependencies a module can have are to the code in the shared directory. Previously I used an approach where a module could depend on another module, but this became very confusing very quickly. Allowing cross-dependencies creates a dependency graph between modules, and it is hard to remember the hierarchy of the dependencies and it is easy to introduce circular references.
 
 However, not having dependencies between modules leads to a major problem, because sometimes there are dependencies. For example, I have an authentication module and a menu module. The former encapsulates everything about authentication and the latter everything about the main navigation header and sidebar menu available at the top of every page in the app. But the sidebar menu has to include a logout button, and the logic for how to handle a logout request is correctly located out of reach in the authentication module. Similarly, the navigation header includes a quick search option, with a button that opens a modal dialog where the user can enter a search, but the search logic is located out of reach in the search module.
 
-My fix for this was to create the concept of menu option handler components. The top-level menu module component requires that two such handler components are passed to it via props, one for the logout menu option and one for the search menu option. These handlers define the behaviour of each option when it is triggered. The actual visual appearance is still determined by the menu module, as a menu option handler component has to be passed a component that it renders as its visual appearance. For example, the top-level _Menu_ component requires a `searchMenuOptionHandler` prop to be passed to it. It renders this passed component in the navigation menu, passing it the component that actually renders the search button:
+My fix for this was to create the concept of menu option handler components. The top-level menu module component requires that two such handler components are passed to it via props, one for the logout menu option and one for the search menu option. These handlers define the behaviour of each option when it is triggered. The actual visual appearance is still determined by the menu module, as a menu option handler component has to be passed a component that it renders as its visual appearance. For example, the top-level Menu component requires a `searchMenuOptionHandler` prop to be passed to it. It renders this passed component in the navigation menu, passing it the component that actually renders the search button:
 
 ```
 <SearchMenuOptionHandler component={SearchButton} />
 ```
 
-The _SearchMenuOptionHandler_ component renders the component it is passed, in this case the _SearchButton_ component. When doing so, it passes it an `onClick` reference to be invoked when the search button is clicked, and a boolean that indicates if the search dialog is open or not:
+The SearchMenuOptionHandler component renders the component it is passed, in this case the SearchButton component. When doing so, it passes it an `onClick` reference to be invoked when the search button is clicked, and a boolean that indicates if the search dialog is open or not:
 
 ```
 <Component searchOpen={searchOpen} onClick={searchOpened} />
 ```
 
-The _SearchMenuOptionHandler_ component is part of the search module and completely control displaying the search dialog and what happens when the user enters a search term there. The menu module is in control of the visual appearance of that option in the navigation menu, but it is the search module that brings the option to life. This is also how the logout button works in the sidebar menu. In this way, a dependency between the menu module on the one hand and the auth and search modules on the other is avoided by the latter modules exporting handler components and the menu module requiring them via props. It is only the top-level _app.js_ file that knows about all of these components and is responsible for connecting them together:
+The SearchMenuOptionHandler component is part of the search module and completely control displaying the search dialog and what happens when the user enters a search term there. The menu module is in control of the visual appearance of that option in the navigation menu, but it is the search module that brings the option to life. This is also how the logout button works in the sidebar menu. In this way, a dependency between the menu module on the one hand and the auth and search modules on the other is avoided by the latter modules exporting handler components and the menu module requiring them via props. It is only the top-level _app.js_ file that knows about all of these components and is responsible for connecting them together:
 
 ```
 ...

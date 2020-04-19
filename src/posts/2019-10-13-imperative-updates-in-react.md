@@ -29,7 +29,7 @@ What does this mean for controlling focus and scroll position in a React applica
 
 A simple React application that demonstrates all of the solutions in this post is available to view [here](https://stevejay.github.io/section-scroll-experiment/), while the source code for it is [here](https://github.com/stevejay/section-scroll-experiment).
 
-The basic component architecture for each example follows the same pattern of a parent component that renders two areas. Firstly it renders a child _Navigation_ component that contains the four section buttons. Secondly it renders a child _Section_ component for each of the four sections.
+The basic component architecture for each example follows the same pattern of a parent component that renders two areas. Firstly it renders a child Navigation component that contains the four section buttons. Secondly it renders a child Section component for each of the four sections.
 
 In this way each section button and the section it controls are rendered in separate components, and so some means of component communication is required. In thinking about and collating possible solutions to this problem, I made use of [this issue](https://github.com/facebook/react/issues/6646) in the React GitHub repository about parent-to-child communication in React.
 
@@ -39,7 +39,7 @@ Note that scrolling an element into view can be implemented in at least two ways
 
 As a React developer, you will hear discussion about how some UI feature is or is not implemented in a React way. Arguably the simplest solution to the scrolling sections problem is to use element IDs, bypassing using React to trigger scrolling in favour of direct DOM access.
 
-I give each section an `id` prop, with the _Card_ component rendering that `id` prop on the section's DOM element:
+I give each section an `id` prop, with the Card component rendering that `id` prop on the section's DOM element:
 
 ```jsx
 const Section = ({ section }) => (
@@ -70,8 +70,8 @@ Pros:
 Cons:
 
 - It is not a React-based solution.
-- It requires developers maintaining this solution to understand that the `id` prop on each section cannot be removed, despite it not being obvious in the _Section_ component why this prop is required.
-- The _Section_ component is not in control of how it is scrolled to.
+- It requires developers maintaining this solution to understand that the `id` prop on each section cannot be removed, despite it not being obvious in the Section component why this prop is required.
+- The Section component is not in control of how it is scrolled to.
 
 ## Using state
 
@@ -117,7 +117,7 @@ const UsingStateExample = ({ sections }) => {
 };
 ```
 
-The _Section_ component uses an effect for detecting when the value of the `scrollSectionId` prop changes, and if `scrollSectionId` is equal to `section.id` as a result of the change then the section scrolls itself into view. It also then invokes the `onSectionScrolled` event handler so that the parent component can reset `scrollSectionId` to `null`:
+The Section component uses an effect for detecting when the value of the `scrollSectionId` prop changes, and if `scrollSectionId` is equal to `section.id` as a result of the change then the section scrolls itself into view. It also then invokes the `onSectionScrolled` event handler so that the parent component can reset `scrollSectionId` to `null`:
 
 ```jsx
 const Section = ({ section, scrollSectionId, onSectionScrolled }) => {
@@ -137,7 +137,7 @@ const Section = ({ section, scrollSectionId, onSectionScrolled }) => {
 Pros:
 
 - It is a React-based solution.
-- The _Section_ component is in control of how it is scrolled to.
+- The Section component is in control of how it is scrolled to.
 
 Cons:
 
@@ -188,7 +188,7 @@ const UsingCountersExample = ({ sections }) => {
 };
 ```
 
-In contrast the _Section_ component is straightforward. It uses an effect to monitor for changes to its `scrollCounter` prop. To prevent scrolling on first render when the section mounts, the effect ignores the value of zero that `scrollCounter` is initially set to on mount:
+In contrast the Section component is straightforward. It uses an effect to monitor for changes to its `scrollCounter` prop. To prevent scrolling on first render when the section mounts, the effect ignores the value of zero that `scrollCounter` is initially set to on mount:
 
 ```jsx
 const Section = ({ section, scrollCounter }) => {
@@ -207,7 +207,7 @@ const Section = ({ section, scrollCounter }) => {
 Pros:
 
 - It is a React-based solution.
-- The _Section_ component is in control of how it is scrolled to.
+- The Section component is in control of how it is scrolled to.
 
 Cons:
 
@@ -251,7 +251,7 @@ const UsingStateObjectExample = ({ sections }) => {
 };
 ```
 
-The _Section_ component uses an effect to monitor for changes to the `scrollState` prop. If `scrollState` changes identity, i.e., it is a new object, the section checks if it is the section to be scrolled to, and if it is then it invokes the `scrollToElement` function:
+The Section component uses an effect to monitor for changes to the `scrollState` prop. If `scrollState` changes identity, i.e., it is a new object, the section checks if it is the section to be scrolled to, and if it is then it invokes the `scrollToElement` function:
 
 ```jsx
 const Section = ({ section, scrollState }) => {
@@ -270,7 +270,7 @@ const Section = ({ section, scrollState }) => {
 Pros:
 
 - It is a React-based solution.
-- The _Section_ component is in control of how it is scrolled to.
+- The Section component is in control of how it is scrolled to.
 - It is quite a concise solution.
 - It avoids the state change hack of the 'Using State' solution.
 
@@ -314,7 +314,7 @@ const UsingRefsExample = ({ sections }) => {
 };
 ```
 
-The _Section_ component is straightforward. It exposes a function called `scroll` that the parent component can invoke. This means that section scrolling is encapsulated within this component. The alternative is for the parent component to call `scrollToElement(refsMap[id].current)` itself, but this would mean that the section component is not in control of how it is scrolled into view:
+The Section component is straightforward. It exposes a function called `scroll` that the parent component can invoke. This means that section scrolling is encapsulated within this component. The alternative is for the parent component to call `scrollToElement(refsMap[id].current)` itself, but this would mean that the section component is not in control of how it is scrolled into view:
 
 ```jsx
 const Section = React.forwardRef(({ section }, ref) => {
@@ -337,7 +337,7 @@ An important restriction of this solution is that the section to scroll to needs
 ### Pros
 
 - It is a React-based solution.
-- The _Section_ component is in control of how it is scrolled to.
+- The Section component is in control of how it is scrolled to.
 - It uses `ref`s, whose role in React includes being an 'escape hatch' for imperative-style coding.
 
 ### Cons

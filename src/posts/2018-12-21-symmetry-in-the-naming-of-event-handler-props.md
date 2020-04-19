@@ -46,9 +46,9 @@ class UserSummary extends React.Component {
 }
 ```
 
-We need here to pass the ID of the clicked entity to the parent of _UserSummary_. One approach, as implemented here, is to create a handler method in _UserSummary_ for the `onClick` event, and have that handler simply invoke the `onClick` prop passed to _UserSummary_, with the ID of the clicked entity as an argument. The convention is to prefix the names of implementations of event handers with the word `handle`, so I have done that here with the `handleClick` method.
+We need here to pass the ID of the clicked entity to the parent of UserSummary. One approach, as implemented here, is to create a handler method in UserSummary for the `onClick` event, and have that handler simply invoke the `onClick` prop passed to UserSummary, with the ID of the clicked entity as an argument. The convention is to prefix the names of implementations of event handers with the word `handle`, so I have done that here with the `handleClick` method.
 
-But notice that the prop for the click event handler that is passed to _UserSummary_ is still named with the `on` prefix. This is because it is a prop not an implementation. This leads to a neat naming symmetry for event handler props, so that regardless of whether you are rendering HTML elements or React components, you are still always passing event hander functions to props named in the same way, with the `on` prefix:
+But notice that the prop for the click event handler that is passed to UserSummary is still named with the `on` prefix. This is because it is a prop not an implementation. This leads to a neat naming symmetry for event handler props, so that regardless of whether you are rendering HTML elements or React components, you are still always passing event hander functions to props named in the same way, with the `on` prefix:
 
 ```jsx
 <button onClick={...} />

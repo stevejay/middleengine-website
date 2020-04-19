@@ -26,13 +26,13 @@ Before adding Good Fences to a React application, I first construct a hierarchy 
 
 ![](/images/2019-10-12-managing-dependencies-in-react-js-apps/dependency-hierarchy-2x.png "An example module hierarchy")
 
-In this approach, a given module can only have dependencies on those modules below it in the hierarchy; it cannot have dependencies on any modules above it or at the same level. Note that the _Shared_ module is for lower-level code that is useful across multiple modules in the application.
+In this approach, a given module can only have dependencies on those modules below it in the hierarchy; it cannot have dependencies on any modules above it or at the same level. Note that the Shared module is for lower-level code that is useful across multiple modules in the application.
 
-The top module in the above hierarchy is _App_, which might actually just be a single component. It is responsible for bringing the whole application to life, so it inevitably has dependencies on all the other modules.
+The top module in the above hierarchy is App, which might actually just be a single component. It is responsible for bringing the whole application to life, so it inevitably has dependencies on all the other modules.
 
-I have added _Header_ and _Footer_ as below _App_ but above _Search_, _Auth_, and _Orders_. This may or may not be true in your application. I find that site headers and footers tend to contain functionality from a number of modules. For example, the header might contain login/logout functionality from the _Auth_ module and a quick search form from the _Search_ module.
+I have added Header and Footer as below App but above Search, Auth, and Orders. This may or may not be true in your application. I find that site headers and footers tend to contain functionality from a number of modules. For example, the header might contain login/logout functionality from the Auth module and a quick search form from the Search module.
 
-Ideally modules should be as self-contained as possible, with only a dependency on the _Shared_ module. In the above hierarchy this is true of the _Search_, _Auth_, and _Orders_ modules. In this way you have less modules to consider when working on one of them, and you know which modules your changes might affect.
+Ideally modules should be as self-contained as possible, with only a dependency on the Shared module. In the above hierarchy this is true of the Search, Auth, and Orders modules. In this way you have less modules to consider when working on one of them, and you know which modules your changes might affect.
 
 At this point, the hierarchy is just informational; Good Fences can be introduced into the application to enforce it.
 

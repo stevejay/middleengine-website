@@ -86,7 +86,7 @@ UserActivity.propTypes = {
 };
 ```
 
-I will also update the _UserActivityList_ component to use this new component:
+I will also update the UserActivityList component to use this new component:
 
 ```jsx
 const UserActivityList = ({ activities }) => {
@@ -106,9 +106,9 @@ const UserActivityList = ({ activities }) => {
 };
 ```
 
-There is something interesting to notice here: the _UserActivity_ component does not include any list-related elements in its markup; it is the _UserActivityList_ component that wraps each activity in a `li` element. In this way it is solely the _UserActivityList_ component that describes the 'list-ness' of the activity list. This maximises the reusability of the _UserActivity_ component&#8212;it can be used to display the details of a user activity anywhere in the app, not just within a list.
+There is something interesting to notice here: the UserActivity component does not include any list-related elements in its markup; it is the UserActivityList component that wraps each activity in a `li` element. In this way it is solely the UserActivityList component that describes the 'list-ness' of the activity list. This maximises the reusability of the UserActivity component&#8212;it can be used to display the details of a user activity anywhere in the app, not just within a list.
 
-In fact, the _UserActivityList_ does not even need to be tied to displaying activities. It could instead be passed as a prop the component to display within each list item:
+In fact, the UserActivityList does not even need to be tied to displaying activities. It could instead be passed as a prop the component to display within each list item:
 
 ```jsx
 const EntityList = ({ entities, entityComponent: EntityComponent }) => {
@@ -166,9 +166,9 @@ EntityList.propTypes = {
 
 Regardless of how this is done, the list component can now display a list of any entity type, just so long as the entity type has an `id` property and so long as the list styling it applies is actually appropriate.
 
-It is your choice whether you use a more generic approach or whether you prefer the more specific _UserActivityList_ component. You might only use a more generic approach when you actually see repetition, using the [rule of three](<https://en.wikipedia.org/wiki/Rule_of_three_(computer_programming)>) as a guide for when to make the change.
+It is your choice whether you use a more generic approach or whether you prefer the more specific UserActivityList component. You might only use a more generic approach when you actually see repetition, using the [rule of three](<https://en.wikipedia.org/wiki/Rule_of_three_(computer_programming)>) as a guide for when to make the change.
 
-An alternative to creating both the _UserActivityList_ and _UserActivity_ components is to create a single component that combines the two:
+An alternative to creating both the UserActivityList and UserActivity components is to create a single component that combines the two:
 
 ```jsx
 const UserActivityList = ({ activities }) => {
@@ -217,7 +217,7 @@ UserSearchForm.propTypes = {
 };
 ```
 
-I am going to use [React Final Form](https://github.com/final-form/react-final-form) to manage the form; it will pass my _UserSearchForm_ component a prop called `handleSubmit`. As for the content of the form, it is up to you if you include the entire markup for the form in the _UserSearchForm_ component or if you create a series of components (e.g., _Button_, _TextInput_, etc). The app you are working on will probably already have a set of shared components for buttons and inputs, either home-grown or as part of a component library, so you would just use those. I am going to keep things simple and include the button and text input in the _UserSearchForm_:
+I am going to use [React Final Form](https://github.com/final-form/react-final-form) to manage the form; it will pass my UserSearchForm component a prop called `handleSubmit`. As for the content of the form, it is up to you if you include the entire markup for the form in the UserSearchForm component or if you create a series of components (e.g., Button, TextInput, etc). The app you are working on will probably already have a set of shared components for buttons and inputs, either home-grown or as part of a component library, so you would just use those. I am going to keep things simple and include the button and text input in the UserSearchForm:
 
 ```jsx
 const UserSearchForm = ({ handleSubmit }) => (
@@ -256,9 +256,9 @@ render() {
 }
 ```
 
-Notice that I have to pass some mock objects into the _UserSearchForm_ and _EntityList_ components (namely, the no-op `handleSubmit` prop and the mock user activities list). I will something about that now, because I am ready to start work on the handler components.
+Notice that I have to pass some mock objects into the UserSearchForm and EntityList components (namely, the no-op `handleSubmit` prop and the mock user activities list). I will something about that now, because I am ready to start work on the handler components.
 
-I need a handler component that runs the _UserSearchForm_ component. My hypothetical app uses [Redux](https://redux.js.org/) for state management and implements a `searchForUserActivity` [thunk](https://github.com/reduxjs/redux-thunk) to query the server for a given user's recent activity:
+I need a handler component that runs the UserSearchForm component. My hypothetical app uses [Redux](https://redux.js.org/) for state management and implements a `searchForUserActivity` [thunk](https://github.com/reduxjs/redux-thunk) to query the server for a given user's recent activity:
 
 ```jsx
 class UserSearchFormHandler extends React.Component {
@@ -292,7 +292,7 @@ render() {
 }
 ```
 
-An alternative to creating a _UserSearchFormHandler_ would be to mutate the _UserSearchForm_ component to incorporate the handler component's code. This is a valid approach but I prefer to separate these concerns in my apps.
+An alternative to creating a UserSearchFormHandler would be to mutate the UserSearchForm component to incorporate the handler component's code. This is a valid approach but I prefer to separate these concerns in my apps.
 
 Now I can implement the handler component for the entity list:
 
@@ -308,9 +308,9 @@ export default connect((state) => ({ entities: state.userActivity.results }))(
 );
 ```
 
-This handler component has a single job: to handle connecting to Redux so that I can access the user activity data returned by the server. Notice that both the handler components (this one and _UserSearchFormHandler_) do not include any HTML markup in their render methods. They only return presentation components, and it is only the presentation components that include HTML markup.
+This handler component has a single job: to handle connecting to Redux so that I can access the user activity data returned by the server. Notice that both the handler components (this one and UserSearchFormHandler) do not include any HTML markup in their render methods. They only return presentation components, and it is only the presentation components that include HTML markup.
 
-Again, I have to update the page component to use the _EntityListHandler_:
+Again, I have to update the page component to use the EntityListHandler:
 
 ```jsx
 render() {

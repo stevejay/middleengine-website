@@ -119,7 +119,7 @@ const VisuallyHidden = styled.span`
 
 To increase the specificity of the rule, I opted to use multiple ampersands rather than `!important`. This is a technique suggested in the Styled Components [documentation](https://www.styled-components.com/docs/faqs#how-can-i-override-styles-with-higher-specificity). You can adjust the specificity as you please; you might find that you require no additional specificity.
 
-I then used this _VisuallyHidden_ component to create a `SkipLink` component. First I created a styled component for the visual appearance of the skip link:
+I then used this VisuallyHidden component to create a `SkipLink` component. First I created a styled component for the visual appearance of the skip link:
 
 ```js
 const SkipLinkButton = styled.button`
@@ -137,7 +137,7 @@ const SkipLinkButton = styled.button`
 `;
 ```
 
-As you can see, I decided to implement it as a button that is positioned absolutely. I then used this styled button and the _VisuallyHidden_ component to create the final skip link component:
+As you can see, I decided to implement it as a button that is positioned absolutely. I then used this styled button and the VisuallyHidden component to create the final skip link component:
 
 ```js
 const SkipLink = ({ skipRef, children }) => {
@@ -153,6 +153,6 @@ const SkipLink = ({ skipRef, children }) => {
 };
 ```
 
-I set the _SkipLinkButton_ as the `as` [polymorphic prop](https://www.styled-components.com/docs/api#as-polymorphic-prop) of the _VisuallyHidden_ component, which changes the underlying DOM element of the latter to a `button`.
+I set the SkipLinkButton as the `as` [polymorphic prop](https://www.styled-components.com/docs/api#as-polymorphic-prop) of the VisuallyHidden component, which changes the underlying DOM element of the latter to a `button`.
 
 Implementing a robust mechanism to skip to the target element is not straightforward. Often the target element is a non-focusable element like `h1`, `main`, `div` or `footer`, and a11y requirements and browser differences complicate the matter. There is an [excellent post by Axess Lab](https://axesslab.com/skip-links/) which describes the problems that can occur with the naive solution and how it can be fixed. In particular, I found the 'Update 3 - A comment from gov.uk' addition very useful. You can see the complete source code for my skip links solution in [this repository](https://github.com/stevejay/react-performance). It takes the approach of&#8212;if required&#8212;setting a `tabindex` value of `-1` on the target element before invoking `focus` and `scrollIntoView` on it, before removing the `tabindex` value on blur.
