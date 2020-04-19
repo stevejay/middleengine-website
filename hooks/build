@@ -6,5 +6,5 @@
 # and are available during automated builds, automated tests,
 # and while executing hooks.
 # https://docs.docker.com/docker-hub/builds/advanced/
-docker build -t $IMAGE_NAME .
+docker build -t $IMAGE_NAME --build-arg UNSPLASH_APP_NAME=$UNSPLASH_APP_NAME --build-arg UNSPLASH_APP_ACCESS_KEY=$UNSPLASH_APP_ACCESS_KEY --build-arg UNSPLASH_APP_SECRET_KEY=$UNSPLASH_APP_SECRET_KEY .
 exit
