@@ -73,7 +73,7 @@ Cons:
 - It requires developers maintaining this solution to understand that the `id` prop on each section cannot be removed, despite it not being obvious in the _Section_ component why this prop is required.
 - The _Section_ component is not in control of how it is scrolled to.
 
-## Using State
+## Using state
 
 If you want to implement a React-based solution to this scrolling sections problem, you would probably think about using state. It might work something like this:
 
@@ -143,7 +143,7 @@ Cons:
 
 - Having to immediately reset the `scrollSectionId` state variable to `null` after it has been set to a non-`null` value is inefficient&#8212;it results in another render of the parent and its children straight after the render for the initial click state change.
 
-## Using Counters
+## Using counters
 
 This is a solution mentioned by one of the contributors to [the GitHub issue](https://github.com/facebook/react/issues/6646) linked to earlier in this post. It follows on from the above 'Using State' approach. Basically I create a counter state variable for each section, and when a user clicks on a section button I increment the counter value for the clicked section. This deals with the issue of supporting successive clicks on the same section button.
 
@@ -214,7 +214,7 @@ Cons:
 - It is quite a lot of code.
 - It is harder to understand than previous solutions, since it involves the unintuitive behaviour of using a counter to trigger a side-effect in the application.
 
-## Using a State Object
+## Using a state object
 
 The 'Using State' solution had the problem of requiring a state change directly after scrolling (to clear the `scrollSectionId` state) in order for the user to be able to click multiple times in succession on a particular section button. But this problem can be avoided if `scrollSectionId` is not a number or string but is instead an object, one that has a property of the section ID to scroll to:
 
@@ -278,7 +278,7 @@ Cons:
 
 - It requires developers maintaining this solution to understand that `scrollState` has to be an object containing the section ID and cannot be changed to be just the ID itself.
 
-## Using Refs
+## Using refs
 
 This solution is likely the most commonly implemented of the React-based solutions. I keep a map of section IDs to section `ref`s, and when the user clicks on a section button, I get the section `ref` corresponding to the ID of the clicked section, and then I invoke an imperative function that the ref exposes to scroll to that `ref`'s section. Essentially `ref`s are used to allow one component to synchronously invoke a function on another component.
 
