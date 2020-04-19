@@ -13,11 +13,11 @@ heroImage:
 
 The rise and rise of cloud computing services has made it easy for developers to experiment with various enterprise deployment techniques. One of those techniques is [blue-green deployment][1], which involves provisioning two production environments and then toggling between them when deploying a new version of the system. The new code is first deployed to the staging environment, validated, and then that environment is made live, with the previously live environment becoming the new staging environment. Advantages include zero downtime when deploying and the ability to easily roll back a release. This post details how I implemented blue-green deployment in [Amazon Web Services][2] (AWS).
 
-## The Website
+## The Web site
 
 I implemented blue-green deployment for a theoretical Web site called _londontamed.com_. The site has two server-side components: the Web site itself and a Web service. Both components get deployed together on a Web server, with a production environment consisting of multiple instances of these Web servers. The database for the system is shared between the live and staging production environments. There is nothing of note about the site itself, rather I focused on creating a realistic build and deployment process.
 
-## The Basic Components
+## The basic components
 
 As stated in the introduction, blue-green deployment requires two production environments. I implemented each in AWS as an [autoscaling group][4] with an appropriate [launch configuration][5] The autoscaling group handles creating and then maintaining the desired number of Web server instances, with the associated launch configuration determining the [Amazon Machine Image][6] (AMI) to use when launching new instances in the group. I used the [immutable server][7] pattern, so that when deploying a new version of the site the existing instances get discarded rather than being updated.
 
@@ -25,7 +25,7 @@ I used [packer.io][8] to create the AMIs. I first created a generic AMI with [ng
 
 I used [Elastic Load Balancing][9] (ELB) to route traffic to the instances in an environment. There are two load balancers, one for each of the two production environments (live and staging). I used [alias records][10] in [Route 53][11] to route traffic to a particular load balancer. So, for a request to the Web service or the Web site, it gets routed by Route 53 to the appropriate load balancer, which in turn forwards the request to one of the instances in the autoscaling group it balances the load for. I also made use of [SSL termination][14] in the load balancers to simplify the setup of the instances, since they then only need to handle HTTP traffic.
 
-## Security Setup
+## Security setup
 
 I created a private [Virtual Private Cloud][12] (VPC) for the site, rather than using the default VPC:
 
@@ -58,7 +58,7 @@ The HTTP rule needs to be for all sources, so _0.0.0.0/0_. The other rules shoul
 
 Finally, I created an [Identity and Access Management][15] (IAM) role called _webserver_ with the _AmazonEC2FullAccess_ managed policy, and I created a key pair in EC2 called _londontamed-com-production_.
 
-## Setting Up Load Balancing
+## Setting up load balancing
 
 I used the EC2 Dashboard to create two load balancers. The name of the first load balancer is _londontamed-com-production-1_ and the security group is _londontamed-com-production_:
 
@@ -66,7 +66,7 @@ I used the EC2 Dashboard to create two load balancers. The name of the first loa
 
 By default the load balancer gets configured with the HTTP protocol. You can add HTTPS as well if you supply an SSL certificate. The HTTPS protocol is configured by default to forward to port 80 (i.e., it implements [SSL termination][14]).
 
-## Setting Up Route 53
+## Setting up Route 53
 
 As mentioned in the introduction, the site is called _londontamed.com_. On the live environment, the Web site is accessible as _www.londontamed.com_ and the Web service is accessible as _api.londontamed.com_. On the staging environment, the equivalent domain names are _www-staging.londontamed.com_ and _api-staging.londontamed.com_.
 
@@ -80,7 +80,7 @@ Note that the alias target dropdown does not have any useful entries in it when 
 
 While I set this up so that the public hosted zone points to the first load balancer and the private hosted zone to the second load balancer, this is just the initial order. The load balancer that the record sets for each zone point to will swap over each time you go through the deployment process.
 
-## Deploying to the Staging Environment
+## Deploying to the Staging environment
 
 The setup is now complete, so lets start deploying some code the blue-green way! I decided that I needed three distinct steps to the deployment process:
 
@@ -104,21 +104,21 @@ This script is called _switch-live-and-staging.py_. It is run once you are happy
 
 This script is called _clean-staging.py_. It can be run once the new code is live and you are happy with the result. It deletes the launch configuration and the autoscaling group that is associated with the staging environment. It checks that both are not in use elsewhere in your AWS account. It is not necessary to run this script, but doing so means that you will have no unnecessary instances running and costing you money.
 
-## Alternative Approaches to Blue-Green Deployment
+## Alternative approaches to blue-green deployment
 
 There are a few different ways to implement blue-green deployment in AWS.
 
-### Alias Record Updating
+### Alias record updating
 
 In this post, I have taken the approach of creating a new autoscaling group for the new code, associating the staging load balancer with it and then, when all instances in the group are ready and healthy, I alter the appropriate alias records in Route 53 to make it the new live environment.
 
 I like this approach because, once the autoscaling group is up and running and the appropriate load balancer has been changed to point to it, you do not touch the group or the load balancer again; the switch to live happens within a different AWS system. This seems to me to be a very robust approach. A downside is that which load balancer is live and which is staging changes on each deployment, so it is possible that a mistake could be made and the wrong environment altered at some point. I deal with this in the scripts I created by validating the state of the AWS system at each stage in the deployment process.
 
-### Autoscaling Group Switching
+### Autoscaling group switching
 
 An alternative approach is to have a live load balancer and a staging load balancer, and switch the new and existing autoscaling groups between them when you wish to make the new code live.
 
-### Autoscaling Group Updating
+### Autoscaling group updating
 
 Yet another approach is to alter the existing autoscaling groups, rather than creating new ones. In this way there is a live autoscaling group which is always handled by the live load balancer, and a staging autoscaling group which is always handled by the staging load balancer. Deployment works as follows: first the IDs of the existing instances in the staging group are noted and the launch configuration for this group is changed to the new launch configuration. Those existing instances are then terminated one by one, with the changed launch configuration meaning that the new instances that get created in order to maintain the desired number of servers in the group are instances with the new code. The process is repeated on the live environment once the new code is validated on the staging environment.
 

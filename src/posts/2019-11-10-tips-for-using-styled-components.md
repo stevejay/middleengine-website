@@ -54,7 +54,7 @@ declare module "styled-components" {
 
 This works because TypeScript [merges interfaces](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces) that have the same identifier and are in the same namespace.
 
-## CSS as a JavaScript Object
+## CSS as a JavaScript object
 
 If you create a simple styled component with only static CSS then the result is compact and readable:
 
@@ -99,7 +99,7 @@ const StyledExample = styled.div(
 
 You might find this version easier to read. The technique is mentioned in the Styled Components documentation in the section on [writing CSS as JavaScript objects instead of strings](https://www.styled-components.com/docs/advanced#style-objects). Note that the `css` function is not required in the above example. It is being used here to trigger highlighting of the enclosed CSS when using the [vscode-styled-components extension](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components) in Visual Studio Code.
 
-## Helper Libraries
+## Helper libraries
 
 If you are writing styled components from scratch then, rather than using some components library that is build using Styled Components, I suggest you also use either [Styled System](https://styled-system.com/theme-specification) or [XStyled System](https://www.smooth-code.com/open-source/xstyled/docs/theme-specification/). Both have the same basic benefits:
 
@@ -111,7 +111,7 @@ The reason two libraries exist for this purpose rather than just one is summaris
 
 Regarding TypeScript, Styled System and XStyled System have declarations in the [Definitely Typed](https://github.com/DefinitelyTyped/DefinitelyTyped) repository
 
-## Using Helper Libraries To Add Style Properties
+## Using helper libraries To add style properties
 
 Sometimes you want a styled component to be configurable via props. For example, you might want to create a generalized `Box` flexbox component that supports props for various flexbox, background, and spacing CSS properties. You could of course opt to do this manually:
 
@@ -261,7 +261,7 @@ const SomeComponent = () => {
 };
 ```
 
-## Custom Style Properties in Helper Libraries
+## Custom style properties in helper libraries
 
 In the previous section, I created a `Stack` component with a single `marginTop` prop. I might prefer to give that prop a different name, one that better reflects what it represents. For example, I might want to name the prop `verticalSpacing`.
 
@@ -299,7 +299,7 @@ export type VerticalSpacingProp = {
 };
 ```
 
-## Using Helper Libraries To Access Theme Values
+## Using helper libraries to access theme values
 
 XStyled System includes getter functions for each type of theme prop. You can use them to rewrite the example styled component from the 'CSS as a JavaScript Object' section:
 

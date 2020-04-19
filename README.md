@@ -10,7 +10,7 @@ The following software needs to be installed on your development computer:
 
 You also need an account at Docker Hub. This is the service that will build the deployed Docker images.
 
-## Local Development
+## Local development
 
 Run two console windows:
 
@@ -31,7 +31,7 @@ The deployed Web site is an `nginx` Docker image to which is added the Web site 
 - `docker-compose.test.yml` - invoked automatically by Docker Hub to test each Web site Docker image file that it builds.
 - `test.sh` - the test script that is invoked by the `docker-compose.test.yml` file.
 
-### The Nginx Configuration Files
+### The Nginx configuration files
 
 The Docker image is to be run on TCP port 80 only. It is assumed that this image will be accessed via an SSL-terminating reverse proxy server.
 
@@ -39,7 +39,7 @@ The configuration file `nginx.conf` is a basic `nginx` server configuration. The
 
 The configuration file `conf.d/default.conf` is the configuration for the web site. It is commented.
 
-### The Docker Image
+### The Docker image
 
 #### Files
 
@@ -49,11 +49,11 @@ The files in the created Docker image are located as follows:
 - The `nginx` files - `/etc/nginx`
 - The test script - `/app/test.sh`
 
-### Building the Docker Image
+### Building the Docker image
 
 The image is build automatically in Docker Hub when pushing to this repository's `master` branch. If the test script in that resulting image runs successfully then the image is added to Docker Hub with the tag `latest`.
 
-#### Building and Running Locally
+#### Building and running locally
 
 If you want to test building and running the image locally, then run the following commands from the project root:
 

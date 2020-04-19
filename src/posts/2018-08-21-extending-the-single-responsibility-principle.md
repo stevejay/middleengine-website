@@ -21,7 +21,7 @@ If you are a software developer then you will have heard of the [SOLID principle
 
 Some of the principles, like the Liskov substitution principle, apply specifically to OOP, although others apply more broadly. For example, when I code React single page applications I normally include relatively few uses of OOP structures and techniques (classes, inheritance, etc.), but I do make broad use of the single responsibility principle. In particular, it is a refinement of the single responsibility principle that I find incredibly useful, and it is what I am posting about today.
 
-## Algorithm or Coordinator
+## Algorithm or coordinator
 
 A while ago I read [a post by John Sonmez](https://simpleprogrammer.com/there-are-only-two-roles-of-code/) about how units of code can be classified into one of two roles&#8212;algorithm or coordinator&#8212;and how the quality and testability of your code can be improved by keeping those two roles apart. I think of this as a refinement of the single responsibility principle, that a particular single responsibility has a basic role classification of algorithm or coordinator.
 
@@ -99,7 +99,7 @@ describe("tag graphql querying", () => {
 })
 ```
 
-## The Front-End Connection
+## The front-end connection
 
 After reading the post about this algorithm/coordinator role classification and having used it to improve my back-end coding and testing, I wondered how this would apply to the React front-end code I was writing. I realised that there was a similarity between the aforementioned post by John Sonmez and [a post by Dan Abramov](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0), which details a different but similar division of responsibility in React apps. Dan's basic premise is that a React component often either defines the visual appearance of some part of the screen (termed presentation components by Dan), or defines how some part of the screen behaves and/or how it connects to a data source (termed container components by Dan). Note that Dan's post was about an observation rather than a rule, as [he laments](https://twitter.com/dan_abramov/status/802569801906475008).
 
