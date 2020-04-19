@@ -16,6 +16,7 @@
   --color-neutral-600: #757575;
   --color-neutral-700: #616161;
   --color-neutral-800: #424242;
+  --color-neutral-850: #2e2e2e;
   --color-neutral-900: #212121;
   --color-black: #000000;
 
@@ -629,7 +630,10 @@ body > footer li a {
   padding: var(--space-4);
   font-size: var(--font-size-1);
   color: var(--color-white);
-  background-image: linear-gradient(#2e2e2eff 0%, #000000ff 100%);
+  background-image: linear-gradient(
+    var(--color-neutral-850) 0%,
+    var(--color-black) 100%
+  );
 }
 
 .show-cookie-banner #cookie-banner {
@@ -790,7 +794,10 @@ figure.hero:before {
   left: 0;
   bottom: 0;
   right: 0;
-  background-image: linear-gradient(#76624244 0%, #000000ff 100%);
+  background-image: linear-gradient(
+    var(--color-white) 0%,
+    var(--color-black) 100%
+  );
 }
 
 figure.hero .hero-img-wrap {
@@ -958,7 +965,10 @@ body.index header.hero h1 strong {
   justify-content: space-around;
   align-items: center;
   border-radius: var(--radius-2);
-  background-image: linear-gradient(#2e2e2eff 0%, #000000ff 100%);
+  background-image: linear-gradient(
+    var(--color-neutral-850) 0%,
+    var(--color-black) 100%
+  );
 }
 
 #services-section li:before {
