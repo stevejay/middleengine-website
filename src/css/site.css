@@ -456,6 +456,7 @@ body > header {
   max-width: var(--width-main);
   margin-left: auto;
   margin-right: auto;
+  background-color: var(--color-black);
 }
 
 body > header h2 {
@@ -551,6 +552,7 @@ body > footer {
   max-width: var(--width-main);
   margin-left: auto;
   margin-right: auto;
+  background-color: var(--color-black);
 }
 
 body > footer :first-child {
@@ -965,6 +967,7 @@ body.index header.hero h1 strong {
   justify-content: space-around;
   align-items: center;
   border-radius: var(--radius-2);
+  background-color: var(--color-black);
   background-image: linear-gradient(
     var(--color-neutral-850) 0%,
     var(--color-black) 100%
