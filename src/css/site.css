@@ -635,6 +635,7 @@ body > footer li a {
 }
 
 #cookie-banner button {
+  color: var(--color-white);
   background-color: var(--color-secondary);
   line-height: 1;
   border: none;
