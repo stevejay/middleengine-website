@@ -191,18 +191,12 @@ const processIndexHtmlFile = async (postsData, globalContext) => {
     }
   );
 
-  const sortedPostsData = _.orderBy(
-    postsData,
-    ["meta.date", "meta.title"],
-    ["desc", "asc"]
-  );
-
   const template = Handlebars.compile(layoutContent);
   const context = {
     ...globalContext,
     title: "Home",
-    latestPosts: sortedPostsData.slice(0, 6),
-    olderPosts: sortedPostsData.slice(6),
+    latestPosts: postsData.slice(0, 6),
+    olderPosts: postsData.slice(6),
   };
   const options = { data: { intl: handlebarsIntlData } };
   const html = template(context, options);
@@ -220,18 +214,12 @@ const processBlogFile = async (postsData, globalContext) => {
     }
   );
 
-  const sortedPostsData = _.orderBy(
-    postsData,
-    ["meta.date", "meta.title"],
-    ["desc", "asc"]
-  );
-
   const template = Handlebars.compile(layoutContent);
   const context = {
     ...globalContext,
     title: "Blog",
-    latestPosts: sortedPostsData.slice(0, 6),
-    olderPosts: sortedPostsData.slice(6),
+    latestPosts: postsData.slice(0, 6),
+    olderPosts: postsData.slice(6),
   };
   const options = { data: { intl: handlebarsIntlData } };
   const html = template(context, options);
@@ -242,15 +230,9 @@ const processBlogFile = async (postsData, globalContext) => {
 };
 
 const createSitemapFile = async (postsData) => {
-  const sortedPostsData = _.orderBy(
-    postsData,
-    ["meta.date", "meta.title"],
-    ["desc", "asc"]
-  );
-
   const sitemapEntries = [`${DOMAIN}/`, `${DOMAIN}/blog`];
 
-  sortedPostsData.forEach((postData) => {
+  postsData.forEach((postData) => {
     sitemapEntries.push(`${DOMAIN}${postData.absPath}`);
   });
 
@@ -399,11 +381,16 @@ const generateDynamicFiles = async (staticFiles) => {
     postFiles.map((postFile) => processPostFile(postFile, globalContext))
   );
 
-  await processIndexHtmlFile(postsData, globalContext);
-  await processBlogFile(postsData, globalContext);
+  const publishedPostsData = _.chain(postsData)
+    .filter((postData) => !postData.meta.draft)
+    .orderBy(["meta.date", "meta.title"], ["desc", "asc"])
+    .value();
+
+  await processIndexHtmlFile(publishedPostsData, globalContext);
+  await processBlogFile(publishedPostsData, globalContext);
   await processLegalFile(globalContext);
   await processPrivacyFile(globalContext);
-  await createSitemapFile(postsData);
+  await createSitemapFile(publishedPostsData);
 };
 
 // MAIN ENTRY POINT:
