@@ -167,9 +167,6 @@ const processPostFile = async (postFile, globalContext) => {
   }
 
   const buildPostDir = createPostDirectoryPath(md.meta.date);
-
-  console.log("buildPostDir", buildPostDir);
-
   await ensureDir(path.join(POSTS_BUILD_DIR, buildPostDir));
 
   const buildPostName = srcPathParts.groups.name;
