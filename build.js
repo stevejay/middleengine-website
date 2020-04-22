@@ -166,7 +166,10 @@ const processPostFile = async (postFile, globalContext) => {
     );
   }
 
-  const buildPostDir = `${srcPathParts.groups.year}/${srcPathParts.groups.month}/${srcPathParts.groups.day}`;
+  const buildPostDir = createPostDirectoryPath(md.meta.date);
+
+  console.log("buildPostDir", buildPostDir);
+
   await ensureDir(path.join(POSTS_BUILD_DIR, buildPostDir));
 
   const buildPostName = srcPathParts.groups.name;
@@ -182,6 +185,13 @@ const processPostFile = async (postFile, globalContext) => {
     meta: md.meta,
   };
 };
+
+const createPostDirectoryPath = (postDate) =>
+  `${postDate.getUTCFullYear()}/${_.padStart(
+    postDate.getUTCMonth() + 1,
+    2,
+    "0"
+  )}/${_.padStart(postDate.getUTCDate(), 2, "0")}`;
 
 const processIndexHtmlFile = async (postsData, globalContext) => {
   const layoutContent = await readFile(
