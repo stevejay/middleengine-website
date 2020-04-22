@@ -21,7 +21,7 @@ In my opinion, a successful code review:
 - Is performed by one developer working preferably for a maximum of one hour on the task.
 - Consists of feedback that is constructive and considerate.
 
-The following sections expand on each of these points.
+The following sections expand on each of these points. In particular, the advice is driven by how code reviews were organized in the most recent role I worked, an approach that I found sensible and highly effective.
 
 ## Submitter assistance
 
