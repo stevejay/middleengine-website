@@ -28,7 +28,7 @@ const writeFile = util.promisify(fs.writeFile);
 const copyFile = util.promisify(fs.copyFile);
 const copy = util.promisify(fs.copy);
 
-const DOMAIN = "https://middle-engine.com";
+const DOMAIN = "https://www.middle-engine.com";
 const BUILD_DIR = "./build";
 const CSS_BUILD_DIR = path.join(BUILD_DIR, "css");
 const JS_BUILD_DIR = path.join(BUILD_DIR, "js");
