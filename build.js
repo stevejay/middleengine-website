@@ -177,10 +177,12 @@ const processPostFile = async (postFile, globalContext) => {
   );
   await writeFile(filePath, html, { encoding: "utf-8" });
 
-  return {
-    absPath: `/blog/posts/${buildPostDir}/${buildPostName}`,
-    meta: md.meta,
-  };
+  const absPath = `/blog/posts/${buildPostDir}/${buildPostName}`;
+  if (md.meta.draft) {
+    console.log(absPath);
+  }
+
+  return { absPath, meta: md.meta };
 };
 
 const createPostDirectoryPath = (postDate) =>
