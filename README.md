@@ -67,7 +67,8 @@ You should now be able to access the Web site using the URL `http://localhost/`.
 - For favicon generation: [Favicon Converter](https://favicon.io/favicon-converter/).
 - For images: [Unsplash](https://unsplash.com/).
 - For broken links: [DrLinkCheck](https://www.drlinkcheck.com/).
-- For SVG optimisation: [SVGOMG](https://jakearchibald.github.io/svgomg/)
+- For SVG optimisation: [SVGOMG](https://jakearchibald.github.io/svgomg/).
+- For site monitoring: [Uptime Robot](https://uptimerobot.com/).
 
 ## File versioning
 
