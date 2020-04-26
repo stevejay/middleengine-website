@@ -9,7 +9,6 @@ author:
 heroImage:
   source: Unsplash
   id: 842ofHC6MaI
-draft: true
 ---
 
 Like many developers, I use [Git](https://git-scm.com/) for source control. Normally I use a short-lived branch for each feature I code, branching it off of the _master_ branch and rebasing it as required, but sometimes I have to branch off of a branch, and in this situation rebasing can be problematic. One solution is to use the --onto option when rebasing, and this post details how the process works.
@@ -46,7 +45,7 @@ Now I want to continue working on _branch-b_, but I want to be working on top of
 
 The rebase affects all of commits B, C, D and E, even though I am actually only interested in commits D and E. Depending on the exact changes involved, this can result in a very confusing rebase. There can be merge conflicts between the original commits on _branch-a_ (commits B and C) and the final combined commit on _master_, and there can be no-op commits when the changes in an original commit match those already on _master_. In the latter case, you will see the message "_No changes - did you forget to use 'git add'?_".
 
-One answer is to use the --onto option with `git rebase` as [documented here](https://git-scm.com/docs/git-rebase). This allows you to specify a particular range of commits to rebase; no other commits get included in the rebase. You need to specify both the branch to rebase onto and the range of commits to rebase. There are multiple ways to specify that range, but I find the simplest is the `HEAD~x` syntax, where `x` is the number of commits to count back from the head commit. (The head commit is the most recent commit on the current branch, and `HEAD` is Git's reference for that particular commit.) With this syntax, you specify the first commit you do **not** want to be included in the rebase. So to only include the most recent commit you would specify `HEAD~1`, and to include the most recent two commits you would specify `HEAD~2`. In the example in this post, I enter the following commands in turn:
+One answer is to use the --onto option with Git rebase [as documented here](https://git-scm.com/docs/git-rebase). This allows you to specify a particular range of commits to rebase; no other commits get included in the rebase. You need to specify both the branch to rebase onto and the range of commits to rebase. There are multiple ways to specify that range, but I find the simplest is the `HEAD~x` syntax, where `x` is the number of commits to count back from the head commit. (The head commit is the most recent commit on the current branch, and `HEAD` is Git's shorthand reference for that particular commit.) With this syntax, you specify the first commit you do **not** want to be included in the rebase. So to only include the most recent commit you would specify `HEAD~1`, and to include the most recent two commits you would specify `HEAD~2`. In the example for this post, I enter the following commands in turn:
 
 ```
 # Check out the branch to be rebased (branch-b):
@@ -54,6 +53,9 @@ git checkout branch-b
 
 # Rebase the desired range of commits:
 git rebase --onto master HEAD~2
+
+# Check things look right:
+git log --oneline --graph --decorate
 
 # Force push the rebased branch-b to the origin repo:
 git push --force-with-lease origin HEAD

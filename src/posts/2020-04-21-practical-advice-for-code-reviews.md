@@ -9,7 +9,6 @@ author:
 heroImage:
   source: Unsplash
   id: Lks7vei-eAg
-draft: true
 ---
 
 The code review is a necessary step in the software development process. Code written by a developer or developer pair is submitted as a pull request for review by a peer in order to catch errors and omissions, for change suggestions, and to disseminate system and programming knowledge. Thus the team collectively enhance themselves and the code base that they work on.
