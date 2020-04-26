@@ -63,3 +63,61 @@ td:before {
 ```
 
 Support for the attr function [is good](https://caniuse.com/#feat=css-gencontent), but only when used within the `content` property of a pseudo element, so this function is not widely usable with other properties. Also, this particular table styling has the downside that the width of the pseudo element cannot be dynamically set; it has to be hard-coded to a value greater than or equal to the width of the longest column header text.
+
+## The owl selector
+
+By default, Web browsers style many elements with default top and bottom margins. This works very well when rendering prose, for example a blog post or a news article. With such content, the page consists of a sequence of headings, paragraphs, block quotes, lists, etc. Each of these elements has predetermined vertical margin values, and the vertical margins collapse, so that regardless of the order that the different elements occur in, there is always the correct amount of vertical margin between them. The result is the application of an automatic rhythm to the vertical spacing of the page's elements. The blog post you are currently reading uses this approach to vertical margins (although the exact margin top and bottom values for each element type have been set to custom values, rather than relying on the browser defaults).
+
+While this works well for prose, it does not work so well for content in other forms, such as summary information in the form of a collection of cards. An example of this is the list of posts on the [blog page](/blog) of the Web site you are reading now. The listing is styled as a grid of cards, one for each post, where each includes the post's title, author, date, and a summary sentence. Here is a screen shot of one such card:
+
+![](/images/2020-04-21-useful-css-features/card-2x.png "A post summary card")
+
+The card HTML mark-up is basically this:
+
+```html
+<li class="card">
+  <h3>...</h3>
+  <div class="byline">...</div>
+  <p>...</p>
+  <a>...</a>
+</li>
+```
+
+If the card styling relied on the default vertical margins for the elements that form each card, the vertical spacing between elements would be too great:
+
+![](/images/2020-04-21-useful-css-features/card-default-2x.png "A post summary card with default margins")
+
+What is likely required for a card is a particular vertical margin value between each child element of the card. This can be achieved in two stages:
+
+1. Remove the default vertical margins on each card's child elements.
+2. Add the same vertical margin value between each card's child elements.
+
+The first stage can be implemented as follows:
+
+```css
+.card > * {
+  margin: 0;
+}
+```
+
+This CSS rule states: "for every direct descendent of elements with the `.card` class, set all its margin values to zero".
+
+For the second stage, we want a CSS rule that only applies vertical margin between adjacent child elements of the card, not also before the first child or after the last child. An elegant way to achieve this is to use the owl selector (a.k.a. lobotomised owl selector), which is `* + *`. This selector selects an element only if it has a prior sibling element. The rule to use in this card example is the following:
+
+```css
+.card > * + * {
+  margin-top: 8px;
+}
+```
+
+This rule states "for every direct descendent of elements with the `.card` class that also have a prior sibling element, set its margin top value to 8 pixels". Notice that the first child element will _not_ get the margin top value applied to it, since it is has no prior sibling. An alternative to using the owl selector is the following, but it requires two rules:
+
+```css
+.card > * {
+  margin-top: 8px;
+}
+
+.card > :first-child {
+  margin-top: 0;
+}
+```
