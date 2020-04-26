@@ -315,6 +315,7 @@ blockquote p {
   font-size: var(--font-size-1);
   font-weight: var(--font-weight-heading-regular);
   text-transform: uppercase;
+  line-height: 1;
 }
 
 .byline {
@@ -1095,14 +1096,17 @@ body.index header.hero h1 strong {
   padding: var(--space-5) var(--space-3) var(--space-6);
 }
 
-#blog-posts-listing h1,
-#blog-posts-listing h2,
-#blog-posts-listing h3,
-#blog-posts-listing p,
-#blog-posts-listing ul,
-#blog-posts-listing li {
-  margin-top: 0;
-  margin-bottom: 0;
+/* Override vertical margins */
+
+#blog-posts-listing li > *,
+#blog-posts-listing header > *,
+#blog-posts-listing > * {
+  margin: 0;
+}
+
+#blog-posts-listing li > * + *,
+#blog-posts-listing header > * + * {
+  margin-top: var(--space-3);
 }
 
 #blog-posts-listing header {
@@ -1111,10 +1115,6 @@ body.index header.hero h1 strong {
   align-items: center;
   text-align: center;
   margin-bottom: var(--space-6);
-}
-
-#blog-posts-listing header > * + * {
-  margin-top: var(--space-3);
 }
 
 #blog-posts-listing h1:before,
@@ -1158,10 +1158,6 @@ body.index header.hero h1 strong {
 #blog-posts-listing li {
   border-top: var(--width-hair) solid var(--color-neutral-300);
   padding-top: var(--space-3);
-}
-
-#blog-posts-listing li > * + * {
-  margin-top: var(--space-3);
 }
 
 #blog-posts-listing h3 a {
