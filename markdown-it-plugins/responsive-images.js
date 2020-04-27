@@ -6,18 +6,21 @@ const localImageRegExp = /^\/images\//;
 const pixelDensityRegExp = /-(\d)x\.[^.]+$/;
 
 /*
-This markdown-it plugin generates HTML for image elements in the markdown
-that:
+POST IMAGES plug-in
+
+This markdown-it plug-in generates custom HTML for images in the markdown file.
+
+The plug-in:
 - Wraps the image in a figure element.
 - Wraps the image title in a figcaption element.
 - Generates a responsive image wrapper around the image (one that uses
-    the percentage vertical padding technique).
+    the percentage padding-bottom technique).
 */
 
 const postImages = (md, opts) => {
   opts = Object.assign({}, postImages.defaults, opts);
 
-  // Remember old renderer, if overridden, or proxy to default renderer
+  // Remember the old renderer, if overridden, or proxy to the default renderer
   const defaultRender =
     md.renderer.rules.image ||
     ((tokens, idx, options, env, self) =>
@@ -26,8 +29,9 @@ const postImages = (md, opts) => {
   md.renderer.rules.image = (tokens, idx, options, env, self) => {
     const imageToken = tokens[idx];
     const srcAttrIndex = imageToken.attrIndex("src");
+    const hasSrcAttr = srcAttrIndex !== -1;
 
-    if (srcAttrIndex === -1) {
+    if (!hasSrcAttr) {
       return defaultRender(tokens, idx, options, env, self);
     }
 
@@ -41,6 +45,7 @@ const postImages = (md, opts) => {
     const titleAttrIndex = imageToken.attrIndex("title");
     const title =
       titleAttrIndex > -1 ? imageToken.attrs[titleAttrIndex][1] : null;
+
     const alt = imageToken.content || "";
 
     const imagePath = path.join(opts.imageRootPath, src);
@@ -69,7 +74,7 @@ const postImages = (md, opts) => {
 
 postImages.defaults = {
   level: 1,
-  imageRootPath: "./src"
+  imageRootPath: "./src",
 };
 
 export default postImages;

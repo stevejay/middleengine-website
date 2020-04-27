@@ -17,7 +17,7 @@
     "fs-extra": "^9.0.0",
     "handlebars": "^4.7.6",
     "handlebars-intl": "^1.1.2",
-    "highlight.js": "^9.18.1",
+    "highlight.js": "^10.0.1",
     "local-web-server": "^4.0.0",
     "lodash": "^4.17.15",
     "markdown-it": "^10.0.0",

@@ -15,7 +15,7 @@ import Unsplash from "unsplash-js";
 import revisionHash from "rev-hash";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
-import postImages from "./markdown-it-plugins/post-images.js";
+import responsiveImages from "./markdown-it-plugins/responsive-images.js";
 
 global.fetch = fetch;
 dotenv.config();
@@ -129,7 +129,7 @@ const processPostFile = async (postFile, globalContext) => {
       permalinkBefore: true,
     })
     .use(attribution, { removeMarker: false })
-    .use(postImages)
+    .use(responsiveImages)
     .use(multimdTable, {
       multiline: false,
       rowspan: false,
