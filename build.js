@@ -336,8 +336,11 @@ const generateHTMLFiles = async (buildContext) => {
     .value();
 
   buildContext.publishedBlogPosts = publishedBlogPosts;
-  buildContext.latestPosts = publishedBlogPosts.slice(0, LATEST_POSTS_LENGTH);
-  buildContext.olderPosts = publishedBlogPosts.slice(LATEST_POSTS_LENGTH);
+  buildContext.latestBlogPosts = publishedBlogPosts.slice(
+    0,
+    LATEST_POSTS_LENGTH
+  );
+  buildContext.olderBlogPosts = publishedBlogPosts.slice(LATEST_POSTS_LENGTH);
 
   await createHTMLFile(buildContext, "index.html.hbs", "index.html");
   await createHTMLFile(buildContext, "blog.hbs", "blog.html");
@@ -352,8 +355,8 @@ void (async () => {
     const buildContext = {
       head: { staticFiles: {} },
       publishedBlogPosts: [],
-      latestPosts: [],
-      olderPosts: [],
+      latestBlogPosts: [],
+      olderBlogPosts: [],
     };
 
     await createBuildDirectory();

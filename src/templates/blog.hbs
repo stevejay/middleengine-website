@@ -11,7 +11,7 @@
                 <h1>Blog posts</h1>
             </header>
             <ul>
-                {{#each latestPosts}}
+                {{#each latestBlogPosts}}
                 <li>
                     <figure class="hero" role="presentation" aria-hidden="true">
                         <div class="hero-img-wrap">
@@ -34,7 +34,7 @@
                     <a href="{{absPath}}">Read this post</a>
                 </li>
                 {{/each}}
-                {{#each olderPosts}}
+                {{#each olderBlogPosts}}
                 <li>
                     <h3><a href="{{absPath}}">{{meta.title}}</a></h3>
                     <div class="byline">
