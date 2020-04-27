@@ -65,6 +65,6 @@ This results in the following state, and I am now able to continue working on _b
 
 ![](/images/2020-04-25-rebasing-with-git-rebase-onto/rebase-onto-2x.png "A 'git rebase --onto' of branch-b")
 
-Note that there are other ways to achieve the same result. For example, I could perform an interactive rebase of _branch-b_ in which I remove the lines of outdated commits B and C.
+Note that there are other ways to achieve the same result. For example, I could perform an interactive rebase of _branch-b_ in which I remove the lines for outdated commits B and C.
 
 Having learned the rebase --onto technique, I now feel more in control of Git. I have the power to move ranges of commits around at will, without the very confusing merge conflicts that I would have had in the past.
