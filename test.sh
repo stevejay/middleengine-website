@@ -26,7 +26,7 @@ if [ ! -f /usr/share/nginx/html/js/cookie-banner-*.js ]; then
 fi
 
 filelist="\
-  /usr/share/nginx/html/images/logo-v1.svg
+  /usr/share/nginx/html/images/logo-v1.svg \
   /usr/share/nginx/html/index.html \
   /usr/share/nginx/html/blog.html \
   /usr/share/nginx/html/blog/posts/2019/11/10/tips-for-using-styled-components.html \

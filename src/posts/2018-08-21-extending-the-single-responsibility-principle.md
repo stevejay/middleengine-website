@@ -81,7 +81,7 @@ describe("normaliseCreateTagRequest", () => {
 });
 ```
 
-In contrast, the coordinator function is tested using a few integration tests. The coordinator runs as a lambda which is deployed using the Serverless framework. I use the Serverless offline plugin to be able to run the lambda locally against a local DynamoDB database running in a [Localstack](https://github.com/localstack/localstack) docker container, so no mocking is required. The tests are in [this file](https://github.com/stevejay/artfullylondon-api/blob/master/tag-service/tests/integration/tag-graphql-mutation.test.js) and are structured like so:
+In contrast, the coordinator function is tested using a few integration tests. The coordinator runs as a lambda which is deployed using the Serverless framework. I use the Serverless offline plug-in to be able to run the lambda locally against a local DynamoDB database running in a [Localstack](https://github.com/localstack/localstack) docker container, so no mocking is required. The tests are in [this file](https://github.com/stevejay/artfullylondon-api/blob/master/tag-service/tests/integration/tag-graphql-mutation.test.js) and are structured like so:
 
 ```
 describe("tag graphql querying", () => {
