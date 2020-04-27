@@ -28,8 +28,8 @@
   --font-weight-heading-regular: 400;
   --font-weight-heading-bold: 700;
 
-  --font-family-main-heading: "Archivo", sans-serif;
-  --font-weight-main-heading-regular: 400;
+  --font-family-page-heading: "Archivo", sans-serif;
+  --font-weight-page-heading: 400;
 
   --width-hair: 1px;
   --width-main: 1150px;
@@ -84,6 +84,14 @@ html {
 }
 
 /********************************/
+/*       Site background        */
+/********************************/
+
+html {
+  background-color: var(--color-black);
+}
+
+/********************************/
 /*          Body font           */
 /********************************/
 
@@ -107,8 +115,8 @@ strong {
 /********************************/
 
 h1 {
-  font-family: var(--font-family-main-heading);
-  font-weight: var(--font-weight-main-heading-regular);
+  font-family: var(--font-family-page-heading);
+  font-weight: var(--font-weight-page-heading);
   font-style: italic;
   line-height: 1.2;
 }
@@ -171,6 +179,7 @@ h6 {
 }
 
 @media (min-width: 768px) {
+  /* Push the anchor to the left on wider screens */
   .header-anchor {
     position: absolute;
     left: -1.5ch;
@@ -279,7 +288,7 @@ dl dd {
 }
 
 /********************************/
-/*          Block quote         */
+/*         Block quotes         */
 /********************************/
 
 figure.c-blockquote {
@@ -351,7 +360,7 @@ blockquote p {
 /*              Table           */
 /********************************/
 
-/* From: https://codepen.io/geoffyuen/pen/FCBEg */
+/* From https://codepen.io/geoffyuen/pen/FCBEg */
 
 table {
   background: var(--color-neutral-200);
@@ -437,14 +446,6 @@ li code {
 }
 
 /********************************/
-/*       Site background        */
-/********************************/
-
-html {
-  background-color: var(--color-black);
-}
-
-/********************************/
 /*         Site header          */
 /********************************/
 
@@ -460,8 +461,13 @@ body > header {
   background-color: var(--color-black);
 }
 
+/* Control vertical margins manually */
+body > header > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 body > header h2 {
-  margin: 0;
   width: 267px;
   height: 92px;
   flex-shrink: 0;
@@ -495,10 +501,11 @@ body > header nav {
   width: 100%;
 }
 
-/* Control margins manually in the site navigation */
+/* Control vertical margins manually */
 body > header nav ul,
 body > header nav li {
-  margin: 0;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 body > header nav ul {
@@ -516,15 +523,16 @@ body > header nav a {
   padding: var(--space-2) var(--space-4);
 }
 
-body.index > header nav li:nth-of-type(1) a,
-body.blog > header nav li:nth-of-type(2) a {
+body.index > header nav a.home-link,
+body.blog > header nav a.blog-link {
   border-top-color: var(--color-primary);
 }
 
 @media (min-width: 768px) {
   body > header nav {
     flex-grow: 1;
-    margin: 0 0 2px;
+    margin-top: 0;
+    margin-bottom: 2px;
     padding-top: 0;
     border-top: none;
     border-bottom: var(--width-hair) solid var(--color-primary);
@@ -534,8 +542,8 @@ body.blog > header nav li:nth-of-type(2) a {
     justify-content: flex-end;
   }
 
-  body.index > header nav li:nth-of-type(1) a,
-  body.blog > header nav li:nth-of-type(2) a {
+  body.index > header nav a.home-link,
+  body.blog > header nav a.blog-link {
     border-top-color: transparent;
     border-bottom-color: var(--color-primary);
   }
@@ -548,7 +556,7 @@ body.blog > header nav li:nth-of-type(2) a {
 body > footer {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   padding: var(--space-6) var(--space-4);
   max-width: var(--width-main);
   margin-left: auto;
@@ -608,10 +616,12 @@ body > footer li a {
 @media (min-width: 768px) {
   body > footer {
     flex-direction: row;
+    align-items: center;
     justify-content: space-between;
     padding: var(--space-6);
   }
 
+  /* Control vertical margins manually */
   body > footer > * {
     margin-top: 0;
     margin-bottom: 0;
@@ -643,7 +653,7 @@ body > footer li a {
   display: flex;
 }
 
-#cookie-banner p {
+#cookie-banner :first-child {
   margin-top: 0;
 }
 
@@ -669,8 +679,10 @@ body > footer li a {
     justify-content: space-between;
   }
 
-  #cookie-banner p {
-    margin: 0;
+  /* Control vertical margins manually */
+  #cookie-banner > * {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   #cookie-banner button {
@@ -757,8 +769,7 @@ main > article > section > * {
   margin-right: auto;
 }
 
-/* Remove vertical margins around the article */
-
+/* Remove vertical margins around the article body */
 main > article > section > :first-child {
   margin-top: 0;
 }
@@ -859,6 +870,7 @@ header.hero {
   position: relative;
 }
 
+/* Control vertical margins manually */
 header.hero h1 {
   margin-top: 0;
   margin-bottom: 0;
@@ -891,8 +903,8 @@ header.hero p {
 header.hero h1 {
   color: var(--color-white);
   font-size: var(--font-size-5);
-  font-family: var(--font-family-main-heading);
-  font-weight: var(--font-weight-main-heading-regular);
+  font-family: var(--font-family-page-heading);
+  font-weight: var(--font-weight-page-heading);
   font-style: italic;
 }
 
@@ -908,11 +920,6 @@ header.hero h1 {
   header.hero h1 {
     font-size: var(--font-size-6);
   }
-
-  body.index header.hero h1,
-  body.index header.hero p {
-    width: 60%;
-  }
 }
 
 @media (min-width: 992px) {
@@ -925,9 +932,20 @@ header.hero h1 {
   }
 }
 
+/********************************/
+/*    Home page hero header     */
+/********************************/
+
 body.index header.hero h1 strong {
   color: var(--color-primary-500);
-  font-weight: var(--font-weight-main-heading-regular);
+  font-weight: var(--font-weight-page-heading);
+}
+
+@media (min-width: 768px) {
+  body.index header.hero h1,
+  body.index header.hero p {
+    width: 60%;
+  }
 }
 
 /********************************/
@@ -944,6 +962,7 @@ body.index header.hero h1 strong {
   padding: var(--space-4);
 }
 
+/* Control vertical margins manually */
 #services-section p,
 #services-section ul,
 #services-section li {
@@ -1037,7 +1056,8 @@ body.index header.hero h1 strong {
   padding: var(--space-5) var(--space-4);
 }
 
-#cta-section p {
+/* Control vertical margins manually */
+#cta-section > * {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -1096,11 +1116,10 @@ body.index header.hero h1 strong {
   padding: var(--space-5) var(--space-3) var(--space-6);
 }
 
-/* Override vertical margins */
-
+/* Control vertical margins manually */
+#blog-posts-listing > *,
 #blog-posts-listing li > *,
-#blog-posts-listing header > *,
-#blog-posts-listing > * {
+#blog-posts-listing header > * {
   margin: 0;
 }
 
