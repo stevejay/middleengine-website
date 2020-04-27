@@ -81,4 +81,3 @@ The result of this versioning is that all of these files can have a very long ca
 ## TODO
 
 - Fade-in of hero images when they are not already in the browser's cache, using [image loading events](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onloadstart).
-- Page-specific description meta tags?

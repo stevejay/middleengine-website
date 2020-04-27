@@ -29,6 +29,7 @@ const copyFile = util.promisify(fs.copyFile);
 const copy = util.promisify(fs.copy);
 
 const DOMAIN = "https://www.middle-engine.com";
+const LATEST_POSTS_LENGTH = 6;
 const BUILD_DIR = "./build";
 const CSS_BUILD_DIR = path.join(BUILD_DIR, "css");
 const JS_BUILD_DIR = path.join(BUILD_DIR, "js");
@@ -57,7 +58,7 @@ const highlightJsCallback = (str, lang) => {
   return ""; // use external default escaping
 };
 
-const handlebarsIntlData = {
+const handlebarsI18nData = {
   locales: "en-GB",
   formats: {
     date: {
@@ -70,7 +71,7 @@ const handlebarsIntlData = {
   },
 };
 
-const createUnsplashMetaData = async (unsplashImageId) => {
+const getUnsplashImageMetaData = async (unsplashImageId) => {
   let photoJson = null;
   let attempts = 1;
 
@@ -92,10 +93,10 @@ const createUnsplashMetaData = async (unsplashImageId) => {
         );
       }
     } catch (err) {
-      console.error(err);
       ++attempts;
 
       if (attempts > 3) {
+        console.error(err);
         throw err;
       } else {
         photoJson = null;
@@ -114,8 +115,8 @@ const createUnsplashMetaData = async (unsplashImageId) => {
   };
 };
 
-const processPostFile = async (postFile, globalContext) => {
-  const md = new MarkdownIt({
+const processBlogPostFile = async (blogPostFile, buildContext) => {
+  const markdownIt = new MarkdownIt({
     html: true,
     linkify: false,
     highlight: highlightJsCallback,
@@ -136,37 +137,39 @@ const processPostFile = async (postFile, globalContext) => {
       headerless: false,
     });
 
-  const post = await readFile(postFile.path, { encoding: "utf-8" });
-  const content = md.render(post);
+  const post = await readFile(blogPostFile.path, { encoding: "utf-8" });
+  const content = markdownIt.render(post);
 
-  if (md.meta.heroImage) {
-    if (md.meta.heroImage.source === "Unsplash") {
-      md.meta.heroImage = await createUnsplashMetaData(md.meta.heroImage.id);
+  if (markdownIt.meta.heroImage) {
+    if (markdownIt.meta.heroImage.source === "Unsplash") {
+      markdownIt.meta.heroImage = await getUnsplashImageMetaData(
+        markdownIt.meta.heroImage.id
+      );
     }
   }
 
   const layoutContent = await readFile(
-    path.join(TEMPLATES_SRC_DIR, `${md.meta.layout}.hbs`),
+    path.join(TEMPLATES_SRC_DIR, `${markdownIt.meta.layout}.hbs`),
     {
       encoding: "utf-8",
     }
   );
 
   const template = Handlebars.compile(layoutContent);
-  const context = { ...globalContext, ...md.meta, content };
-  const options = { data: { intl: handlebarsIntlData } };
+  const context = { ...buildContext, ...markdownIt.meta, content };
+  const options = { data: { intl: handlebarsI18nData } };
   const html = template(context, options);
 
-  const fileName = path.parse(postFile.path).name;
+  const fileName = path.parse(blogPostFile.path).name;
 
   const srcPathParts = fileName.match(POST_NAME_REGEXP);
   if (!srcPathParts) {
     throw new Error(
-      `post file name does not have expected format: ${fileName}`
+      `Blog post file name does not match the expected format: ${fileName}`
     );
   }
 
-  const buildPostDir = createPostDirectoryPath(md.meta.date);
+  const buildPostDir = createPostDirectoryPath(markdownIt.meta.date);
   await ensureDir(path.join(POSTS_BUILD_DIR, buildPostDir));
 
   const buildPostName = srcPathParts.groups.name;
@@ -178,11 +181,11 @@ const processPostFile = async (postFile, globalContext) => {
   await writeFile(filePath, html, { encoding: "utf-8" });
 
   const absPath = `/blog/posts/${buildPostDir}/${buildPostName}`;
-  if (md.meta.draft) {
-    console.log(absPath);
+  if (markdownIt.meta.draft) {
+    console.log("Draft blog post", `http://127.0.0.1:8001/${absPath}`);
   }
 
-  return { absPath, meta: md.meta };
+  return { absPath, meta: markdownIt.meta };
 };
 
 const createPostDirectoryPath = (postDate) =>
@@ -192,56 +195,27 @@ const createPostDirectoryPath = (postDate) =>
     "0"
   )}/${_.padStart(postDate.getUTCDate(), 2, "0")}`;
 
-const processIndexHtmlFile = async (postsData, globalContext) => {
+const createHTMLFile = async (buildContext, templateFileName, destFileName) => {
   const layoutContent = await readFile(
-    path.join(TEMPLATES_SRC_DIR, "index.html.hbs"),
+    path.join(TEMPLATES_SRC_DIR, templateFileName),
     {
       encoding: "utf-8",
     }
   );
 
   const template = Handlebars.compile(layoutContent);
-  const context = {
-    ...globalContext,
-    title: "Home",
-    latestPosts: postsData.slice(0, 6),
-    olderPosts: postsData.slice(6),
-  };
-  const options = { data: { intl: handlebarsIntlData } };
-  const html = template(context, options);
+  const options = { data: { intl: handlebarsI18nData } };
+  const html = template(buildContext, options);
 
-  await writeFile(path.join(BUILD_DIR, "index.html"), html, {
+  await writeFile(path.join(BUILD_DIR, destFileName), html, {
     encoding: "utf-8",
   });
 };
 
-const processBlogFile = async (postsData, globalContext) => {
-  const layoutContent = await readFile(
-    path.join(TEMPLATES_SRC_DIR, "blog.hbs"),
-    {
-      encoding: "utf-8",
-    }
-  );
-
-  const template = Handlebars.compile(layoutContent);
-  const context = {
-    ...globalContext,
-    title: "Blog",
-    latestPosts: postsData.slice(0, 6),
-    olderPosts: postsData.slice(6),
-  };
-  const options = { data: { intl: handlebarsIntlData } };
-  const html = template(context, options);
-
-  await writeFile(path.join(BUILD_DIR, "blog.html"), html, {
-    encoding: "utf-8",
-  });
-};
-
-const createSitemapFile = async (postsData) => {
+const createSitemapFile = async (buildContext) => {
   const sitemapEntries = [`${DOMAIN}/`, `${DOMAIN}/blog`];
 
-  postsData.forEach((postData) => {
+  buildContext.publishedBlogPosts.forEach((postData) => {
     sitemapEntries.push(`${DOMAIN}${postData.absPath}`);
   });
 
@@ -252,40 +226,6 @@ const createSitemapFile = async (postsData) => {
       encoding: "utf-8",
     }
   );
-};
-
-const processLegalFile = async (globalContext) => {
-  const layoutContent = await readFile(
-    path.join(TEMPLATES_SRC_DIR, "legal.hbs"),
-    {
-      encoding: "utf-8",
-    }
-  );
-
-  const template = Handlebars.compile(layoutContent);
-  const context = { ...globalContext, title: "Terms & Conditions" };
-  const html = template(context);
-
-  await writeFile(path.join(BUILD_DIR, "legal.html"), html, {
-    encoding: "utf-8",
-  });
-};
-
-const processPrivacyFile = async (globalContext) => {
-  const layoutContent = await readFile(
-    path.join(TEMPLATES_SRC_DIR, "privacy.hbs"),
-    {
-      encoding: "utf-8",
-    }
-  );
-
-  const template = Handlebars.compile(layoutContent);
-  const context = { ...globalContext, title: "Privacy Policy" };
-  const html = template(context);
-
-  await writeFile(path.join(BUILD_DIR, "privacy.html"), html, {
-    encoding: "utf-8",
-  });
 };
 
 const autoRegisterPartial = async (partialFile) => {
@@ -303,20 +243,21 @@ const autoRegisterPartial = async (partialFile) => {
 
 const autoRegisterAllPartials = async () => {
   const partialFiles = await walk(PARTIALS_SRC_DIR, {
-    entryFilter: (node) => node.dirent.isFile() && node.name.endsWith(".hbs"),
+    entryFilter: (node) =>
+      node.dirent.isFile() &&
+      node.name.startsWith("_") &&
+      node.name.endsWith(".hbs"),
     stats: true,
   });
 
   await Promise.all(partialFiles.map(autoRegisterPartial));
 };
 
-const prepare = async () => {
+const createBuildDirectory = async () => {
+  // Create the basic build directory structure
   await fs.emptyDir(BUILD_DIR);
-
   await mkdir(CSS_BUILD_DIR);
   await mkdir(JS_BUILD_DIR);
-
-  await autoRegisterAllPartials();
 };
 
 const copyStaticFileWithHashValue = async (srcFilePath, destRelFilePath) => {
@@ -332,7 +273,7 @@ const copyStaticFileWithHashValue = async (srcFilePath, destRelFilePath) => {
   return destRelFilePathWithHash;
 };
 
-const copyStaticFiles = async () => {
+const generateResourceFiles = async (buildContext) => {
   await copyFile(
     path.join(SRC_DIR, "robots.txt"),
     path.join(BUILD_DIR, "robots.txt")
@@ -348,66 +289,76 @@ const copyStaticFiles = async () => {
     path.join(CSS_SRC_DIR, "site.css"),
     "/css/site.css"
   );
+  buildContext.head.staticFiles.siteCSS = siteCSS;
 
   const highlightCSS = await copyStaticFileWithHashValue(
     "./node_modules/highlight.js/styles/tomorrow.css",
     "/css/highlight.css"
   );
+  buildContext.head.staticFiles.highlightCSS = highlightCSS;
 
   const normalizeCSS = await copyStaticFileWithHashValue(
     "./node_modules/normalize.css/normalize.css",
     "/css/normalize.css"
   );
+  buildContext.head.staticFiles.normalizeCSS = normalizeCSS;
 
   const cookieBannerJS = await copyStaticFileWithHashValue(
     path.join(JS_SRC_DIR, "cookie-banner.js"),
     "/js/cookie-banner.js"
   );
+  buildContext.head.staticFiles.cookieBannerJS = cookieBannerJS;
 
   const turbolinksJS = await copyStaticFileWithHashValue(
     path.join(JS_SRC_DIR, "turbolinks.js"),
     "/js/turbolinks.js"
   );
-
-  return {
-    turbolinksJS,
-    cookieBannerJS,
-    normalizeCSS,
-    highlightCSS,
-    siteCSS,
-  };
+  buildContext.head.staticFiles.turbolinksJS = turbolinksJS;
 };
 
-const generateDynamicFiles = async (staticFiles) => {
-  const globalContext = { header: { staticFiles } };
+const generateHTMLFiles = async (buildContext) => {
+  await autoRegisterAllPartials();
 
-  const postFiles = await walk(POSTS_SRC_DIR, {
+  const blogPostFiles = await walk(POSTS_SRC_DIR, {
     entryFilter: (node) => node.dirent.isFile() && node.name.endsWith(".md"),
     stats: true,
   });
 
-  const postsData = await Promise.all(
-    postFiles.map((postFile) => processPostFile(postFile, globalContext))
+  const blogPosts = await Promise.all(
+    blogPostFiles.map((blogPostFile) =>
+      processBlogPostFile(blogPostFile, buildContext)
+    )
   );
 
-  const publishedPostsData = _.chain(postsData)
-    .filter((postData) => !postData.meta.draft)
+  const publishedBlogPosts = _.chain(blogPosts)
+    .filter((blogPost) => !blogPost.meta.draft)
     .orderBy(["meta.date", "meta.title"], ["desc", "asc"])
     .value();
 
-  await processIndexHtmlFile(publishedPostsData, globalContext);
-  await processBlogFile(publishedPostsData, globalContext);
-  await processLegalFile(globalContext);
-  await processPrivacyFile(globalContext);
-  await createSitemapFile(publishedPostsData);
+  buildContext.publishedBlogPosts = publishedBlogPosts;
+  buildContext.latestPosts = publishedBlogPosts.slice(0, LATEST_POSTS_LENGTH);
+  buildContext.olderPosts = publishedBlogPosts.slice(LATEST_POSTS_LENGTH);
+
+  await createHTMLFile(buildContext, "index.html.hbs", "index.html");
+  await createHTMLFile(buildContext, "blog.hbs", "blog.html");
+  await createHTMLFile(buildContext, "legal.hbs", "legal.html");
+  await createHTMLFile(buildContext, "privacy.hbs", "privacy.html");
+  await createSitemapFile(buildContext);
 };
 
 // MAIN ENTRY POINT:
 void (async () => {
   try {
-    await prepare();
-    const staticFiles = await copyStaticFiles();
-    await generateDynamicFiles(staticFiles);
+    const buildContext = {
+      head: { staticFiles: {} },
+      publishedBlogPosts: [],
+      latestPosts: [],
+      olderPosts: [],
+    };
+
+    await createBuildDirectory();
+    await generateResourceFiles(buildContext);
+    await generateHTMLFiles(buildContext);
     console.log("Completed");
     process.exit(0);
   } catch (err) {
