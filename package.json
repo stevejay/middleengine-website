@@ -33,7 +33,6 @@
     "postcss-css-variables": "^0.17.0",
     "probe-image-size": "^5.0.0",
     "rev-hash": "^3.0.0",
-    "tmp": "^0.2.0",
     "unsplash-js": "^6.0.0"
   },
   "engines": {

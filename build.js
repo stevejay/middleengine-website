@@ -17,7 +17,6 @@ import dotenv from "dotenv";
 import fetch from "node-fetch";
 import postcss from "postcss";
 import cssvariables from "postcss-css-variables";
-import tmp from "tmp";
 import responsiveImages from "./markdown-it-plugins/responsive-images.js";
 
 global.fetch = fetch;
@@ -263,25 +262,29 @@ const createBuildDirectory = async () => {
   await mkdir(JS_BUILD_DIR);
 };
 
-const copyStaticFileWithHashValue = async (srcFilePath, destRelFilePath) => {
-  const hash = revisionHash(fs.readFileSync(srcFilePath));
-  const fileExt = path.extname(destRelFilePath);
-  const destRelFilePathWithHash = `${destRelFilePath.substr(
+const addHashToFilePath = (filePath, hash) => {
+  const fileExt = path.extname(filePath);
+
+  return `${filePath.substr(
     0,
-    destRelFilePath.length - fileExt.length
+    filePath.length - fileExt.length
   )}-${hash}${fileExt}`;
-
-  await copyFile(srcFilePath, path.join(BUILD_DIR, destRelFilePathWithHash));
-
-  return destRelFilePathWithHash;
 };
 
-const createPostCSSProcessedFile = async (srcFilePath) => {
+const copyFileWithAddedHash = async (srcFilePath, destFilePath) => {
+  const hash = revisionHash(fs.readFileSync(srcFilePath));
+  const destFilePathWithHash = addHashToFilePath(destFilePath, hash);
+  await copyFile(srcFilePath, destFilePathWithHash);
+  return destFilePathWithHash;
+};
+
+const copyPostCSSProcessedFile = async (srcFilePath, destFilePath) => {
   const content = await readFile(srcFilePath, { encoding: "utf-8" });
   const processedCSS = postcss([cssvariables()]).process(content).css;
-  const tmpFile = tmp.fileSync();
-  await writeFile(tmpFile.name, processedCSS, { encoding: "utf-8" });
-  return tmpFile;
+  const hash = revisionHash(processedCSS);
+  const destFilePathWithHash = addHashToFilePath(destFilePath, hash);
+  await writeFile(destFilePathWithHash, processedCSS, { encoding: "utf-8" });
+  return destFilePathWithHash;
 };
 
 const generateResourceFiles = async (buildContext) => {
@@ -296,37 +299,33 @@ const generateResourceFiles = async (buildContext) => {
 
   await copy(FAVICON_SRC_DIR, BUILD_DIR);
 
-  const postCSSFile = await createPostCSSProcessedFile(
-    path.join(CSS_SRC_DIR, "site.css")
-  );
-
-  const siteCSS = await copyStaticFileWithHashValue(
-    postCSSFile.name,
-    "/css/site.css"
+  const siteCSS = await copyPostCSSProcessedFile(
+    path.join(CSS_SRC_DIR, "site.css"),
+    path.join(BUILD_DIR, "css/site.css")
   );
   buildContext.head.staticFiles.siteCSS = siteCSS;
 
-  const highlightCSS = await copyStaticFileWithHashValue(
+  const highlightCSS = await copyFileWithAddedHash(
     "./node_modules/highlight.js/styles/tomorrow.css",
-    "/css/highlight.css"
+    path.join(BUILD_DIR, "css/highlight.css")
   );
   buildContext.head.staticFiles.highlightCSS = highlightCSS;
 
-  const normalizeCSS = await copyStaticFileWithHashValue(
+  const normalizeCSS = await copyFileWithAddedHash(
     "./node_modules/normalize.css/normalize.css",
-    "/css/normalize.css"
+    path.join(BUILD_DIR, "css/normalize.css")
   );
   buildContext.head.staticFiles.normalizeCSS = normalizeCSS;
 
-  const cookieBannerJS = await copyStaticFileWithHashValue(
+  const cookieBannerJS = await copyFileWithAddedHash(
     path.join(JS_SRC_DIR, "cookie-banner.js"),
-    "/js/cookie-banner.js"
+    path.join(BUILD_DIR, "js/cookie-banner.js")
   );
   buildContext.head.staticFiles.cookieBannerJS = cookieBannerJS;
 
-  const turbolinksJS = await copyStaticFileWithHashValue(
+  const turbolinksJS = await copyFileWithAddedHash(
     path.join(JS_SRC_DIR, "turbolinks.js"),
-    "/js/turbolinks.js"
+    path.join(BUILD_DIR, "js/turbolinks.js")
   );
   buildContext.head.staticFiles.turbolinksJS = turbolinksJS;
 };
