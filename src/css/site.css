@@ -422,7 +422,7 @@ code {
 }
 
 pre {
-  background-color: var(--color-neutral-100); /* TODO */
+  background-color: var(--color-neutral-100);
   overflow-x: scroll;
 }
 
@@ -442,7 +442,7 @@ p code,
 li code {
   padding: 0.05em 0.25em;
   border-radius: var(--radius-1);
-  background-color: var(--color-neutral-200); /* TODO */
+  background-color: var(--color-neutral-200);
 }
 
 /********************************/

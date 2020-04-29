@@ -15,6 +15,9 @@ import Unsplash from "unsplash-js";
 import revisionHash from "rev-hash";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
+import postcss from "postcss";
+import cssvariables from "postcss-css-variables";
+import tmp from "tmp";
 import responsiveImages from "./markdown-it-plugins/responsive-images.js";
 
 global.fetch = fetch;
@@ -273,6 +276,14 @@ const copyStaticFileWithHashValue = async (srcFilePath, destRelFilePath) => {
   return destRelFilePathWithHash;
 };
 
+const createPostCSSProcessedFile = async (srcFilePath) => {
+  const content = await readFile(srcFilePath, { encoding: "utf-8" });
+  const processedCSS = postcss([cssvariables()]).process(content).css;
+  const tmpFile = tmp.fileSync();
+  await writeFile(tmpFile.name, processedCSS, { encoding: "utf-8" });
+  return tmpFile;
+};
+
 const generateResourceFiles = async (buildContext) => {
   await copyFile(
     path.join(SRC_DIR, "robots.txt"),
@@ -285,8 +296,12 @@ const generateResourceFiles = async (buildContext) => {
 
   await copy(FAVICON_SRC_DIR, BUILD_DIR);
 
+  const postCSSFile = await createPostCSSProcessedFile(
+    path.join(CSS_SRC_DIR, "site.css")
+  );
+
   const siteCSS = await copyStaticFileWithHashValue(
-    path.join(CSS_SRC_DIR, "site.css"),
+    postCSSFile.name,
     "/css/site.css"
   );
   buildContext.head.staticFiles.siteCSS = siteCSS;

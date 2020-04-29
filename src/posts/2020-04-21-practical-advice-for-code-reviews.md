@@ -44,7 +44,7 @@ As discussed above, frequent pull requests that have fewer changes are preferabl
 
 ## Review effort
 
-In one role I worked, each pull request was being reviewed by four or five developers. This made the review process far too time consuming. Also, since there was no limit on how many reviews were necessary, it was common for a pull request to be given the green light, only for yet another developer to submit a review and so reset the process back to square one. Generally each pull request should be reviewed by a single developer and the pull request should be small enough that the reviewer needs to spend less than an hour on their task. Exceptions are if the change is complex or risky and so requires multiple pairs of eyes on it, or if the changes could not be broken down and so required additional review time.
+In one role I worked, each pull request was being reviewed by four or five developers. This made the review process far too time consuming. Also, since there was no limit on how many reviews were necessary, it was common for a pull request to be given the green light, only for yet another developer to submit a review and so reset the process back to square one. Generally each pull request should be reviewed by a single developer and the pull request should be small enough that the reviewer needs to spend less than an hour on their task. Exceptions are if the change is complex or risky and so requires multiple pairs of eyes on it, or if the changes could not be broken down and so require additional review time.
 
 ## Constructiveness and consideration
 
