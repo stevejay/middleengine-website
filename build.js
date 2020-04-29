@@ -271,20 +271,22 @@ const addHashToFilePath = (filePath, hash) => {
   )}-${hash}${fileExt}`;
 };
 
-const copyFileWithAddedHash = async (srcFilePath, destFilePath) => {
+const copyFileWithAddedHash = async (srcFilePath, destRelFilePath) => {
   const hash = revisionHash(fs.readFileSync(srcFilePath));
-  const destFilePathWithHash = addHashToFilePath(destFilePath, hash);
-  await copyFile(srcFilePath, destFilePathWithHash);
-  return destFilePathWithHash;
+  const destRelFilePathWithHash = addHashToFilePath(destRelFilePath, hash);
+  await copyFile(srcFilePath, path.join(BUILD_DIR, destRelFilePathWithHash));
+  return destRelFilePathWithHash;
 };
 
-const copyPostCSSProcessedFile = async (srcFilePath, destFilePath) => {
+const copyPostCSSProcessedFile = async (srcFilePath, destRelFilePath) => {
   const content = await readFile(srcFilePath, { encoding: "utf-8" });
   const processedCSS = postcss([cssvariables()]).process(content).css;
   const hash = revisionHash(processedCSS);
-  const destFilePathWithHash = addHashToFilePath(destFilePath, hash);
-  await writeFile(destFilePathWithHash, processedCSS, { encoding: "utf-8" });
-  return destFilePathWithHash;
+  const destRelFilePathWithHash = addHashToFilePath(destRelFilePath, hash);
+  await writeFile(path.join(BUILD_DIR, destRelFilePathWithHash), processedCSS, {
+    encoding: "utf-8",
+  });
+  return destRelFilePathWithHash;
 };
 
 const generateResourceFiles = async (buildContext) => {
@@ -301,31 +303,31 @@ const generateResourceFiles = async (buildContext) => {
 
   const siteCSS = await copyPostCSSProcessedFile(
     path.join(CSS_SRC_DIR, "site.css"),
-    path.join(BUILD_DIR, "css/site.css")
+    "/css/site.css"
   );
   buildContext.head.staticFiles.siteCSS = siteCSS;
 
   const highlightCSS = await copyFileWithAddedHash(
     "./node_modules/highlight.js/styles/tomorrow.css",
-    path.join(BUILD_DIR, "css/highlight.css")
+    "/css/highlight.css"
   );
   buildContext.head.staticFiles.highlightCSS = highlightCSS;
 
   const normalizeCSS = await copyFileWithAddedHash(
     "./node_modules/normalize.css/normalize.css",
-    path.join(BUILD_DIR, "css/normalize.css")
+    "/css/normalize.css"
   );
   buildContext.head.staticFiles.normalizeCSS = normalizeCSS;
 
   const cookieBannerJS = await copyFileWithAddedHash(
     path.join(JS_SRC_DIR, "cookie-banner.js"),
-    path.join(BUILD_DIR, "js/cookie-banner.js")
+    "/js/cookie-banner.js"
   );
   buildContext.head.staticFiles.cookieBannerJS = cookieBannerJS;
 
   const turbolinksJS = await copyFileWithAddedHash(
     path.join(JS_SRC_DIR, "turbolinks.js"),
-    path.join(BUILD_DIR, "js/turbolinks.js")
+    "/js/turbolinks.js"
   );
   buildContext.head.staticFiles.turbolinksJS = turbolinksJS;
 };
