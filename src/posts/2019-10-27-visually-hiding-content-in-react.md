@@ -49,7 +49,7 @@ This adds the CSS from the `sr-only` mixin, but only if the styled element does 
 
 Nowadays I use Styled Components for styling React components and I noticed that the GOV.UK developers created the [@govuk-react/skip-link](https://www.npmjs.com/package/@govuk-react/skip-link) React component using it. The component is designed to be used for both variations in hiding content, but it implements the focusable variation in a different way to Bootstrap. It always applies the CSS attributes to hide the content and then if the content is focusable it applies an extra rule to reset those attributes on focus. The following is the helper function that the component uses to do this:
 
-```js
+```jsx
 function visuallyHidden({
   important: isImportant = true,
   focusable: isFocusable = false,
@@ -99,7 +99,7 @@ This is problematic because it is sometimes not certain what each CSS attribute 
 
 I instead created the following component:
 
-```js
+```jsx
 const VisuallyHidden = styled.span`
   /* && for increased specificity: */
   &&${(props) => (props.isFocusable ? ":not(:focus):not(:active)" : "")} {
@@ -121,7 +121,7 @@ To increase the specificity of the rule, I opted to use multiple ampersands rath
 
 I then used this VisuallyHidden component to create a `SkipLink` component. First I created a styled component for the visual appearance of the skip link:
 
-```js
+```jsx
 const SkipLinkButton = styled.button`
   position: absolute;
   left: 1em;
@@ -139,7 +139,7 @@ const SkipLinkButton = styled.button`
 
 As you can see, I decided to implement it as a button that is positioned absolutely. I then used this styled button and the VisuallyHidden component to create the final skip link component:
 
-```js
+```jsx
 const SkipLink = ({ skipRef, children }) => {
   const handleClick = () => {
     // The skipping magic happens here.

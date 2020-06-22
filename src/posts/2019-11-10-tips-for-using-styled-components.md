@@ -146,7 +146,7 @@ const Box = styled.div<Props>`
 
 The component would then be used like so:
 
-```js
+```ts
 import React from "react";
 import { ThemeContext } from "styled-components";
 
@@ -208,7 +208,7 @@ const Box = styled.div<Props>`
 
 The exact names of the functions and props types differ between the two libraries, but the effect is the same. The resulting styled component is both easier to write and easier to use:
 
-```js
+```ts
 import React from "react";
 
 const SomeComponent = () => {
@@ -247,7 +247,7 @@ const Stack = styled.div<MarginTopProps>`
 
 This also allows me to support responsive `marginTop` prop values:
 
-```js
+```ts
 const SomeComponent = () => {
   // Note: variable used here because
   // syntax highlighting was breaking:
@@ -370,7 +370,7 @@ const StyledExample = styled.div<Props>`
 
 I can use it like so:
 
-```js
+```ts
 // A theme space prop index
 const ExampleOne = () => <StyledExample spacing={3}>One</StyledExample>;
 

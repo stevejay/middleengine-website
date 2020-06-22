@@ -15,20 +15,18 @@ As my blogging history demonstrates, I am a big fan of [React](https://reactjs.o
 
 Originally there was only one type of component in React: the class component. It must extend either `React.Component` or `React.PureComponent`:
 
-```
+```jsx
 class MyClassComponent extends React.Component {
-  render () {
-    return <p>Cats are great</p>
+  render() {
+    return <p>Cats are great</p>;
   }
 }
 ```
 
 Later, in the version 0.14 release, function components were introduced:
 
-```
-const MyFunctionComponent = () => (
-  <p>Cats are great</p>
-);
+```jsx
+const MyFunctionComponent = () => <p>Cats are great</p>;
 ```
 
 The terminology for this latter type of component varies and has included stateless functional component (SFC), stateless pure-function component, stateless component, and functional component; the [React documentation](https://reactjs.org/docs/components-and-props.html#function-and-class-components) refers to them as function components. These varied names reflect the restrictions that function components have compared to class components. They do not have access to [state](https://reactjs.org/docs/state-and-lifecycle.html#adding-local-state-to-a-class) (in particular as implemented in class components), do not have [lifecycle methods](https://reactjs.org/docs/react-component.html#the-component-lifecycle), cannot be [error boundaries](https://reactjs.org/docs/error-boundaries.html), and the [ref attribute](https://reactjs.org/docs/refs-and-the-dom.html) cannot be used on them. Conversely, a class component can implement lifecycle methods, can use state, can be an error boundary, and the ref attribute can be used on them.

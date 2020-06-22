@@ -6,7 +6,8 @@ import path from "path";
 import MarkdownIt from "markdown-it";
 import meta from "markdown-it-meta";
 import attribution from "markdown-it-attribution";
-import highlight from "highlight.js";
+import Prism from "prismjs";
+import loadLanguages from "prismjs/components/index.js";
 import Handlebars from "handlebars";
 import HandlebarsIntl from "handlebars-intl";
 import anchor from "markdown-it-anchor";
@@ -18,6 +19,8 @@ import fetch from "node-fetch";
 import postcss from "postcss";
 import cssvariables from "postcss-css-variables";
 import responsiveImages from "./markdown-it-plugins/responsive-images.js";
+
+loadLanguages(["asm6502", "ts", "scss", "jsx"]);
 
 global.fetch = fetch;
 dotenv.config();
@@ -49,16 +52,6 @@ const FAVICON_SRC_DIR = path.join(SRC_DIR, "favicon");
 const POST_NAME_REGEXP = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})-(?<name>.+)$/;
 
 HandlebarsIntl.registerWith(Handlebars);
-
-const highlightJsCallback = (str, lang) => {
-  if (lang && highlight.getLanguage(lang)) {
-    try {
-      return highlight.highlight(lang, str).value;
-    } catch (__) {}
-  }
-
-  return ""; // use external default escaping
-};
 
 const handlebarsI18nData = {
   locales: "en-GB",
@@ -121,7 +114,17 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
   const markdownIt = new MarkdownIt({
     html: true,
     linkify: false,
-    highlight: highlightJsCallback,
+    highlight: (text, lang) => {
+      const code = Prism.languages[lang]
+        ? Prism.highlight(text, Prism.languages[lang])
+        : markdownIt.utils.escapeHtml(text);
+
+      const classAttr = lang
+        ? ` class="${markdownIt.options.langPrefix}${lang}"`
+        : "";
+
+      return `<pre${classAttr}><code${classAttr}>${code}</code></pre>`;
+    },
   })
     .use(meta)
     .use(anchor, {
@@ -306,12 +309,6 @@ const generateResourceFiles = async (buildContext) => {
     "/css/site.css"
   );
   buildContext.head.staticFiles.siteCSS = siteCSS;
-
-  const highlightCSS = await copyFileWithAddedHash(
-    "./node_modules/highlight.js/styles/tomorrow.css",
-    "/css/highlight.css"
-  );
-  buildContext.head.staticFiles.highlightCSS = highlightCSS;
 
   const normalizeCSS = await copyFileWithAddedHash(
     "./node_modules/normalize.css/normalize.css",

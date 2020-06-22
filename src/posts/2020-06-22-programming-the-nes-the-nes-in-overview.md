@@ -17,7 +17,7 @@ This is the first in a series of posts about programming the [Nintendo Entertain
 
 ## The console
 
-![](/images/2020-06-22-programming-the-nes-the-nes-in-overview/1280px-NES-Console-Set.jpg "The Nintendo Entertainment System")
+![](/images/2020-06-22-programming-the-nes-the-nes-in-overview/1280px-NES-Console-Set.jpg "The Nintendo Entertainment System (Wikipedia)")
 
 The NES was released by Nintendo in the West in the mid 80s. It was the export version of the Famicom, Nintendo's home console that was released in Japan in 1983. Games were sold on cartridges, called [Game Paks](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System_Game_Pak), that plugged into the console. It came with two game controllers. Each controller was a simple affair by today's standards, with a D-pad, two action buttons (A and B), a Start button, and a Select button. The console itself had only two buttons: Power and Reset.
 
