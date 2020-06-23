@@ -63,7 +63,7 @@ You could check that the created Lambda zip file contains the PhantomJS binary f
 
 Because of the presence of the phantomjs binary file, your zipped Lambda file will be quite large (~20 MB). If you are on a bad connection, you will want to increase the AWS CLI timeout. This can be done with serverless by executing the following deploy command:
 
-```
+```shell
 AWS_CLIENT_TIMEOUT=900000 sls deploy
 ```
 

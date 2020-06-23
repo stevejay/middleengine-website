@@ -757,6 +757,11 @@ main > article > section > pre[class*="language-"] {
   margin-right: auto;
 }
 
+main > article > section > pre[class*="language-"] {
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
 /* Remove vertical margins around the article body */
 main > article > section > :first-child {
   margin-top: 0;
@@ -1239,9 +1244,11 @@ section.opcode h5 {
 section.opcode h6 {
   border-top: 1px solid var(--color-white);
   padding-bottom: 0;
+  color: var(--color-neutral-700);
 }
 
-section.opcode h6 + p {
+section.opcode h6 + p,
+section.opcode h6 + pre {
   padding-top: var(--space-2);
 }
 

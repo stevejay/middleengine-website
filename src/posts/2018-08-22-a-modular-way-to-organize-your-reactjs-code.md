@@ -32,7 +32,7 @@ My concern in this post is how to organize a larger React code base. Some kind o
 
 I have an example code base [there](https://github.com/stevejay/artfullylondon-web-admin) where you can see my particular modular approach. It has been bootstrapped using [create-react-app](https://github.com/facebook/create-react-app). The _src_ directory contains the application's source code and has the following basic structure:
 
-```
+```shell
 modules/
 	...
 shared/
@@ -44,7 +44,7 @@ registerServiceWorker.js
 
 Any React application is likely to have components and helper functions that are required by many of its pages. I put these in the _shared_ directory. Any module can import these shared files. It is structured like so:
 
-```
+```shell
 utils/
 	...
 entity-image/

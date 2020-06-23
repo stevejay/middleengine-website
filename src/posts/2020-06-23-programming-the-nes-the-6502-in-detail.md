@@ -9,6 +9,7 @@ author:
 heroImage:
   source: Unsplash
   id: ZV7lnfyQLmA
+draft: true
 ---
 
 ## Introduction
@@ -217,11 +218,11 @@ Now let us try adding $FFFE and $0003 (65,534 + 3 in decimal). First we add the 
 
 ### Adding signed binary values
 
-Adding signed binary values introduces the problem of overflow. As an example, let us try to add the signed byte values %01111111 and %00000010, or +127 and +2 in decimal:
+Adding signed binary values introduces the problem of overflow. As an example, let us try adding the signed byte values %01111111 and %00000010 (+127 and +2 in decimal):
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/addition-signed-overflow-binary-2x.png "Overflow when adding signed binary values")
 
-The result is %10000001, which would be the correct answer if we were adding unsigned values, but we are not. In two's complement representation, this result is actually -127. This is the wrong result. The problem is that bit #7 in a signed byte is reserved for the value's sign, so there is actually one less bit with which to represent a value's magnitude. A signed byte value can only represent values in the range -128 to +127, and the correct answer of +129 falls outside. The result has _overflowed_ the available magnitude bits.
+The result is %10000001, which would be the correct answer if we were adding unsigned values, but we are not. This result is actually -127 in two's complement representation, which is the wrong result. The problem is that bit #7 in a signed byte is reserved for the value's sign, so there is actually one less bit with which to represent a value's magnitude. A signed byte value can only represent values in the range -128 to +127, and the correct answer of +129 falls outside it. The result has _overflowed_ the available magnitude bits.
 
 Previously, when we added unsigned binary values, we could detect an invalid result because there would be a carry bit remaining after adding the MSBs. How can we detect overflow when adding signed bytes? We have to look to see if the sign bit of the result is correct given the particular values we are adding. In the example above, we added two positive numbers, +127 and +2, so we would expect the result to be positive as well. In fact, bit #7 of the result is set, and so the result is negative. This result would be identified as invalid.
 
@@ -295,7 +296,7 @@ But the approach is not as obvious for signed values. The solution is called [si
 
 There are two important caveats regarding addition and subtraction:
 
-- Avoid mixing signed and unsigned values &mdash; at the very least, it is difficult to know when overflow has occurred and how any carry bits should be handled.
+- Avoid mixing signed and unsigned values. At the very least it is difficult to know when overflow has occurred and how any carry bits should be handled.
 - The two values to add or subtract should have the same bit count. Consider sign-extending the shorter value if this is not the case.
 
 ## Processor registers
@@ -304,35 +305,35 @@ The 6502 has six [processor registers](https://en.wikipedia.org/wiki/Processor_r
 
 The six registers, along with their commonly used abbreviations, are: the Program Counter (PC), the Stack Pointer (S), the Processor Status (P) register, the Accumulator (A), Index Register X (X), and Index Register Y (Y).
 
-The _Program Counter_ (PC) stores the address of the next instruction to be executed. Normally that address gets updated automatically by the CPU as it sequentially executes your program, but certain instructions update the value of the Program Counter to an address somewhere else in the program code. Because the Program Counter stores an address and the 6502 uses 16-bit addresses, this register is two bytes in size.
+The **Program Counter** (PC) stores the address of the next instruction to be executed. Normally that address gets updated automatically by the CPU as it sequentially executes your program, but certain instructions update the value of the Program Counter to an address somewhere else in the program code. Because the Program Counter stores an address and the 6502 uses 16-bit addresses, this register is two bytes in size.
 
 The rest of the registers each hold a single data value and, since the 6502 has an 8-bit data bus, all are one byte in size.
 
-The _Accumulator_ (A) is the main register that instructions operate on. Many instructions use it in their inputs or write their results to it. It is also useful as a temporary storage area when moving data from one memory location to another.
+The **Accumulator** (A) is the main register that instructions operate on. Many instructions use it in their inputs or write their results to it. It is also useful as a temporary storage area when moving data from one memory location to another.
 
-_Index Register X_ (X) and _Index Register Y_ (Y), or more simply the X register and the Y register, are both primarily used to specify a particular byte in the address space for an instruction to operate on, when the address of that byte is the sum of some base address plus the current value of the X or Y register. For example, if an instruction uses a base address of $0C01 with the X register, and the current value in the X register is $02, then the address accessed by the instruction will be $0C03 ($0C01 plus \$02). Indexing in this way is useful when you want to iterate through a sequence of bytes in memory. Like the Accumulator, these index registers can also be used as temporary storage areas.
+**Index Register X** (X) and **Index Register Y** (Y), or more simply the X register and the Y register, are both primarily used to specify a particular byte in the address space for an instruction to operate on, when the address of that byte is the sum of some base address plus the current value of the X or Y register. For example, if an instruction uses a base address of $0C01 with the X register, and the current value in the X register is $02, then the address accessed by the instruction will be $0C03 ($0C01 plus \$02). Indexing in this way is useful when you want to iterate through a sequence of bytes in memory. Like the Accumulator, these index registers can also be used as temporary storage areas.
 
-The _Stack Pointer_ (S) is used to point to the next free byte in the 6502's call stack. The call stack is covered in detail later in this post.
+The **Stack Pointer** (S) is used to point to the next free byte in the 6502's call stack. The call stack is covered in detail later in this post.
 
-Finally there is the _Processor Status_ (P) register. This register actually operates as eight flag bits, where each bit indicates if some particular processor status is currently true or not. A bit is set if it is a 1, and clear or not set if it is a 0. Only seven out of the eight flag bits are used; bit #5 is unused.
+Finally there is the **Processor Status** (P) register. This register actually operates as eight flag bits, where each bit indicates if some particular processor status is currently true or not. A bit is set if it is a 1, and clear or not set if it is a 0. Only seven out of the eight flag bits are used; bit #5 is unused.
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/processor-status-register-2x.png "The Processor Status register flags")
 
-The _[Carry](https://en.wikipedia.org/wiki/Carry_flag)_ (C) flag is used by the ALU as a carry or borrow bit for addition and subtraction, and as a ninth bit for the bit shifting operations. When performing addition, if this flag is set then a carry bit gets added to the calculation, and if it tests as set after the addition then the result includes a carry bit. When performing subtraction this flag indicates a borrow bit, but as its complement: when the Carry flag is set then there is no borrow bit, but when it is not set then there is a borrow bit. So if this flag is not set on performing the subtraction then it indicates that a bit has been borrowed from the calculation, and if it tests as not set after the subtraction then a bit was borrowed in the calculation.
+The **[Carry](https://en.wikipedia.org/wiki/Carry_flag)** (C) flag is used by the ALU as a carry or borrow bit for addition and subtraction, and as a ninth bit for the bit shifting operations. When performing addition, if this flag is set then a carry bit gets added to the calculation, and if it tests as set after the addition then the result includes a carry bit. When performing subtraction this flag indicates a borrow bit, but as its complement: when the Carry flag is set then there is no borrow bit, but when it is not set then there is a borrow bit. So if this flag is not set on performing the subtraction then it indicates that a bit has been borrowed from the calculation, and if it tests as not set after the subtraction then a bit was borrowed in the calculation.
 
-The _Negative_ (N) flag is useful when values are being interpreted as signed values using two's complement representation. As described earlier in this post, in that representation the most significant bit (the sign bit) indicates if the value is negative &mdash; when that bit is set &mdash; or positive &mdash; when that bit is not set. To assist with checking whether a signed value is positive or negative, some instructions update the state of this Negative flag to the same state as bit #7 of the instruction result. If we know that the result represents the MSB of a signed value, then the state of this flag tells us if the value is positive or negative.
+The **Negative** (N) flag is useful when values are being interpreted as signed values using two's complement representation. As described earlier in this post, in that representation the most significant bit (the sign bit) indicates if the value is negative &mdash; when that bit is set &mdash; or positive &mdash; when that bit is not set. To assist with checking whether a signed value is positive or negative, some instructions update the state of this Negative flag to the same state as bit #7 of the instruction result. If we know that the result represents the MSB of a signed value, then the state of this flag tells us if the value is positive or negative.
 
-The [_Overflow_](https://en.wikipedia.org/wiki/Overflow_flag) (V) flag is set by the ALU when the sign bit of the result of an addition or subtraction does not have the expected state, specifically when the values being added or subtracted are interpreted as signed 8-bit values using two's complement representation. If the Overflow flag is set then overflow has occurred and the result is not valid. If this flag is not set then overflow has not occurred. Note that it is only useful to check for overflow after adding or subtracting the MSBs of two signed values.
+The [**Overflow**](https://en.wikipedia.org/wiki/Overflow_flag) (V) flag is set by the ALU when the sign bit of the result of an addition or subtraction does not have the expected state, specifically when the values being added or subtracted are interpreted as signed 8-bit values using two's complement representation. If the Overflow flag is set then overflow has occurred and the result is not valid. If this flag is not set then overflow has not occurred. Note that it is only useful to check for overflow after adding or subtracting the MSBs of two signed values.
 
 The Overflow and Negative flags are useful if you want to check the state of bit #6 or bit #7 of some byte. For example, this can be done for any byte in memory using a BIT instruction (discussed later in this post). This makes these bits cheap to test for, and so any flag bytes in your program should generally use bit #6 or bit #7 for flags that are checked frequently.
 
-The _Zero_ (Z) flag is set by some instructions if the result of the instruction is zero (i.e., $00). For example, subtracting $04 from $04 equals $00, which would result in the Zero flag being set.
+The **Zero** (Z) flag is set by some instructions if the result of the instruction is zero (i.e., $00). For example, subtracting $04 from $04 equals $00, which would result in the Zero flag being set.
 
-The _Interrupt Disable_ (I) flag indicates if maskable interrupts are disabled &mdash; the bit is set &mdash; or enabled &mdash; the bit is not set. Interrupts are covered later in this post.
+The **Interrupt Disable** (I) flag indicates if maskable interrupts are disabled &mdash; the bit is set &mdash; or enabled &mdash; the bit is not set. Interrupts are covered later in this post.
 
-The _Break_ (B) flag is updated by the CPU as appropriate and is useful in an interrupt handler if you need to determine if the interrupt was triggered by a BRK instruction or whether it was triggered by a normal maskable interrupt. Interrupts are covered later in this post.
+The **Break** (B) flag is updated by the CPU as appropriate and is useful in an interrupt handler if you need to determine if the interrupt was triggered by a BRK instruction or whether it was triggered by a normal maskable interrupt. Interrupts are covered later in this post.
 
-The _Decimal Mode_ (D) flag is used to control if the CPU is in binary coded decimal mode or not. The flag can be set and cleared but, because the CPU used in the NES does not implement this mode, there is no effect on the CPU's operation.
+The **Decimal Mode** (D) flag is used to control if the CPU is in binary coded decimal mode or not. The flag can be set and cleared but, because the CPU used in the NES does not implement this mode, there is no effect on the CPU's operation.
 
 ## Addressing modes
 
@@ -354,25 +355,25 @@ As stated earlier in this post, a program instruction represents a particular op
 
 Each operation supports one or more of these addressing modes, although no operation supports all of them.
 
-In the _Implied_ addressing mode, it is the operation itself that implies the byte to operate on. For example, the CLC (Clear Carry Flag) clears the Carry flag of the Processor Status register. The byte to operate on &mdash; the Processor Status register &mdash; is implied; you cannot specify a different byte of data.
+In the **Implied** addressing mode, it is the operation itself that implies the byte to operate on. For example, the CLC (Clear Carry Flag) clears the Carry flag of the Processor Status register. The byte to operate on &mdash; the Processor Status register &mdash; is implied; you cannot specify a different byte of data.
 
-Related to the implied addressing mode is the _Accumulator_ addressing mode, which takes the form `<mnemonic> A`. It specifies that the byte to operate on is the value in the Accumulator (hence 'A').
+Related to the implied addressing mode is the **Accumulator** addressing mode, which takes the form `<mnemonic> A`. It specifies that the byte to operate on is the value in the Accumulator (hence 'A').
 
 Instructions that use either the implied or Accumulator addressing modes are always just one byte long because they have no operand. The remainder of the addressing modes require an operand to specify the byte of data to operate on. I will mainly use the LDA (Load Accumulator with memory) operation to illustrate these addressing modes. It is used to load a byte of data from memory into the Accumulator.
 
-The _Immediate_ addressing mode takes the form `<mnemonic> #<some_byte_value>` (note the hash character), where `<some_byte_value>` is the byte to operate on &mdash; it is embedded in the instruction. An instruction using this addressing mode will be two bytes long: one byte for the opcode and one byte for the embedded byte value. The following example loads the value \$04 into the Accumulator:
+The **Immediate** addressing mode takes the form `<mnemonic> #<some_byte_value>` (note the hash character), where `<some_byte_value>` is the byte to operate on &mdash; it is embedded in the instruction. An instruction using this addressing mode will be two bytes long: one byte for the opcode and one byte for the embedded byte value. The following example loads the value \$04 into the Accumulator:
 
 ```asm6502
 LDA #$04
 ```
 
-The _Absolute_ addressing mode takes the form `<mnemonic> <some_address>`, where `<some_address>` is a two-byte address in the CPU address space. It is the byte at this address that will be operated on. An instruction using this addressing mode will be three bytes long: one byte for the opcode and two bytes for the address. The following example loads the byte at address \$027E into the Accumulator:
+The **Absolute** addressing mode takes the form `<mnemonic> <some_address>`, where `<some_address>` is a two-byte address in the CPU address space. It is the byte at this address that will be operated on. An instruction using this addressing mode will be three bytes long: one byte for the opcode and two bytes for the address. The following example loads the byte at address \$027E into the Accumulator:
 
 ```asm6502
 LDA $027E
 ```
 
-A variation on the absolute addressing mode is the _Zero Page_ addressing mode. This takes the form `<mnemonic> <some_byte_value>`, where `<some_byte_value>` specifies an address within the zero page. The zero page is the first 256 bytes of the CPU address space, from addresses $0000 to $00FF. Since we know that the most significant byte of a zero page address will always be $00, only a single byte is required to specify an address within it. It is the byte at this address that will be operated on. An instruction using this addressing mode will be two bytes long: one byte for the opcode and one byte for the address LSB. The following example loads the byte at address $007E into the Accumulator:
+A variation on the absolute addressing mode is the **Zero Page** addressing mode. This takes the form `<mnemonic> <some_byte_value>`, where `<some_byte_value>` specifies an address within the zero page. The zero page is the first 256 bytes of the CPU address space, from addresses $0000 to $00FF. Since we know that the most significant byte of a zero page address will always be $00, only a single byte is required to specify an address within it. It is the byte at this address that will be operated on. An instruction using this addressing mode will be two bytes long: one byte for the opcode and one byte for the address LSB. The following example loads the byte at address $007E into the Accumulator:
 
 ```asm6502
 LDA $7E
@@ -380,7 +381,7 @@ LDA $7E
 
 You could instead use the Absolute addressing mode to load this byte (using the instruction `LDA $007E`) but there are advantages to preferring the Zero Page addressing mode: the instruction is smaller (two bytes instead of three), and the instruction will take one less cycle to execute. The 6502 has relatively few registers, and the Zero Page addressing mode compensates somewhat for this by making the zero page more efficient to access than the rest of system RAM. Because of this, your most frequently accessed values should be stored in the zero page.
 
-There are four addressing modes that are indexed variations of the Absolute and Zero Page addressing modes: _Absolute, X_; _Absolute, Y_; _Zero Page, X_; and _Zero Page, Y_. In each, the address of the byte to operate on is computed by adding the current value in either the X or Y register to the address specified in the instruction. Thus the address in the instruction is a base address to which an index value is added in order to obtain the final address of the byte to be operated on. (This is the reason why the X and Y registers are called index registers.) These modes are indicated by appending `, X` or `, Y` as appropriate.
+There are four addressing modes that are indexed variations of the Absolute and Zero Page addressing modes: **Absolute, X**; **Absolute, Y**; **Zero Page, X**; and **Zero Page, Y**. In each, the address of the byte to operate on is computed by adding the current value in either the X or Y register to the address specified in the instruction. Thus the address in the instruction is a base address to which an index value is added in order to obtain the final address of the byte to be operated on. (This is the reason why the X and Y registers are called index registers.) These modes are indicated by appending `, X` or `, Y` as appropriate.
 
 The following example instructions demonstrate these four modes:
 
@@ -395,7 +396,7 @@ These indexed addressing modes are useful when you need to loop through some par
 
 Up to now the addressing modes that specify the address of the byte to operate on have done so by hard-coding that address within the instruction. But what if it is only at runtime that you will know the address to use? Or what if you are creating a subroutine and the address needs to vary depending on the current program state? These are the scenarios that the various indirect addressing modes support.
 
-There are two indexed indirect addressing modes. The first one is the _(Indirect, X)_ addressing mode and it takes the form `<mnemonic> (<some_byte_value>, X)`, where `<some_byte_value>` specifies an address within the zero page. The value in the X register is added to this address, with the result again specifying an address within the zero page. The byte of data at this adjusted address is then read, along with the byte after it, and the two bytes are interpreted as the LSB and MSB respectively of an address somewhere in the CPU address space. It is this final address that identifies the byte of data in memory that the instruction should operate on.
+There are two indexed indirect addressing modes. The first one is the **(Indirect, X)** addressing mode and it takes the form `<mnemonic> (<some_byte_value>, X)`, where `<some_byte_value>` specifies an address within the zero page. The value in the X register is added to this address, with the result again specifying an address within the zero page. The byte of data at this adjusted address is then read, along with the byte after it, and the two bytes are interpreted as the LSB and MSB respectively of an address somewhere in the CPU address space. It is this final address that identifies the byte of data in memory that the instruction should operate on.
 
 The following is an example instruction that uses this addressing mode:
 
@@ -407,7 +408,7 @@ The address specified represents the address $0004. The CPU first adds the curre
 
 Note that, as with the Zero Page, X and Zero Page, Y addressing modes, the result of adding the value in the X register to the zero page address is always another zero page address; only the LSB of the address is adjusted. For example, if the instruction is `LDA ($FF, X)` and the value in the X register is $00, then the CPU reads the value of the bytes at addresses $00FF and $0000 to create the final two-byte address, not the bytes at addresses $00FF and \$0100.
 
-The second indexed indirect addressing mode is the _(Indirect), Y_ addressing mode and it takes the form `<mnemonic> (<some_byte_value>), Y`, where `<some_byte_value>` again specifies an address within the zero page, but the indexing is implemented differently. The byte of data at this zero page address is read, along with the byte after it, and the two bytes are interpreted as the LSB and MSB respectively of a base address somewhere in the CPU address space. The value in the Y register is then added to this base address to create the address that actually identities the byte of data that the instruction should operate on.
+The second indexed indirect addressing mode is the **(Indirect), Y** addressing mode and it takes the form `<mnemonic> (<some_byte_value>), Y`, where `<some_byte_value>` again specifies an address within the zero page, but the indexing is implemented differently. The byte of data at this zero page address is read, along with the byte after it, and the two bytes are interpreted as the LSB and MSB respectively of a base address somewhere in the CPU address space. The value in the Y register is then added to this base address to create the address that actually identities the byte of data that the instruction should operate on.
 
 The following is an example instruction that uses this addressing mode:
 
@@ -419,7 +420,7 @@ The address specified represents the address $0004. The CPU reads the value of t
 
 Note that if the zero page address specified in the instruction is $FF, then the CPU reads the value of the bytes at addresses $00FF and $0000 to create the two-byte address, not the bytes at addresses $00FF and \$0100.
 
-There is a third indirect addressing mode, the _Absolute Indirect_ addressing mode, but it is only used with the JMP operation. It takes the form `JMP (<some_address>)` (note the parentheses), where `<some_address>` is an address in the CPU address space. At runtime, the byte of data at this address is read along with the byte after it, and these two bytes are interpreted as the LSB and MSB respectively of an address that is used to update the Program Counter.
+There is a third indirect addressing mode, the **Absolute Indirect** addressing mode, but it is only used with the JMP operation. It takes the form `JMP (<some_address>)` (note the parentheses), where `<some_address>` is an address in the CPU address space. At runtime, the byte of data at this address is read along with the byte after it, and these two bytes are interpreted as the LSB and MSB respectively of an address that is used to update the Program Counter.
 
 The following is an example JMP instruction that uses this addressing mode:
 
@@ -429,7 +430,7 @@ JMP ($1234)
 
 The CPU reads the value of the byte at address $1234 and the value of the byte after it, combining them to create a two-byte address. If the value of the byte at address $1234 is $78 and the value of the byte at address $1235 is $56 then the resulting address is $5678. This is the address that the JMP instruction uses to update the Program Counter with, and so program execution jumps to that address.
 
-The final addressing mode is the _Relative_ addressing mode. This is an addressing mode that is used exclusively by the branch operations (discussed later in this post). This mode takes the form `<mnemonic> <some_signed_byte_value>`, where `some_signed_byte_value` is a single byte that is interpreted by the CPU as a two's complement signed value. The magnitude of this value indicates how much to adjust the Program Counter by, and its sign indicates whether that adjustment is forward (a positive value) or backward (a negative value). Program execution then continues from the adjusted address.
+The final addressing mode is the **Relative** addressing mode. This is an addressing mode that is used exclusively by the branch operations (discussed later in this post). This mode takes the form `<mnemonic> <some_signed_byte_value>`, where `some_signed_byte_value` is a single byte that is interpreted by the CPU as a two's complement signed value. The magnitude of this value indicates how much to adjust the Program Counter by, and its sign indicates whether that adjustment is forward (a positive value) or backward (a negative value). Program execution then continues from the adjusted address.
 
 ```asm6502
 BMI $7F ; Jump forward 127 bytes if the branch condition is true.
@@ -468,11 +469,11 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     <p>
     Sets the Carry flag of the Processor Status register.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-        <h6>Example instructions:</h6>
+        <h6>Example instructions</h6>
     <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEC</span></code></pre>
 </section>
 
@@ -481,11 +482,11 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     <p>
     Clears the Carry flag of the Processor Status register.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-        <h6>Example instructions:</h6>
+        <h6>Example instructions</h6>
     <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLC</span></code></pre>
 </section>
 
@@ -494,11 +495,11 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     <p>
     Clears the Overflow flag.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-        <h6>Example instructions:</h6>
+        <h6>Example instructions</h6>
     <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLV</span></code></pre>
 </section>
 
@@ -507,11 +508,11 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     <p>
     Sets the Interrupt Disable flag.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-        <h6>Example instructions:</h6>
+        <h6>Example instructions</h6>
     <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEI</span></code></pre>
 </section>
 
@@ -520,11 +521,11 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     <p>
     Clears the Interrupt Disable flag.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-        <h6>Example instructions:</h6>
+        <h6>Example instructions</h6>
     <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLI</span></code></pre>
 </section>
 
@@ -533,11 +534,11 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     <p>
     Sets the Decimal Mode flag.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
     <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SED</span></code></pre>
 </section>
 
@@ -546,11 +547,11 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     <p>
     Clears the Decimal Mode flag.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-        <h6>Example instructions:</h6>
+        <h6>Example instructions</h6>
     <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLD</span></code></pre>
 </section>
 
@@ -569,15 +570,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Loads the specified byte into the Accumulator.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the specified byte is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the specified byte.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
     <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LDA</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">LDA</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">LDA</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -594,15 +595,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Loads the specified byte into the X register.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the specified byte is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the specified byte.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, Y; and Zero Page, Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
     <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LDX</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">LDX</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">LDX</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -616,15 +617,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Loads the specified byte into the Y register.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the specified byte is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the specified byte.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LDY</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">LDY</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">LDY</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -638,15 +639,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Copies the value in the Accumulator to the specified memory location.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Does not update any flags.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">STA</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">STA</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
 <span class="token opcode property">STA</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
@@ -662,15 +663,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Copies the value in the X register to the specified memory location.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Does not update any flags.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Absolute; Zero Page; and Absolute, Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">STX</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">STX</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
 <span class="token opcode property">STX</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
@@ -682,15 +683,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Copies the value in the Y register to the specified memory location.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Does not update any flags.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Absolute; Zero Page; and Absolute, X.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">STY</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">STY</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
 <span class="token opcode property">STY</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
@@ -702,15 +703,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Copies the value in the Accumulator to the X register.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAX</span>
 </code></pre>
 </section>
@@ -720,15 +721,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Copies the value in the Accumulator to the Y register.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAY</span>
 </code></pre>
 </section>
@@ -738,15 +739,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Copies the value in the X register to the Accumulator.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXA</span>
 </code></pre>
 </section>
@@ -756,15 +757,15 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Copies the value in the Y register to the Accumulator.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TYA</span>
 </code></pre>
 </section>
@@ -776,15 +777,15 @@ The final two operations below are for data transfers between the X register and
     <p>
     Copies the value in the X register to the Stack Pointer.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Does not update any flags.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXS</span>
 </code></pre>
 </section>
@@ -794,15 +795,15 @@ The final two operations below are for data transfers between the X register and
     <p>
     Copies the value in the Stack Pointer to the X register.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TSX</span>
 </code></pre>
 </section>
@@ -836,15 +837,15 @@ Addition is performed using the ADC operation.
     <p>
     Adds three values together: the current value in the Accumulator, the byte value specified by the operand, and the Carry flag. The result of the addition is stored in the Accumulator.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Carry flag if the result includes a carry bit, otherwise clears it. Sets the Overflow flag if bit #7 of the result changed in a way that indicates overflow when adding signed byte values, otherwise clears it. Sets the Zero flag if the result is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 in the result.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ADC</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">ADC</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">ADC</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1017,15 +1018,15 @@ Subtraction is performed using the SBC operation.
     <p>
     Subtracts the byte value specified by the operand from the current value in the Accumulator, taking any borrow into account (with borrow being the complement of the Carry flag). The result of the subtraction is stored in the Accumulator.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Carry flag if borrowing did not occur during the calculation, otherwise clears it. Sets the Overflow flag if bit #7 of the result changed in a way that indicates overflow when subtracting signed byte values, otherwise clears it. Sets the Zero flag if the result is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 in the result.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SBC</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">SBC</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">SBC</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1102,15 +1103,15 @@ Three [bitwise](https://en.wikipedia.org/wiki/Bitwise_operation) operations are 
     <p>
     Performs a bitwise AND operation between the value in the Accumulator and the specified byte, storing the result in the Accumulator.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the result is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 in the result.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect) Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">AND</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">AND</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">AND</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1127,15 +1128,15 @@ Three [bitwise](https://en.wikipedia.org/wiki/Bitwise_operation) operations are 
     <p>
     Performs a bitwise OR operation between the value in the Accumulator and the specified byte, storing the result in the Accumulator.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the result is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 in the result.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect) Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ORA</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">ORA</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">ORA</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1152,15 +1153,15 @@ Three [bitwise](https://en.wikipedia.org/wiki/Bitwise_operation) operations are 
     <p>
     Performs a bitwise XOR operation between the value in the Accumulator and the specified byte, storing the result in the Accumulator.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the result is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 in the result.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect) Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">EOR</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">EOR</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">EOR</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1226,15 +1227,15 @@ The primary role for the X and Y registers is in indexing. To support this role,
     <p>
     Increments the value in the X register by one, wrapping around so that the result of incrementing $FF is $00. The Carry flag is not affected.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the result is zero, otherwise clears it. Sets the Negative flag to the value of bit #7 in the result.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INX</span>
 </code></pre>
 </section>
@@ -1244,15 +1245,15 @@ The primary role for the X and Y registers is in indexing. To support this role,
     <p>
     Increments the value in the Y register by one, wrapping around so that the result of incrementing $FF is $00. The Carry flag is not affected.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the result is zero, otherwise clears it. Sets the Negative flag to the value of bit #7 in the result.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INY</span>
 </code></pre>
 </section>
@@ -1262,15 +1263,15 @@ The primary role for the X and Y registers is in indexing. To support this role,
     <p>
     Decrements the value in the X register by one, wrapping around so that the result of decrementing $00 is $FF. The Carry flag is not affected.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the result is zero, otherwise clears it. Sets the Negative flag to the value of bit #7 in the result.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEX</span>
 </code></pre>
 </section>
@@ -1280,15 +1281,15 @@ The primary role for the X and Y registers is in indexing. To support this role,
     <p>
     Decrements the value in the Y register by one, wrapping around so that the result of decrementing $00 is $FF. The Carry flag is not affected.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the result is zero, otherwise clears it. Sets the Negative flag to the value of bit #7 in the result.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEY</span>
 </code></pre>
 </section>
@@ -1304,15 +1305,15 @@ Incrementing or decrementing a value directly in memory takes a greater number o
     <p>
     Increments the value in the specified byte in memory by one, wrapping around so that the result of incrementing $FF is $00. The Carry flag is not affected.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates the Negative flag to the value of bit #7 in the result. Sets the Zero flag if the result is zero, else clears it.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INC</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">INC</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
 <span class="token opcode property">INC</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
@@ -1325,15 +1326,15 @@ Incrementing or decrementing a value directly in memory takes a greater number o
     <p>
     Decrements the value in the specified byte in memory by one, wrapping around so that the result of decrementing $00 is $FF. The Carry flag is not affected.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates the Negative flag to the value of bit #7 in the result. Sets the Zero flag if the result is zero, else clears it.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEC</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">DEC</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
 <span class="token opcode property">DEC</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
@@ -1352,15 +1353,15 @@ The comparison instructions are often used with the branch instructions, as cove
     <p>
     Subtracts the byte specified by the operand from the value in the Accumulator, then uses the result to update the state of the Negative, Zero and Carry flags. The result of the subtraction is not stored anywhere.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates the Negative flag to the value of bit #7 in the result. Sets the Zero flag if the value in the Accumulator is equal to the operand byte, otherwise clears it. Sets the Carry flag if the value in the Accumulator is greater than or equal to the operand byte, otherwise clears it.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CMP</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">CMP</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">CMP</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1377,15 +1378,15 @@ The comparison instructions are often used with the branch instructions, as cove
     <p>
     Subtracts the byte specified by the operand from the value in the X register, then uses the result to update the state of the Negative, Zero and Carry flags. The result of the subtraction is not stored anywhere.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates the Negative flag to the value of bit #7 in the result. Sets the Zero flag if the value in the X register is equal to the operand byte, otherwise clears it. Sets the Carry flag if the value in the X register is greater than or equal to the operand byte, otherwise clears it.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; and Zero Page.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CPX</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">CPX</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">CPX</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1397,15 +1398,15 @@ The comparison instructions are often used with the branch instructions, as cove
     <p>
     Subtracts the byte specified by the operand from the value in the Y register, then uses the result to update the state of the Negative, Zero and Carry flags. The result of the subtraction is not stored anywhere.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates the Negative flag to the value of bit #7 in the result. Sets the Zero flag if the value in the Y register is equal to the operand byte, otherwise clears it. Sets the Carry flag if the value in the Y register is greater than or equal to the operand byte, otherwise clears it.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; and Zero Page.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CPY</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
 <span class="token opcode property">CPY</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">CPY</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1431,15 +1432,15 @@ The result of the AND operation is not stored anywhere; the value in the Accumul
     <p>
     Performs a bitwise AND operation between the value in the Accumulator and the specified byte in main memory. The value in the Accumulator is not updated.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates the Negative flag to equal bit #7 of the specified memory byte. Updates the Overflow flag to equal bit #6 of the memory byte. Sets the Zero flag if the result of the AND operation is zero (none of the bits tested were set in both bytes), otherwise clears it.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Absolute; and Zero Page.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">BIT</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">BIT</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
 </code></pre>
@@ -1489,15 +1490,15 @@ The following diagram visualises the effect of ROL, the rotate left operation, s
     <p>
     Shifts the bits of the specified byte one bit to the right, i.e., bit #7 becomes bit #6, bit #6 becomes bit #5, and so on. The new value of bit #7 is zero. The old value of bit #0 is stored in the Carry flag.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     The Negative flag is always cleared (because bit #7 becomes zero). Sets the Zero flag if the shifted byte is zero, otherwise clears it. The old value of bit #0 is stored in the Carry flag.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Accumulator; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LSR</span> <span class="token register variable">A</span>         <span class="token comment">; Accumulator</span>
 <span class="token opcode property">LSR</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">LSR</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1511,15 +1512,15 @@ The following diagram visualises the effect of ROL, the rotate left operation, s
     <p>
     Shifts the bits of the specified byte one bit to the left, i.e., bit #0 becomes bit #1, bit #1 becomes bit #2, etc. The new value of bit #0 is zero. The old value of bit #7 is stored in the Carry flag.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Negative flag to the value of bit #7 in the shifted byte. Sets the Zero flag if the shifted byte is zero, otherwise clears it. The old value of bit #7 is stored in the Carry flag.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Accumulator; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ASL</span> <span class="token register variable">A</span>         <span class="token comment">; Accumulator</span>
 <span class="token opcode property">ASL</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">ASL</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1533,15 +1534,15 @@ The following diagram visualises the effect of ROL, the rotate left operation, s
     <p>
     Rotates the bits of the specified byte by one bit to the left, i.e., bit #0 becomes bit #1, bit #1 becomes bit #2, etc. The new value of bit #0 comes from the Carry flag, and then the old value of bit #7 is used to update the Carry flag.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates the Carry flag to the old value of bit #7. Updates the Negative flag to the value of the new bit #7 (which was bit #6 in the original byte). Sets the Zero flag if the shifted byte is zero, otherwise clears it.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Accumulator; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ROL</span> <span class="token register variable">A</span>         <span class="token comment">; Accumulator</span>
 <span class="token opcode property">ROL</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">ROL</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1555,15 +1556,15 @@ The following diagram visualises the effect of ROL, the rotate left operation, s
     <p>
     Rotates the bits of the specified byte by one bit to the right, i.e., bit #7 becomes bit #6, bit #6 becomes bit #5, and so on. The new value of bit #7 comes from the Carry flag, and then the old value of bit #0 is used to update the Carry flag.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates the Carry flag to the old value of bit #0 in the specified byte. Updates the Negative flag to the previous value of the Carry flag. Sets the Zero flag if the new value of the specified byte is zero, otherwise resets it.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Accumulator; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ROR</span> <span class="token register variable">A</span>         <span class="token comment">; Accumulator</span>
 <span class="token opcode property">ROR</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
 <span class="token opcode property">ROR</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
@@ -1583,15 +1584,15 @@ A simple means of controlling program execution is the JMP operation. This is th
     <p>
     Sets the Program Counter to the memory location specified by the operand.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Does not update any flags.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Absolute; and Absolute Indirect.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">JMP</span> <span class="token hexnumber string">$1234</span>   <span class="token comment">; Absolute</span>
 <span class="token opcode property">JMP</span> (<span class="token hexnumber string">$1234</span>) <span class="token comment">; Absolute Indirect</span>
 </code></pre>
@@ -1689,7 +1690,7 @@ no_jump:
 
 A common selection mechanism in a high level language is the [switch statement](https://en.wikipedia.org/wiki/Switch_statement). It can be implemented in assembly by combining byte comparison (CMP, CPX, and CPY) and branch instructions. The following is a pseudo-code switch statement that tests the value in the Accumulator against a series of constants in order to decide how to proceed:
 
-```
+```clike
 switch (a) {
   case 0:
     ...
@@ -1750,15 +1751,15 @@ The RTS operation is used to exit a subroutine. When an RTS instruction is execu
     <p>
     Jumps to a new location in the program code. Also pushes the current value of the Program Counter onto the stack (two bytes).
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Does not update any flags.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Absolute only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">JSR</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute.</span>
 <span class="token comment">; The operand is normally a label rather than an address.</span>
 </code></pre>
@@ -1769,15 +1770,15 @@ The RTS operation is used to exit a subroutine. When an RTS instruction is execu
     <p>
     Pops the top two bytes off of the stack and uses them to update the value of the Program Counter.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Does not update any flags.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">RTS</span>     <span class="token comment">; Implied</span>
 </code></pre>
 </section>
@@ -1798,15 +1799,15 @@ To deal with this, there are operations to push the current value of the Accumul
     <p>
     Pushes the current value of the Accumulator onto the stack.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Does not update any flags.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">PHA</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
@@ -1816,15 +1817,15 @@ To deal with this, there are operations to push the current value of the Accumul
     <p>
     Pushes the current value of the Processor Status register onto the stack.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Does not update any flags.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">PHP</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
@@ -1834,15 +1835,15 @@ To deal with this, there are operations to push the current value of the Accumul
     <p>
     Pops the topmost byte from the stack and stores it in the Accumulator.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">PLA</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
@@ -1852,15 +1853,15 @@ To deal with this, there are operations to push the current value of the Accumul
     <p>
     Pops the topmost byte from the stack and stores it in the Processor Status register.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates all flags since the entire value for this register is popped from the stack.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">PLP</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
@@ -1943,15 +1944,15 @@ Now program execution continues within the handler. When you wish to exit the ha
     <p>
     Pops the topmost byte from the stack and uses it to update the Processor Status register, then pops the next two bytes from the stack and uses them to update the Program Counter.
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Updates all flags since the entire value for this register is updated. Effectively clears the Interrupt Disable flag if the updated value does not have this flag set.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">RTI</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
@@ -1976,15 +1977,15 @@ The 6502 includes the BRK operation that is used to programmatically signal the 
     <p>
     Saves the current values of the Processor Status register and Program Counter to the call stack. Transfers control to the IRQ/BRK vector. The break occurs even if the Interrupt Disable flag in the Processor Status register is set (i.e., interrupts are masked).
     </p>
-    <h6>Processor Status register changes:</h6>
+    <h6>Processor Status register changes</h6>
     <p>
     Sets the Interrupt Disable flag.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">BRK</span>   <span class="token comment">; Implied</span>
 </code></pre>
 </section>
@@ -2010,11 +2011,11 @@ The final operation to cover is NOP, the no-op operation. At first glance, an in
     <p>
     Does nothing. It is one byte in size and takes two clock cycles to execute.
     </p>
-    <h6>Supported addressing modes:</h6>
+    <h6>Supported addressing modes</h6>
     <p>
     Implied only.
     </p>
-    <h6>Example instructions:</h6>
+    <h6>Example instructions</h6>
 <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">NOP</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
