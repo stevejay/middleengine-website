@@ -931,7 +931,7 @@ LDA #$FB  ; Load $FB as an immediate value into the Accumulator.
 ADC $00   ; Add value at address $0000 to the Accumulator.
 ```
 
-After this code runs, the Carry flag is set and the Overflow flag is not set. We are adding signed values so we are only interested in checking for overflow. Since the Overflow flag is not set, the result is valid. On the other hand, if the above addition was changed to `$80 + $FB`, or `-128 + -5` in decimal, then the Overflow flag would be set and so the result would be invalid. The answer to this is to use 16-bit signed values:
+After this code runs, the Carry flag is set and the Overflow flag is not set. We are adding signed values so we are only interested in checking for overflow. Since the Overflow flag is not set, the result is valid. On the other hand, if the above addition was changed to `$80 + $FB`, or `-128 + -5` in decimal, then the Overflow flag would be set and the result would be invalid. The answer to this is to use 16-bit signed values:
 
 ```asm6502
 ; $FF80 + $FFFB (-128 + -5 in decimal)
@@ -2028,7 +2028,7 @@ The result depends on the exact unofficial value used. For some, the result is a
 
 ## Conclusion
 
-If you have not done any low-level programming before, then writing games for the NES, and so programming the 6502, involves learning a lot of new concepts. This has been a long post and it has covered some tricky details, but the information presented here will provide a solid base for your future programming of the NES.
+If you have not done any low-level programming before, then writing games for the NES, and so programming the 6502, involves learning a number of new concepts. This has been a long post and it has covered some tricky details, but the information presented here will provide a solid base for your future programming of the NES.
 
 ## Further reading
 
