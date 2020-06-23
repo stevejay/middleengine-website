@@ -68,7 +68,7 @@ LDA $0211 ; This instruction has the operand $0211.
 sei       ; You can write the mnemonic in lowercase.
 ```
 
-The addressing mode is indicated by either the lack of an operand, or, if there is an operand, by the syntax used to define it. Using this combination of mnemonic and addressing mode, the assembler can identify the opcode to output. For example, in all three of the following instructions, the operation is `ADC` and the operand value is `$04`, but the additional syntax (`#`, `, X`, and `(), Y`) indicates to the assembler what addressing mode is used and so the particular opcode to output:
+The addressing mode is indicated by either the lack of an operand, or, if there is an operand, by the syntax used to define it. Using this combination of mnemonic and addressing mode, the assembler can identify the opcode to output. For example, in all three of the following instructions, the operation is `ADC` and the operand value is `$04`, but the additional syntax indicates to the assembler what addressing mode is used and so the particular opcode to output:
 
 ```asm6502
 ADC #$04     ; The opcode is $69.
@@ -76,7 +76,7 @@ ADC $04, X   ; The opcode is $61.
 ADC ($04), Y ; The opcode is $71.
 ```
 
-The assembler will follow the opcode by the operand, if there is one. The operand is one or two bytes in size, so every machine instruction is either one, two, or three bytes long.
+The assembler will follow the opcode by the operand, if there is one. The operand is one or two bytes in size, so every machine instruction is either one, two, or three bytes in size.
 
 The 6503 is little endian, so any addresses in the program get encoded LSB first and MSB second. For example, if an operation has the operand of the address `$1234`, `$12` being the MSB and `$34` being the LSB, the assembler will encode that address in the machine code as `$3412`.
 
@@ -1201,7 +1201,7 @@ ORA #$10 ; Perform the OR operation with the mask %00010000.
 STA $00  ; Save the altered value back to memory at address $0000.
 ```
 
-After this code runs, the value in memory at address $0000 is `%10011111`, or $9F in hex.
+After this code runs, the value in memory at address \$0000 is `%10011111`, or `$9F` in hex.
 
 The EOR operation can be used to flip bits in a given byte. This requires loading a suitable bitmask into the Accumulator, one in which the bits to be flipped are ones and all other bits are zeros. This example assembly shows how to flip all the bits of a given byte:
 
@@ -1668,7 +1668,7 @@ loop:
   DEX      ; Decrement the value of X register,
            ; which sets the Negative flag if X is now less than zero.
   BPL loop ; Loop if the Negative flag is not set.
-; execution continues here if the branch is not taken.
+  ; Execution continues here if the branch is not taken.
 ```
 
 By counting down, no comparison instruction is required. This is because the DEX instruction not only decrements the value in the X register, it also sets the Negative flag if the value in the X register is now less than zero. The BPL instruction allows us to branch based on the state of that Negative flag without having to first perform a comparison.
