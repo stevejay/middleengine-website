@@ -187,7 +187,7 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
 
   const absPath = `/blog/posts/${buildPostDir}/${buildPostName}`;
   if (markdownIt.meta.draft) {
-    console.log("Draft blog post", `http://127.0.0.1:8001/${absPath}`);
+    console.log("Draft blog post", `http://127.0.0.1:8001${absPath}`);
   }
 
   return { absPath, meta: markdownIt.meta };

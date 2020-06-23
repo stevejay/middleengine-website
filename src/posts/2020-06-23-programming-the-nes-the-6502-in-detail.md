@@ -474,7 +474,7 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     Implied only.
     </p>
         <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEC</span></code></pre>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEC</span>    <span class="token comment">; Implied</span></code></pre>
 </section>
 
 <section class="opcode">
@@ -487,7 +487,7 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     Implied only.
     </p>
         <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLC</span></code></pre>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLC</span>    <span class="token comment">; Implied</span></code></pre>
 </section>
 
 <section class="opcode">
@@ -500,7 +500,7 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     Implied only.
     </p>
         <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLV</span></code></pre>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLV</span>    <span class="token comment">; Implied</span></code></pre>
 </section>
 
 <section class="opcode">
@@ -513,7 +513,7 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     Implied only.
     </p>
         <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEI</span></code></pre>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEI</span>    <span class="token comment">; Implied</span></code></pre>
 </section>
 
 <section class="opcode">
@@ -526,7 +526,7 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     Implied only.
     </p>
         <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLI</span></code></pre>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLI</span>    <span class="token comment">; Implied</span></code></pre>
 </section>
 
 <section class="opcode">
@@ -539,7 +539,7 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     Implied only.
     </p>
     <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SED</span></code></pre>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SED</span>    <span class="token comment">; Implied</span></code></pre>
 </section>
 
 <section class="opcode">
@@ -552,7 +552,7 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     Implied only.
     </p>
         <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLD</span></code></pre>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLD</span>    <span class="token comment">; Implied</span></code></pre>
 </section>
 
 ### Operations for transferring bytes of data
@@ -712,7 +712,7 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAX</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAX</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -730,7 +730,7 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAY</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAY</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -748,7 +748,7 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXA</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXA</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -766,7 +766,7 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TYA</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TYA</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -786,7 +786,7 @@ The final two operations below are for data transfers between the X register and
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXS</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXS</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -804,7 +804,7 @@ The final two operations below are for data transfers between the X register and
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TSX</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TSX</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -1236,7 +1236,7 @@ The primary role for the X and Y registers is in indexing. To support this role,
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INX</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INX</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -1254,7 +1254,7 @@ The primary role for the X and Y registers is in indexing. To support this role,
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INY</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INY</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -1272,7 +1272,7 @@ The primary role for the X and Y registers is in indexing. To support this role,
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEX</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEX</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -1290,7 +1290,7 @@ The primary role for the X and Y registers is in indexing. To support this role,
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEY</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEY</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -1779,7 +1779,7 @@ The RTS operation is used to exit a subroutine. When an RTS instruction is execu
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">RTS</span>     <span class="token comment">; Implied</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">RTS</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
@@ -1986,7 +1986,7 @@ The 6502 includes the BRK operation that is used to programmatically signal the 
     Implied only.
     </p>
     <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">BRK</span>   <span class="token comment">; Implied</span>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">BRK</span>    <span class="token comment">; Implied</span>
 </code></pre>
 </section>
 
