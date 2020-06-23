@@ -20,7 +20,7 @@ import postcss from "postcss";
 import cssvariables from "postcss-css-variables";
 import responsiveImages from "./markdown-it-plugins/responsive-images.js";
 
-loadLanguages(["asm6502", "ts", "scss", "jsx"]);
+loadLanguages(["asm6502", "ts", "scss", "jsx", "shell"]);
 
 global.fetch = fetch;
 dotenv.config();

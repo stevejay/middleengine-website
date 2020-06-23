@@ -88,7 +88,7 @@ The setup is now complete, so lets start deploying some code the blue-green way!
 2. Altering the alias records in Route 53 to switch the live and staging environments (switch live and staging).
 3. Removing the old code from the old live environment (clean staging).
 
-I decided to do the scripting in Python using [Boto3][16], the AWS client for Python. I preferred this approach to, say, using the AWS CLI (command line interface) as it allowed me to easily create robust, cross-platform deployment scripts. The scripts are included in my [teamcity GitHub repository][18], in the _scripts_ directory.
+I decided to do the scripting in Python using [Boto3][16], the AWS client for Python. I preferred this approach to, say, using the AWS CLI (command line interface) as it allowed me to easily create robust, cross-platform deployment scripts. ~~The scripts are included in my teamcity GitHub repository, in the _scripts_ directory.~~
 
 To run these scripts, you need to set up your AWS credentials on the machine that you will use. The [quickstart guide][19] on the Boto3 Web site includes instructions on how to do this. Also, to simplify the scripts and the number of parameters that they require, I used convention over configuration regarding the naming of the various AWS objects. For example, the convention I use for naming the VPC is as per the domain name, but with periods replaced by hyphens, so _londontamed-com_. The result is that I have to pass far fewer parameters through to the scripts.
 
@@ -128,26 +128,25 @@ An advantage of this approach is that any monitoring you have on the autoscaling
 
 Blue-green deployment is a great way to create an automated and robust deployment process. AWS supports the technique well and allows for complete scripting of the process of deploying new code.
 
-[1]: http://martinfowler.com/bliki/BlueGreenDeployment.html
-[2]: http://aws.amazon.com/
+[1]: https://martinfowler.com/bliki/BlueGreenDeployment.html
+[2]: https://aws.amazon.com/
 [3]: https://en.wikipedia.org/wiki/Single-page_application
-[4]: http://aws.amazon.com/autoscaling/
-[5]: http://docs.aws.amazon.com/AutoScaling/latest/DeveloperGuide/LaunchConfiguration.html
-[6]: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html
-[7]: http://martinfowler.com/bliki/ImmutableServer.html
-[8]: https://packer.io/
-[9]: http://aws.amazon.com/elasticloadbalancing/
-[10]: http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-creating.html
+[4]: https://aws.amazon.com/autoscaling/
+[5]: https://docs.aws.amazon.com/autoscaling/ec2/userguide/LaunchConfiguration.html
+[6]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html
+[7]: https://martinfowler.com/bliki/ImmutableServer.html
+[8]: https://www.packer.io/
+[9]: https://aws.amazon.com/elasticloadbalancing/
+[10]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-creating.html
 [11]: https://aws.amazon.com/route53/
-[12]: http://aws.amazon.com/vpc/
-[13]: http://serverspec.org/
+[12]: https://aws.amazon.com/vpc/
+[13]: https://serverspec.org/
 [14]: https://aws.amazon.com/blogs/aws/elastic-load-balancer-support-for-ssl-termination/
-[15]: http://aws.amazon.com/iam/
-[16]: http://aws.amazon.com/sdk-for-python/
+[15]: https://aws.amazon.com/iam/
+[16]: https://aws.amazon.com/sdk-for-python/
 [17]: https://aws.amazon.com/cli/
-[18]: https://github.com/stevejay/teamcity
-[19]: http://boto3.readthedocs.org/en/latest/guide/quickstart.html
+[19]: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html
 [20]: https://github.com/stevejay/londontamed-example
 [21]: https://github.com/stevejay/aws-ami
-[22]: http://wiki.nginx.org/Main
-[23]: https://nodejs.org/
+[22]: https://www.nginx.com/resources/wiki/
+[23]: https://nodejs.org/en/

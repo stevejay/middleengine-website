@@ -417,9 +417,10 @@ table caption {
 /*             Code             */
 /********************************/
 
-/* Override for prismjs */
+/* Overrides for prismjs */
 pre[class*="language-"] {
   font-size: var(--font-size-1);
+  background-color: var(--color-neutral-100);
 }
 
 /* Code embedded in body text */
@@ -1247,6 +1248,11 @@ section.opcode h6 + p {
 section.opcode > * {
   padding: var(--space-4);
   margin: 0;
+}
+
+/* Overrides for prismjs */
+section.opcode pre[class*="language-"] {
+  background-color: transparent;
 }
 
 /********************************/

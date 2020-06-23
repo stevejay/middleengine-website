@@ -138,9 +138,9 @@ It is common to use uppercase for the names of constants.
 Your program code will consist mainly of instructions, but sometimes data needs to be embedded into it. For example, you might need to embed colour data. An assembler will normally include a means of doing this. For example, the following assembly embeds the specified data into the program code:
 
 ```asm6502
-  .byte $02,$30,$20,$20 ; Embeds these four byte values.
-  .word $1234           ; Embeds this two-byte value.
-  .addr some_label      ; Embeds the address associated with the label.
+.byte $02,$30,$20,$20 ; Embeds these four byte values.
+.word $1234           ; Embeds this two-byte value.
+.addr some_label      ; Embeds the address associated with the label.
 ```
 
 In this particular assembler dialect, `.byte`, `.word` and `.addr` are control commands, instructions for the assembler itself.
@@ -472,13 +472,9 @@ Some of the Processor Status register flags can be set and/or cleared by the pro
     <p>
     Implied only.
     </p>
+        <h6>Example instructions:</h6>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEC</span></code></pre>
 </section>
-
-An SEC instruction:
-
-```asm6502
-SEC
-```
 
 <section class="opcode">
     <h5>CLC (Clear Carry Flag)</h5>
@@ -489,13 +485,9 @@ SEC
     <p>
     Implied only.
     </p>
+        <h6>Example instructions:</h6>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLC</span></code></pre>
 </section>
-
-A CLC instruction:
-
-```asm6502
-CLC
-```
 
 <section class="opcode">
     <h5>CLV (Clear Overflow Flag)</h5>
@@ -506,13 +498,9 @@ CLC
     <p>
     Implied only.
     </p>
+        <h6>Example instructions:</h6>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLV</span></code></pre>
 </section>
-
-A CLV instruction:
-
-```asm6502
-CLV
-```
 
 <section class="opcode">
     <h5>SEI (Set Interrupt Disable Flag)</h5>
@@ -523,13 +511,9 @@ CLV
     <p>
     Implied only.
     </p>
+        <h6>Example instructions:</h6>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEI</span></code></pre>
 </section>
-
-An SEI instruction:
-
-```asm6502
-SEI
-```
 
 <section class="opcode">
     <h5>CLI (Clear Interrupt Disable Flag)</h5>
@@ -540,13 +524,9 @@ SEI
     <p>
     Implied only.
     </p>
+        <h6>Example instructions:</h6>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLI</span></code></pre>
 </section>
-
-A CLI instruction:
-
-```asm6502
-CLI
-```
 
 <section class="opcode">
     <h5>SED (Set Decimal Mode)</h5>
@@ -557,13 +537,9 @@ CLI
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SED</span></code></pre>
 </section>
-
-An SED instruction:
-
-```asm6502
-SED
-```
 
 <section class="opcode">
     <h5>CLD (Clear Decimal Mode)</h5>
@@ -574,13 +550,9 @@ SED
     <p>
     Implied only.
     </p>
+        <h6>Example instructions:</h6>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLD</span></code></pre>
 </section>
-
-A CLD instruction:
-
-```asm6502
-CLD
-```
 
 ### Operations for transferring bytes of data
 
@@ -605,20 +577,17 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
+    <h6>Example instructions:</h6>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LDA</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">LDA</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">LDA</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">LDA</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">LDA</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+<span class="token opcode property">LDA</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+<span class="token opcode property">LDA</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
+<span class="token opcode property">LDA</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
+</code></pre>
 </section>
-
-Example LDA instructions:
-
-```asm6502
-LDA #$04      ; Immediate
-LDA $0C00     ; Absolute
-LDA $04       ; Zero Page
-LDA $0C00, X  ; Absolute, X
-LDA $0C00, Y  ; Absolute, Y
-LDA $04, X    ; Zero Page, X
-LDA ($04, X)  ; (Indirect, X)
-LDA ($04), Y  ; (Indirect), Y
-```
 
 <section class="opcode">
     <h5>LDX (Load Index Register X with memory)</h5>
@@ -633,17 +602,14 @@ LDA ($04), Y  ; (Indirect), Y
     <p>
     Immediate; Absolute; Zero Page; Absolute, Y; and Zero Page, Y.
     </p>
+    <h6>Example instructions:</h6>
+    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LDX</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">LDX</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">LDX</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">LDX</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+<span class="token opcode property">LDX</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">Y</span>    <span class="token comment">; Zero Page, Y</span>
+</code></pre>
 </section>
-
-Example LDX instructions:
-
-```asm6502
-LDX #$04      ; Immediate
-LDX $0C00     ; Absolute
-LDX $04       ; Zero Page
-LDX $0C00, Y  ; Absolute, Y
-LDX $04, Y    ; Zero Page, Y
-```
 
 <section class="opcode">
     <h5>LDY (Load Index Register Y with memory)</h5>
@@ -658,17 +624,14 @@ LDX $04, Y    ; Zero Page, Y
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LDY</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">LDY</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">LDY</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">LDY</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">LDY</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+</code></pre>
 </section>
-
-Example LDY instructions:
-
-```asm6502
-LDY #$04      ; Immediate
-LDY $0C00     ; Absolute
-LDY $04       ; Zero Page
-LDY $0C00, X  ; Absolute, X
-LDY $04, X    ; Zero Page, X
-```
 
 <section class="opcode">
     <h5>STA (Store Accumulator in memory)</h5>
@@ -683,19 +646,16 @@ LDY $04, X    ; Zero Page, X
     <p>
     Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">STA</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">STA</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">STA</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">STA</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+<span class="token opcode property">STA</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+<span class="token opcode property">STA</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
+<span class="token opcode property">STA</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
+</code></pre>
 </section>
-
-Example STA instructions:
-
-```asm6502
-STA $0700     ; Absolute
-STA $04       ; Zero Page
-STA $0700, X  ; Absolute, X
-STA $0700, Y  ; Absolute, Y
-STA $04, X    ; Zero Page, X
-STA ($04, X)  ; (Indirect, X)
-STA ($04), Y  ; (Indirect), Y
-```
 
 <section class="opcode">
     <h5>STX (Store Index Register X in memory)</h5>
@@ -710,15 +670,12 @@ STA ($04), Y  ; (Indirect), Y
     <p>
     Absolute; Zero Page; and Absolute, Y.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">STX</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">STX</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">STX</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+</code></pre>
 </section>
-
-Example STX instructions:
-
-```asm6502
-STX $0700     ; Absolute
-STX $04       ; Zero Page
-STX $0700, Y  ; Absolute, Y
-```
 
 <section class="opcode">
     <h5>STY (Store Index Register Y in memory)</h5>
@@ -733,15 +690,12 @@ STX $0700, Y  ; Absolute, Y
     <p>
     Absolute; Zero Page; and Absolute, X.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">STY</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">STY</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">STY</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+</code></pre>
 </section>
-
-Example STY instructions:
-
-```asm6502
-STY $0700     ; Absolute
-STY $04       ; Zero Page
-STY $0700, X  ; Absolute, X
-```
 
 <section class="opcode">
     <h5>TAX (Transfer Accumulator to Index Register X)</h5>
@@ -756,13 +710,10 @@ STY $0700, X  ; Absolute, X
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAX</span>
+</code></pre>
 </section>
-
-A TAX instruction:
-
-```asm6502
-TAX
-```
 
 <section class="opcode">
     <h5>TAY (Transfer Accumulator to Index Register Y)</h5>
@@ -777,13 +728,10 @@ TAX
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAY</span>
+</code></pre>
 </section>
-
-A TAY instruction:
-
-```asm6502
-TAY
-```
 
 <section class="opcode">
     <h5>TXA (Transfer Index Register X to Accumulator)</h5>
@@ -798,13 +746,10 @@ TAY
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXA</span>
+</code></pre>
 </section>
-
-A TXA instruction:
-
-```asm6502
-TXA
-```
 
 <section class="opcode">
     <h5>TYA (Transfer Index Register Y to Accumulator)</h5>
@@ -819,13 +764,10 @@ TXA
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TYA</span>
+</code></pre>
 </section>
-
-A TYA instruction:
-
-```asm6502
-TYA
-```
 
 The final two operations below are for data transfers between the X register and the Stack Pointer. Their usage is covered later in this post in the section on the call stack.
 
@@ -842,13 +784,10 @@ The final two operations below are for data transfers between the X register and
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXS</span>
+</code></pre>
 </section>
-
-A TXS instruction:
-
-```asm6502
-TXS
-```
 
 <section class="opcode">
     <h5>TSX (Transfer Stack Pointer to Index Register X)</h5>
@@ -863,13 +802,10 @@ TXS
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TSX</span>
+</code></pre>
 </section>
-
-A TSX instruction:
-
-```asm6502
-TSX
-```
 
 The following assembly demonstrates how these data transfer operations can be used to store a given 16-bit value in memory and then copy it to a another memory location:
 
@@ -908,20 +844,17 @@ Addition is performed using the ADC operation.
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ADC</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">ADC</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">ADC</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">ADC</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">ADC</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+<span class="token opcode property">ADC</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+<span class="token opcode property">ADC</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
+<span class="token opcode property">ADC</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
+</code></pre>
 </section>
-
-Example ADC instructions:
-
-```asm6502
-ADC #$04      ; Immediate
-ADC $0700     ; Absolute
-ADC $04       ; Zero Page
-ADC $0700, X  ; Absolute, X
-ADC $0700, Y  ; Absolute, Y
-ADC $04, X    ; Zero Page, X
-ADC ($04, X)  ; (Indirect, X)
-ADC ($04), Y  ; (Indirect), Y
-```
 
 The following assembly demonstrates adding together two 8-bit unsigned values:
 
@@ -1031,7 +964,7 @@ ADC $03   ; Add MSB of second value to the Accumulator.
 STA $05   ; Store LSB of result in memory at address $0005.
 ```
 
-The section on binary number theory earlier in this post described how sign extension can be used to add two signed values that have different bit counts. A useful operation to demonstrate is adding an 8-bit signed value -- a delta value -- to a 16-bit signed value, as described [here](https://codebase64.org/doku.php?id=base:signed_8bit_16bit_addition). The following assembly shows how this can be done, with the delta value first being sign-extended before the addition:
+The section on binary number theory earlier in this post described how sign extension can be used to add two signed values that have different bit counts. A useful operation to demonstrate is adding an 8-bit signed value &mdash; a delta value &mdash; to a 16-bit signed value, as described [here](https://codebase64.org/doku.php?id=base:signed_8bit_16bit_addition). The following assembly shows how this can be done, with the delta value first being sign-extended before the addition:
 
 ```asm6502
 ; $0030 + $9C = $FFCC
@@ -1073,7 +1006,7 @@ ADC $01   ; Add value at address $0001 to the Accumulator .
 STA $04   ; Store Accumulator in memory at address $0004.
 ```
 
-The sequence of bytes at the start of the zero page is now `30 00 9c cc ff`. Thus the correct value -- \$FFCC -- has been stored (in little-endian format).
+The sequence of bytes at the start of the zero page is now `30 00 9c cc ff`. Thus the correct value &mdash; \$FFCC &mdash; has been stored (in little-endian format).
 
 ### Subtraction
 
@@ -1092,20 +1025,17 @@ Subtraction is performed using the SBC operation.
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SBC</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">SBC</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">SBC</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">SBC</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">SBC</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+<span class="token opcode property">SBC</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+<span class="token opcode property">SBC</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
+<span class="token opcode property">SBC</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
+</code></pre>
 </section>
-
-Example SBC instructions:
-
-```asm6502
-SBC #$04      ; Immediate
-SBC $0700     ; Absolute
-SBC $04       ; Zero Page
-SBC $0700, X  ; Absolute, X
-SBC $0700, Y  ; Absolute, Y
-SBC $04, X    ; Zero Page, X
-SBC ($04, X)  ; (Indirect, X)
-SBC ($04), Y  ; (Indirect), Y
-```
 
 As described earlier in this post, the subtraction of one byte from another is implemented in the ALU as an addition, but where the byte to subtract by (the subtrahend) is first negated. The ALU automatically performs that negation, including using the state of the Carry flag to determine if it needs to add one as part of the negation operation. (The ALU only adds one if the Carry flag is set.) This use of the Carry flag's current state works well when subtracting the non-LSB bytes of multi-byte signed values, but it will fail when subtracting the LSBs unless we first set the Carry flag. We can use the SEC operation to do this.
 
@@ -1180,20 +1110,17 @@ Three [bitwise](https://en.wikipedia.org/wiki/Bitwise_operation) operations are 
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect) Y.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">AND</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">AND</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">AND</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">AND</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">AND</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+<span class="token opcode property">AND</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+<span class="token opcode property">AND</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
+<span class="token opcode property">AND</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
+</code></pre>
 </section>
-
-Example AND instructions:
-
-```asm6502
-AND #$04      ; Immediate
-AND $0700     ; Absolute
-AND $04       ; Zero Page
-AND $0700, X  ; Absolute, X
-AND $0700, Y  ; Absolute, Y
-AND $04, X    ; Zero Page, X
-AND ($04, X)  ; (Indirect, X)
-AND ($04), Y  ; (Indirect), Y
-```
 
 <section class="opcode">
     <h5>ORA (OR memory with Accumulator)</h5>
@@ -1208,20 +1135,17 @@ AND ($04), Y  ; (Indirect), Y
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect) Y.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ORA</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">ORA</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">ORA</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">ORA</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">ORA</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+<span class="token opcode property">ORA</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+<span class="token opcode property">ORA</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
+<span class="token opcode property">ORA</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
+</code></pre>
 </section>
-
-Example ORA instructions:
-
-```asm6502
-ORA #$04      ; Immediate
-ORA $0700     ; Absolute
-ORA $04       ; Zero Page
-ORA $0700, X  ; Absolute, X
-ORA $0700, Y  ; Absolute, Y
-ORA $04, X    ; Zero Page, X
-ORA ($04, X)  ; (Indirect, X)
-ORA ($04), Y  ; (Indirect), Y
-```
 
 <section class="opcode">
     <h5>EOR (Exclusive-OR memory with Accumulator)</h5>
@@ -1236,20 +1160,17 @@ ORA ($04), Y  ; (Indirect), Y
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect) Y.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">EOR</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">EOR</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">EOR</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">EOR</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">EOR</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+<span class="token opcode property">EOR</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+<span class="token opcode property">EOR</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
+<span class="token opcode property">EOR</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
+</code></pre>
 </section>
-
-Example EOR instructions:
-
-```asm6502
-EOR #$04      ; Immediate
-EOR $0700     ; Absolute
-EOR $04       ; Zero Page
-EOR $0700, X  ; Absolute, X
-EOR $0700, Y  ; Absolute, Y
-EOR $04, X    ; Zero Page, X
-EOR ($04, X)  ; (Indirect, X)
-EOR ($04), Y  ; (Indirect), Y
-```
 
 The AND operation can be used to clear bits in a given byte. This requires loading a suitable [bitmask](<https://en.wikipedia.org/wiki/Mask_(computing)>) into the Accumulator, one in which the bits to be cleared are zeros and all other bits are ones. This example assembly shows how to clear bit #3 of a given byte:
 
@@ -1313,13 +1234,10 @@ The primary role for the X and Y registers is in indexing. To support this role,
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INX</span>
+</code></pre>
 </section>
-
-An INX instruction:
-
-```asm6502
-INX
-```
 
 <section class="opcode">
     <h5>INY (Increment Y register by One)</h5>
@@ -1334,13 +1252,10 @@ INX
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INY</span>
+</code></pre>
 </section>
-
-An INY instruction:
-
-```asm6502
-INY
-```
 
 <section class="opcode">
     <h5>DEX (Decrement X register by One)</h5>
@@ -1355,13 +1270,10 @@ INY
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEX</span>
+</code></pre>
 </section>
-
-A DEX instruction:
-
-```asm6502
-DEX
-```
 
 <section class="opcode">
     <h5>DEY (Decrement Y register by One)</h5>
@@ -1376,13 +1288,10 @@ DEX
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEY</span>
+</code></pre>
 </section>
-
-A DEY instruction:
-
-```asm6502
-DEY
-```
 
 ### Operations for incrementing and decrementing memory
 
@@ -1403,16 +1312,13 @@ Incrementing or decrementing a value directly in memory takes a greater number o
     <p>
     Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">INC</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">INC</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">INC</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">INC</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+</code></pre>
 </section>
-
-Example INC instructions:
-
-```asm6502
-INC $0700     ; Absolute
-INC $04       ; Zero Page
-INC $0700, X  ; Absolute, X
-INC $04, X    ; Zero Page, X
-```
 
 <section class="opcode">
     <h5>DEC (Decrement Memory by One)</h5>
@@ -1427,16 +1333,13 @@ INC $04, X    ; Zero Page, X
     <p>
     Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">DEC</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">DEC</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">DEC</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">DEC</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+</code></pre>
 </section>
-
-Example DEC instructions:
-
-```asm6502
-DEC $0700     ; Absolute
-DEC $04       ; Zero Page
-DEC $0700, X  ; Absolute, X
-DEC $04, X    ; Zero Page, X
-```
 
 ### Operations for byte comparison
 
@@ -1457,20 +1360,17 @@ The comparison instructions are often used with the branch instructions, as cove
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CMP</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">CMP</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">CMP</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">CMP</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">CMP</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
+<span class="token opcode property">CMP</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+<span class="token opcode property">CMP</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
+<span class="token opcode property">CMP</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
+</code></pre>
 </section>
-
-Example CMP instructions:
-
-```asm6502
-CMP #$04      ; Immediate
-CMP $0C00     ; Absolute
-CMP $04       ; Zero Page
-CMP $0C00, X  ; Absolute, X
-CMP $0C00, Y  ; Absolute, Y
-CMP $04, X    ; Zero Page, X
-CMP ($04, X)  ; (Indirect, X)
-CMP ($04), Y  ; (Indirect), Y
-```
 
 <section class="opcode">
     <h5>CPX (Compare Memory and Index Register X)</h5>
@@ -1485,15 +1385,12 @@ CMP ($04), Y  ; (Indirect), Y
     <p>
     Immediate; Absolute; and Zero Page.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CPX</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">CPX</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">CPX</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+</code></pre>
 </section>
-
-Example CPX instructions:
-
-```asm6502
-CPX #$04      ; Immediate
-CPX $0C00     ; Absolute
-CPX $04       ; Zero Page
-```
 
 <section class="opcode">
     <h5>CPY (Compare Memory and Index Register Y)</h5>
@@ -1508,15 +1405,12 @@ CPX $04       ; Zero Page
     <p>
     Immediate; Absolute; and Zero Page.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CPY</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
+<span class="token opcode property">CPY</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">CPY</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+</code></pre>
 </section>
-
-Example CPY instructions:
-
-```asm6502
-CPY #$04      ; Immediate
-CPY $0C00     ; Absolute
-CPY $04       ; Zero Page
-```
 
 When using these comparison operators, it is the state of the Carry and Zero flags that are the useful flags for making program flow decisions:
 
@@ -1545,14 +1439,11 @@ The result of the AND operation is not stored anywhere; the value in the Accumul
     <p>
     Absolute; and Zero Page.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">BIT</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">BIT</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+</code></pre>
 </section>
-
-Example BIT instructions:
-
-```asm6502
-BIT $0C00     ; Absolute
-BIT $04       ; Zero Page
-```
 
 The following assembly code tests if bit #1 is set in the byte at address \$0C01:
 
@@ -1573,7 +1464,7 @@ As mentioned, the Negative and Overflow flags are updated based solely on the st
 
 ### Bit shift operations
 
-A [bit shift](https://en.wikipedia.org/wiki/Bitwise_operation#Bit_shifts) is a type of bitwise operation where the bits of a value are shifted to the left or to the right. The 6502 supports two types of bit shift -- shift and rotate -- with a left and a right version for each.
+A [bit shift](https://en.wikipedia.org/wiki/Bitwise_operation#Bit_shifts) is a type of bitwise operation where the bits of a value are shifted to the left or to the right. The 6502 supports two types of bit shift &mdash; shift and rotate &mdash; with a left and a right version for each.
 
 For both types, the bits of the specified byte are shift by one bit to the left or right. The bit that is shifted out of the byte is stored in the Carry flag. (The Carry flag is effectively used as a ninth bit for the operation.) The different between the two types of bit shift is the handling of the bit that is shifted in. For the shift type, the shifted-in bit is always a zero. For the rotate type, the shifted-in bit is set to the old value of the Carry flag.
 
@@ -1606,17 +1497,14 @@ The following diagram visualises the effect of ROL, the rotate left operation, s
     <p>
     Accumulator; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LSR</span> <span class="token register variable">A</span>         <span class="token comment">; Accumulator</span>
+<span class="token opcode property">LSR</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">LSR</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">LSR</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">LSR</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+</code></pre>
 </section>
-
-Example LSR instructions:
-
-```asm6502
-LSR A         ; Accumulator
-LSR $0700     ; Absolute
-LSR $04       ; Zero Page
-LSR $0700, X  ; Absolute, X
-LSR $04, X    ; Zero Page, X
-```
 
 <section class="opcode">
     <h5>ASL (Shift Left One Bit (Memory or Accumulator))</h5>
@@ -1631,17 +1519,14 @@ LSR $04, X    ; Zero Page, X
     <p>
     Accumulator; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ASL</span> <span class="token register variable">A</span>         <span class="token comment">; Accumulator</span>
+<span class="token opcode property">ASL</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">ASL</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">ASL</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">ASL</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+</code></pre>
 </section>
-
-Example ASL instructions:
-
-```asm6502
-ASL A         ; Accumulator
-ASL $0700     ; Absolute
-ASL $04       ; Zero Page
-ASL $0700, X  ; Absolute, X
-ASL $04, X    ; Zero Page, X
-```
 
 <section class="opcode">
     <h5>ROL (Rotate One Bit Left (Memory or Accumulator))</h5>
@@ -1656,17 +1541,14 @@ ASL $04, X    ; Zero Page, X
     <p>
     Accumulator; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ROL</span> <span class="token register variable">A</span>         <span class="token comment">; Accumulator</span>
+<span class="token opcode property">ROL</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">ROL</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">ROL</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">ROL</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+</code></pre>
 </section>
-
-Example ROL instructions:
-
-```asm6502
-ROL A         ; Accumulator
-ROL $0700     ; Absolute
-ROL $04       ; Zero Page
-ROL $0700, X  ; Absolute, X
-ROL $04, X    ; Zero Page, X
-```
 
 <section class="opcode">
     <h5>ROR (Rotate One Bit Right (Memory or Accumulator))</h5>
@@ -1681,17 +1563,14 @@ ROL $04, X    ; Zero Page, X
     <p>
     Accumulator; Absolute; Zero Page; Absolute, X; and Zero Page, X.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">ROR</span> <span class="token register variable">A</span>         <span class="token comment">; Accumulator</span>
+<span class="token opcode property">ROR</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
+<span class="token opcode property">ROR</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
+<span class="token opcode property">ROR</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
+<span class="token opcode property">ROR</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
+</code></pre>
 </section>
-
-Example ROR instructions:
-
-```asm6502
-ROR A         ; Accumulator
-ROR $0700     ; Absolute
-ROR $04       ; Zero Page
-ROR $0700, X  ; Absolute, X
-ROR $04, X    ; Zero Page, X
-```
 
 ### The JMP operation
 
@@ -1712,14 +1591,11 @@ A simple means of controlling program execution is the JMP operation. This is th
     <p>
     Absolute; and Absolute Indirect.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">JMP</span> <span class="token hexnumber string">$1234</span>   <span class="token comment">; Absolute</span>
+<span class="token opcode property">JMP</span> (<span class="token hexnumber string">$1234</span>) <span class="token comment">; Absolute Indirect</span>
+</code></pre>
 </section>
-
-Example JMP instructions:
-
-```asm6502
-JMP $1234   ; Absolute
-JMP ($1234) ; Absolute Indirect
-```
 
 Note that normally a label would be used as the operand, rather than a literal address.
 
@@ -1882,14 +1758,11 @@ The RTS operation is used to exit a subroutine. When an RTS instruction is execu
     <p>
     Absolute only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">JSR</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute.</span>
+<span class="token comment">; The operand is normally a label rather than an address.</span>
+</code></pre>
 </section>
-
-A JSR instruction:
-
-```asm6502
-JSR $0C00     ; Absolute.
-              ; The operand is normally a label rather than an address.
-```
 
 <section class="opcode">
     <h5>RTS (Return from Subroutine)</h5>
@@ -1904,13 +1777,10 @@ JSR $0C00     ; Absolute.
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">RTS</span>     <span class="token comment">; Implied</span>
+</code></pre>
 </section>
-
-An RTS instruction:
-
-```asm6502
-RTS     ; Implied
-```
 
 Since only one page of memory is allocated to the stack, there is a limit to how deeply you can nest subroutine calls. (The result of exceeding this limit is termed [stack overflow](https://en.wikipedia.org/wiki/Stack_overflow).) However, it is unlikely that you will ever reach this limit. Instead, it is more likely that you will not need to devote all of the stack page to the stack, in which case you are free to treat the unused space as regular system RAM. Since the stack grows downwards from \$01FF, it is the initial bytes of the stack page that you would be able to use in this way.
 
@@ -1936,13 +1806,10 @@ To deal with this, there are operations to push the current value of the Accumul
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">PHA</span>    <span class="token comment">; Implied</span>
+</code></pre>
 </section>
-
-A PHA instruction:
-
-```asm6502
-PHA    ; Implied
-```
 
 <section class="opcode">
     <h5>PHP (Push Processor Status register on Stack)</h5>
@@ -1957,13 +1824,10 @@ PHA    ; Implied
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">PHP</span>    <span class="token comment">; Implied</span>
+</code></pre>
 </section>
-
-A PHP instruction:
-
-```asm6502
-PHP    ; Implied
-```
 
 <section class="opcode">
     <h5>PLA (Pull Accumulator from Stack)</h5>
@@ -1978,13 +1842,10 @@ PHP    ; Implied
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">PLA</span>    <span class="token comment">; Implied</span>
+</code></pre>
 </section>
-
-A PLA instruction:
-
-```asm6502
-PLA    ; Implied
-```
 
 <section class="opcode">
     <h5>PLP (Pull Processor Status register from Stack)</h5>
@@ -1999,13 +1860,10 @@ PLA    ; Implied
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">PLP</span>    <span class="token comment">; Implied</span>
+</code></pre>
 </section>
-
-A PLP instruction:
-
-```asm6502
-PLP    ; Implied
-```
 
 The following assembly demonstrates storing and restoring the value of the Accumulator:
 
@@ -2034,7 +1892,7 @@ The 6502 supports three types of interrupt event:
 - The interrupt request / break (IRQ/BRK) event.
 - The non-maskable interrupt (NMI) event.
 
-It is required that you include a handler in your program code for each of these three event types, with each handler simply being a subroutine that gets invoked by the CPU when the corresponding event type occurs. An [interrupt vector table](https://en.wikipedia.org/wiki/Interrupt_vector_table) is used to map each of the three event types to its handler. Each entry in the table is simply the address of the handler. The very last six bytes of the CPU address space, $FFFA to $FFFF, is reserved for this table. Every program that you write for the NES must include it and it must be found at that particular range of addresses. Note that the table is not executable code -- it is simply a sequence of three two-byte addresses.
+It is required that you include a handler in your program code for each of these three event types, with each handler simply being a subroutine that gets invoked by the CPU when the corresponding event type occurs. An [interrupt vector table](https://en.wikipedia.org/wiki/Interrupt_vector_table) is used to map each of the three event types to its handler. Each entry in the table is simply the address of the handler. The very last six bytes of the CPU address space, $FFFA to $FFFF, is reserved for this table. Every program that you write for the NES must include it and it must be found at that particular range of addresses. Note that the table is not executable code &mdash; it is simply a sequence of three two-byte addresses.
 
 The three addresses, or vectors, in the table are organised as follows:
 
@@ -2093,13 +1951,10 @@ Now program execution continues within the handler. When you wish to exit the ha
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">RTI</span>    <span class="token comment">; Implied</span>
+</code></pre>
 </section>
-
-An RTI instruction:
-
-```asm6502
-RTI    ; Implied
-```
 
 The following is the effective sequence of event that occurs when a handler is exited via an RTI instruction:
 
@@ -2129,13 +1984,10 @@ The 6502 includes the BRK operation that is used to programmatically signal the 
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">BRK</span>   <span class="token comment">; Implied</span>
+</code></pre>
 </section>
-
-A BRK instruction:
-
-```asm6502
-BRK   ; Implied
-```
 
 A BRK instruction is useful for debugging. You can insert the instruction in your program at the point where you would like to examine the current state of the system. This will cause the IRQ / BRK event handler to be invoked, at which point you can perform some debug-related actions. However, since this event handler is invoked both when a maskable interrupt event occurs and when a BRK instruction is executed, you need to be able to detect the latter case. An extra step that is performed when the CPU executes a BRK instruction is that the Processor Status register value that is pushed to the stack is updated so that the Break flag is set. This allows you, in your IRQ / BRK event handler, to check if the interrupt is actually a break interrupt:
 
@@ -2162,13 +2014,10 @@ The final operation to cover is NOP, the no-op operation. At first glance, an in
     <p>
     Implied only.
     </p>
+    <h6>Example instructions:</h6>
+<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">NOP</span>    <span class="token comment">; Implied</span>
+</code></pre>
 </section>
-
-An NOP instruction:
-
-```asm6502
-NOP    ; Implied
-```
 
 ### The unofficial opcodes
 

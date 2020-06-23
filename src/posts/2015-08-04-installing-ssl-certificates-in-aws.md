@@ -50,5 +50,5 @@ Finally, copy the content of the _CACertificate-1.cer_ and _CACertificate-2.cer_
 
 And that is it! Save, apply, and you are good to go.
 
-[1]: http://aws.amazon.com/
-[2]: https://www.rapidssl.com/buy-ssl/wildcard-ssl-certificate/index.html
+[1]: https://aws.amazon.com/
+[2]: https://www.rapidssl.com/buy-ssl/wildcard-ssl-certificate/
