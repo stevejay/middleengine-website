@@ -12,7 +12,7 @@ heroImage:
 ---
 
 I am currently doing some Web scraping and I wanted to take the approach of using AWS Lambda to run my Node.js scraper code.
-Normally using [cheerio](https://github.com/cheeriojs/cheerio) to parse a given Web page is sufficient, but this approach does not work for single page applications; you need to use a headless browser since JavaScript needs to execute to construct the page. I decided to use the [Horseman](https://github.com/johntitus/node-horseman) npm package for this purpose, which requires that you include the [PhantomJS](http://phantomjs.org/) binary file in some way. The PhantomJS _README_ file suggests using the [phantomjs-prebuilt](https://www.npmjs.com/package/phantomjs-prebuilt) package, an approach that worked locally but failed when I deployed my Lambda. The binary file used needs to be compatible with the AWS Lambda servers and this was not the case. This post details how I resolved the issue.
+Normally using [cheerio](https://github.com/cheeriojs/cheerio) to parse a given Web page is sufficient, but this approach does not work for single page applications; you need to use a headless browser since JavaScript needs to execute to construct the page. I decided to use the [Horseman](https://github.com/johntitus/node-horseman) npm package for this purpose, which requires that you include the [PhantomJS](https://phantomjs.org/) binary file in some way. The PhantomJS _README_ file suggests using the [phantomjs-prebuilt](https://www.npmjs.com/package/phantomjs-prebuilt) package, an approach that worked locally but failed when I deployed my Lambda. The binary file used needs to be compatible with the AWS Lambda servers and this was not the case. This post details how I resolved the issue.
 
 ## Getting the PhantomJS binary
 
@@ -20,7 +20,7 @@ I first downloaded and unzipped a prebuilt phantomjs package from [this bitbucke
 
 ## Including PhantomJS in the Lambda package
 
-I use [Serverless](https://serverless.com/) to deploy Lambdas, and [Webpack](https://webpack.github.io/) to build them. I needed to get
+I use [Serverless](https://www.serverless.com/) to deploy Lambdas, and [Webpack](https://webpack.github.io/) to build them. I needed to get
 the binary file included in the zipped Lambda file and I needed it to have execute permissions. I installed three npm packages to do this, all as dev dependencies: [on-build-webpack](https://www.npmjs.com/package/on-build-webpack), [copy-webpack-plugin](https://www.npmjs.com/package/copy-webpack-plugin), and [chmod](https://www.npmjs.com/package/chmod). I then altered my webpack build file so the plugin section looked like this:
 
 ```js
@@ -63,7 +63,7 @@ You could check that the created Lambda zip file contains the PhantomJS binary f
 
 Because of the presence of the phantomjs binary file, your zipped Lambda file will be quite large (~20 MB). If you are on a bad connection, you will want to increase the AWS CLI timeout. This can be done with serverless by executing the following deploy command:
 
-```
+```shell
 AWS_CLIENT_TIMEOUT=900000 sls deploy
 ```
 

@@ -83,7 +83,7 @@ describe("normaliseCreateTagRequest", () => {
 
 In contrast, the coordinator function is tested using a few integration tests. The coordinator runs as a lambda which is deployed using the Serverless framework. I use the Serverless offline plug-in to be able to run the lambda locally against a local DynamoDB database running in a [Localstack](https://github.com/localstack/localstack) docker container, so no mocking is required. The tests are in [this file](https://github.com/stevejay/artfullylondon-api/blob/master/tag-service/tests/integration/tag-graphql-mutation.test.js) and are structured like so:
 
-```
+```js
 describe("tag graphql querying", () => {
   ...
 
@@ -114,7 +114,7 @@ As a concrete example of this separation of concerns when creating components, I
 
 Regarding testing, I test the two types of components in different ways:
 
-- I use [Storybook and visual regression testing](/posts/2018/08/19/adding-visual-regression-testing-to-a-react-app) to test presentation components.
+- I use [Storybook and visual regression testing](/blog/posts/2018/08/19/adding-visual-regression-testing-to-a-react-app) to test presentation components.
 - I use end-to-end tests written using [Cypress](https://www.cypress.io/) to check the handler logic.
 
 Thinking further on this front-end connection, the React roles of handler (a.k.a. container) and presentation pair up with the roles of coordinator and algorithm in the back-end code I have described. Firstly, both the coordinator and the handler roles deal with coordinating how something happens. Secondly, the React presentation components will likely be written as function components. This means that the visual appearance of a component, as described by the object returned from the function, is solely dependent on the props passed to it. It is therefore an algorithm.

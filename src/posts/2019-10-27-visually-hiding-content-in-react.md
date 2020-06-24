@@ -17,7 +17,7 @@ There are two basic variations on this pattern. The first is when the content is
 
 The second variation is when the content is by default visually hidden but it appears when the user is using the TAB key to navigate the page and the content receives focus. An example of such content is the [skip link](https://a11yproject.com/posts/skip-nav-links/). If you want to see this variation in action, the [MDN Web site](https://developer.mozilla.org/en-US/) includes a list of skip links at the top of the page, and the [Starbucks Web site](https://www.starbucks.com/) includes skip links in the header that skip to the navigation, main content, and footer.
 
-Hiding content is not as simple as adding `display: none` or `display: none`. These both hide the content from screen readers. An approach that does work is implemented by Bootstrap's [sr-only SASS mixin](https://github.com/twbs/bootstrap/blob/master/scss/mixins/_screen-reader.scss):
+Hiding content is not as simple as adding `display: none` or `display: none`. These both hide the content from screen readers. An approach that does work is implemented by Bootstrap's [sr-only SASS mixin](https://github.com/twbs/bootstrap/blob/v4-dev/scss/mixins/_screen-reader.scss):
 
 ```scss
 @mixin sr-only {
@@ -49,7 +49,7 @@ This adds the CSS from the `sr-only` mixin, but only if the styled element does 
 
 Nowadays I use Styled Components for styling React components and I noticed that the GOV.UK developers created the [@govuk-react/skip-link](https://www.npmjs.com/package/@govuk-react/skip-link) React component using it. The component is designed to be used for both variations in hiding content, but it implements the focusable variation in a different way to Bootstrap. It always applies the CSS attributes to hide the content and then if the content is focusable it applies an extra rule to reset those attributes on focus. The following is the helper function that the component uses to do this:
 
-```js
+```jsx
 function visuallyHidden({
   important: isImportant = true,
   focusable: isFocusable = false,
@@ -99,7 +99,7 @@ This is problematic because it is sometimes not certain what each CSS attribute 
 
 I instead created the following component:
 
-```js
+```jsx
 const VisuallyHidden = styled.span`
   /* && for increased specificity: */
   &&${(props) => (props.isFocusable ? ":not(:focus):not(:active)" : "")} {
@@ -117,11 +117,11 @@ const VisuallyHidden = styled.span`
 `;
 ```
 
-To increase the specificity of the rule, I opted to use multiple ampersands rather than `!important`. This is a technique suggested in the Styled Components [documentation](https://www.styled-components.com/docs/faqs#how-can-i-override-styles-with-higher-specificity). You can adjust the specificity as you please; you might find that you require no additional specificity.
+To increase the specificity of the rule, I opted to use multiple ampersands rather than `!important`. This is a technique suggested in the Styled Components [documentation](https://styled-components.com/docs/faqs#how-can-i-override-styles-with-higher-specificity). You can adjust the specificity as you please; you might find that you require no additional specificity.
 
 I then used this VisuallyHidden component to create a `SkipLink` component. First I created a styled component for the visual appearance of the skip link:
 
-```js
+```jsx
 const SkipLinkButton = styled.button`
   position: absolute;
   left: 1em;
@@ -139,7 +139,7 @@ const SkipLinkButton = styled.button`
 
 As you can see, I decided to implement it as a button that is positioned absolutely. I then used this styled button and the VisuallyHidden component to create the final skip link component:
 
-```js
+```jsx
 const SkipLink = ({ skipRef, children }) => {
   const handleClick = () => {
     // The skipping magic happens here.
@@ -153,6 +153,6 @@ const SkipLink = ({ skipRef, children }) => {
 };
 ```
 
-I set the SkipLinkButton as the `as` [polymorphic prop](https://www.styled-components.com/docs/api#as-polymorphic-prop) of the VisuallyHidden component, which changes the underlying DOM element of the latter to a `button`.
+I set the SkipLinkButton as the `as` [polymorphic prop](https://styled-components.com/docs/api#as-polymorphic-prop) of the VisuallyHidden component, which changes the underlying DOM element of the latter to a `button`.
 
 Implementing a robust mechanism to skip to the target element is not straightforward. Often the target element is a non-focusable element like `h1`, `main`, `div` or `footer`, and a11y requirements and browser differences complicate the matter. There is an [excellent post by Axess Lab](https://axesslab.com/skip-links/) which describes the problems that can occur with the naive solution and how it can be fixed. In particular, I found the 'Update 3 - A comment from gov.uk' addition very useful. You can see the complete source code for my skip links solution in [this repository](https://github.com/stevejay/react-performance). It takes the approach of&#8212;if required&#8212;setting a `tabindex` value of `-1` on the target element before invoking `focus` and `scrollIntoView` on it, before removing the `tabindex` value on blur.

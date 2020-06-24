@@ -32,7 +32,7 @@ My concern in this post is how to organize a larger React code base. Some kind o
 
 I have an example code base [there](https://github.com/stevejay/artfullylondon-web-admin) where you can see my particular modular approach. It has been bootstrapped using [create-react-app](https://github.com/facebook/create-react-app). The _src_ directory contains the application's source code and has the following basic structure:
 
-```
+```shell
 modules/
 	...
 shared/
@@ -44,7 +44,7 @@ registerServiceWorker.js
 
 Any React application is likely to have components and helper functions that are required by many of its pages. I put these in the _shared_ directory. Any module can import these shared files. It is structured like so:
 
-```
+```shell
 utils/
 	...
 entity-image/
@@ -69,19 +69,19 @@ However, not having dependencies between modules leads to a major problem, becau
 
 My fix for this was to create the concept of menu option handler components. The top-level menu module component requires that two such handler components are passed to it via props, one for the logout menu option and one for the search menu option. These handlers define the behaviour of each option when it is triggered. The actual visual appearance is still determined by the menu module, as a menu option handler component has to be passed a component that it renders as its visual appearance. For example, the top-level Menu component requires a `searchMenuOptionHandler` prop to be passed to it. It renders this passed component in the navigation menu, passing it the component that actually renders the search button:
 
-```
+```jsx
 <SearchMenuOptionHandler component={SearchButton} />
 ```
 
 The SearchMenuOptionHandler component renders the component it is passed, in this case the SearchButton component. When doing so, it passes it an `onClick` reference to be invoked when the search button is clicked, and a boolean that indicates if the search dialog is open or not:
 
-```
+```jsx
 <Component searchOpen={searchOpen} onClick={searchOpened} />
 ```
 
 The SearchMenuOptionHandler component is part of the search module and completely control displaying the search dialog and what happens when the user enters a search term there. The menu module is in control of the visual appearance of that option in the navigation menu, but it is the search module that brings the option to life. This is also how the logout button works in the sidebar menu. In this way, a dependency between the menu module on the one hand and the auth and search modules on the other is avoided by the latter modules exporting handler components and the menu module requiring them via props. It is only the top-level _app.js_ file that knows about all of these components and is responsible for connecting them together:
 
-```
+```jsx
 ...
 <Menu
   logoutMenuOptionHandler={LogoutMenuOptionHandler}

@@ -17,7 +17,7 @@ This is the first in a series of posts about programming the [Nintendo Entertain
 
 ## The console
 
-![](/images/2020-06-22-programming-the-nes-the-nes-in-overview/1280px-NES-Console-Set.jpg "The Nintendo Entertainment System")
+![](/images/2020-06-22-programming-the-nes-the-nes-in-overview/1280px-NES-Console-Set.jpg "The Nintendo Entertainment System (Wikipedia)")
 
 The NES was released by Nintendo in the West in the mid 80s. It was the export version of the Famicom, Nintendo's home console that was released in Japan in 1983. Games were sold on cartridges, called [Game Paks](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System_Game_Pak), that plugged into the console. It came with two game controllers. Each controller was a simple affair by today's standards, with a D-pad, two action buttons (A and B), a Start button, and a Select button. The console itself had only two buttons: Power and Reset.
 
@@ -37,9 +37,9 @@ The CPU is an 8-bit CPU, meaning it has an 8-bit data bus. The data bus is the c
 
 The NES has only 2 KiB of internal (system) RAM, although this can be expanded via the game cartridge.
 
-The CPU has a 16-bit address space, meaning it can address 65,536 (2^16) memory locations, from $0000 to $FFFF. This memory is divided up into a number of regions, not all of which are useful or even available. The system RAM is located in the first 2 KiB of the address space, from addresses $0000 to $07FF. The game cartridge also includes ROM and potentially RAM, and this is made available within the address space. Besides RAM and ROM, the address space is also used to control various components, such as the graphics and audio components, and to query the status of any connected peripherals. This control is achieved by reading from and writing to particular bytes in the address space.
+The CPU has a 16-bit address space, meaning it can address 65,536 (2<sup>16</sup>) memory locations, from $0000 to $FFFF. This memory is divided up into a number of regions, not all of which are useful or even available. The system RAM is located in the first 2 KiB of the address space, from addresses $0000 to $07FF. The game cartridge also includes ROM and potentially RAM, and this is made available within the address space. Besides RAM and ROM, the address space is also used to control various components, such as the graphics and audio components, and to query the status of any connected peripherals. This control is achieved by reading from and writing to particular bytes in the address space.
 
-A useful way to refer to areas in memory is by page number. The CPU address space can be thought of as being divided into 256 pages of 256 bytes each, where the first page, also known as the zero page, begins at address $0000. The CPU is little endian, so any addresses in the program get encoded [least significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte) (LSB) first and [most significant byte](Most_significant_byte) (MSB) second. For example, if I write an instruction in assembly with an operand of the address $1234 &mdash; $12 being the MSB and $34 being the LSB &mdash; the assembler will encode that address as \$3412.
+A useful way to refer to areas in memory is by page number. The CPU address space can be thought of as being divided into 256 pages of 256 bytes each, where the first page, also known as the zero page, begins at address \$0000. The CPU is little endian, so any addresses in the program get encoded [least significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte) (LSB) first and [most significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_byte) (MSB) second. For example, if I write an instruction in assembly with an operand of the address `$1234`, the assembler will encode that address as `$3412` (`$12` being the MSB and `$34` being the LSB).
 
 The CPU includes six [processor registers](https://en.wikipedia.org/wiki/Processor_register), special data storage areas that are quick to access and that are separate from the NES's 2 KiB of system RAM. They allow data to be transferred between locations in memory, to be processed by the CPU's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU), and for information about the current state of the CPU to be tracked. A lot of the process of learning to program the NES in assembly is learning about the opcodes and how they affect the content of these registers. You still have access to the usual programming language constructs like loops and conditionals, but now you have to understand how to code them yourself using a very different set of tools. Basically you have to do what a compiler normally does for you.
 
@@ -78,3 +78,4 @@ The NES has many limitations compared to today's game consoles and personal comp
 ## Changelog
 
 - 2020-06-22: Initial version
+- 2020-06-23: Minor formatting changes

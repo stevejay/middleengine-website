@@ -17,7 +17,6 @@
     "fs-extra": "^9.0.0",
     "handlebars": "^4.7.6",
     "handlebars-intl": "^1.1.2",
-    "highlight.js": "^10.0.1",
     "local-web-server": "^4.0.0",
     "lodash": "^4.17.15",
     "markdown-it": "^10.0.0",
@@ -31,6 +30,7 @@
     "npm-check": "^5.9.2",
     "postcss": "^7.0.27",
     "postcss-css-variables": "^0.17.0",
+    "prismjs": "^1.20.0",
     "probe-image-size": "^5.0.0",
     "rev-hash": "^3.0.0",
     "unsplash-js": "^6.0.0"

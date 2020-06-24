@@ -11,11 +11,11 @@ heroImage:
   id: zP7X_B86xOg
 ---
 
-The library [Styled Components](https://www.styled-components.com/) is one of a number of CSS-in-JS solutions for styling Web apps. I have previously been a big fan of [CSS Modules](https://github.com/css-modules/css-modules) but, having used Styled Components on a recent project, I am now a convert. I have found some rough edges along the way, so I thought I would post about how I have improved my Styled Components usage, including usage with TypeScript.
+The library [Styled Components](https://styled-components.com/) is one of a number of CSS-in-JS solutions for styling Web apps. I have previously been a big fan of [CSS Modules](https://github.com/css-modules/css-modules) but, having used Styled Components on a recent project, I am now a convert. I have found some rough edges along the way, so I thought I would post about how I have improved my Styled Components usage, including usage with TypeScript.
 
 ## Theming
 
-A key feature of Styled Components is that [it supports theming](https://www.styled-components.com/docs/advanced#theming). I believe it makes sense to base your theme's shape around the [System UI Theme Specification](https://system-ui.com/theme/) so that the result will be compatible with any Styled Components-based libraries that use it too. For example, both [Styled System](https://styled-system.com/theme-specification) and [XStyled System](https://www.smooth-code.com/open-source/xstyled/docs/theme-specification/) follow that specification.
+A key feature of Styled Components is that [it supports theming](https://styled-components.com/docs/advanced#theming). I believe it makes sense to base your theme's shape around the [System UI Theme Specification](https://system-ui.com/theme/) so that the result will be compatible with any Styled Components-based libraries that use it too. For example, both [Styled System](https://styled-system.com/theme-specification/) and [XStyled System](https://xstyled.dev/docs/theme-specification/) follow that specification.
 
 The specification details a set of theme object keys for your theme. Example keys are `space`, `fontSizes`, and `colors`. You have to decide what the value for each key will be, although the specification offers guidance here. Generally your choice for a value is for it to be an array, an object, or an array with aliases:
 
@@ -97,17 +97,17 @@ const StyledExample = styled.div(
 );
 ```
 
-You might find this version easier to read. The technique is mentioned in the Styled Components documentation in the section on [writing CSS as JavaScript objects instead of strings](https://www.styled-components.com/docs/advanced#style-objects). Note that the `css` function is not required in the above example. It is being used here to trigger highlighting of the enclosed CSS when using the [vscode-styled-components extension](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components) in Visual Studio Code.
+You might find this version easier to read. The technique is mentioned in the Styled Components documentation in the section on [writing CSS as JavaScript objects instead of strings](https://styled-components.com/docs/advanced#style-objects). Note that the `css` function is not required in the above example. It is being used here to trigger highlighting of the enclosed CSS when using the [vscode-styled-components extension](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components) in Visual Studio Code.
 
 ## Helper libraries
 
-If you are writing styled components from scratch then, rather than using some components library that is build using Styled Components, I suggest you also use either [Styled System](https://styled-system.com/theme-specification) or [XStyled System](https://www.smooth-code.com/open-source/xstyled/docs/theme-specification/). Both have the same basic benefits:
+If you are writing styled components from scratch then, rather than using some components library that is build using Styled Components, I suggest you also use either [Styled System](https://styled-system.com/theme-specification/) or [XStyled System](https://xstyled.dev/docs/theme-specification/). Both have the same basic benefits:
 
 - Simplifying the creation of Styled Components that expose style props.
 - Providing a succinct syntax for responsive styles.
 - Providing alternative ways to access theme values.
 
-The reason two libraries exist for this purpose rather than just one is summarised on [this page](https://www.smooth-code.com/open-source/xstyled/docs/motivation/) on the XStyled System site.
+The reason two libraries exist for this purpose rather than just one is summarised on [this page](https://xstyled.dev/docs/motivation/) on the XStyled System site.
 
 Regarding TypeScript, Styled System and XStyled System have declarations in the [Definitely Typed](https://github.com/DefinitelyTyped/DefinitelyTyped) repository
 
@@ -146,7 +146,7 @@ const Box = styled.div<Props>`
 
 The component would then be used like so:
 
-```js
+```ts
 import React from "react";
 import { ThemeContext } from "styled-components";
 
@@ -208,7 +208,7 @@ const Box = styled.div<Props>`
 
 The exact names of the functions and props types differ between the two libraries, but the effect is the same. The resulting styled component is both easier to write and easier to use:
 
-```js
+```ts
 import React from "react";
 
 const SomeComponent = () => {
@@ -247,7 +247,7 @@ const Stack = styled.div<MarginTopProps>`
 
 This also allows me to support responsive `marginTop` prop values:
 
-```js
+```ts
 const SomeComponent = () => {
   // Note: variable used here because
   // syntax highlighting was breaking:
@@ -281,7 +281,7 @@ const verticalSpacing = style({
 type Props = { verticalSpacing: MarginTopProps["marginTop"] };
 ```
 
-Styled System provides similar functionality via the `system` function, as described [here](https://styled-system.com/custom-props):
+Styled System provides similar functionality via the `system` function, as described [here](https://styled-system.com/custom-props/):
 
 ```ts
 import { system, MarginTopProps } from "styled-system";
@@ -316,7 +316,7 @@ const StyledExample = styled.div`
 `;
 ```
 
-Alternatively you can use the [th function](https://www.smooth-code.com/open-source/xstyled/docs/system-utilities/#theme-getters), which has the same getter functions attached to it:
+Alternatively you can use the [th function](https://xstyled.dev/docs/system-utilities/#theme-getters), which has the same getter functions attached to it:
 
 ```ts
 import { th } from "@xstyled/system";
@@ -370,7 +370,7 @@ const StyledExample = styled.div<Props>`
 
 I can use it like so:
 
-```js
+```ts
 // A theme space prop index
 const ExampleOne = () => <StyledExample spacing={3}>One</StyledExample>;
 

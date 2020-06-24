@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ ! -f /usr/share/nginx/html/css/highlight-*.css ]; then
-  echo "/usr/share/nginx/html/css/highlight-*.css file not found!"
-  exit 1
-fi
-
 if [ ! -f /usr/share/nginx/html/css/normalize-*.css ]; then
   echo "/usr/share/nginx/html/css/normalize-*.css file not found!"
   exit 1

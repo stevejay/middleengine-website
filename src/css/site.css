@@ -88,7 +88,7 @@ html {
 /********************************/
 
 html {
-  background-color: var(--color-black);
+  background-color: var(--color-white);
 }
 
 /********************************/
@@ -416,25 +416,10 @@ table caption {
 /*             Code             */
 /********************************/
 
-code {
+/* Overrides for prismjs */
+pre[class*="language-"] {
   font-size: var(--font-size-1);
-  line-height: 1.4;
-}
-
-pre {
   background-color: var(--color-neutral-100);
-  overflow-x: scroll;
-}
-
-pre code {
-  margin: var(--space-2);
-  display: inline-block;
-}
-
-@media (min-width: 768px) {
-  pre code {
-    margin: var(--space-4);
-  }
 }
 
 /* Code embedded in body text */
@@ -449,7 +434,11 @@ li code {
 /*         Site header          */
 /********************************/
 
-body > header {
+#site-header {
+  background-color: var(--color-black);
+}
+
+#site-header .content-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -458,16 +447,16 @@ body > header {
   max-width: var(--width-main);
   margin-left: auto;
   margin-right: auto;
-  background-color: var(--color-black);
 }
 
 /* Control vertical margins manually */
-body > header > * {
+#site-header h2,
+#site-header nav {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-body > header h2 {
+#site-header h2 {
   width: 267px;
   height: 92px;
   flex-shrink: 0;
@@ -479,7 +468,7 @@ body > header h2 {
 }
 
 @media (min-width: 768px) {
-  body > header {
+  #site-header .content-wrap {
     flex-direction: row;
     align-items: flex-end;
     padding: var(--space-5);
@@ -490,7 +479,7 @@ body > header h2 {
 /*       Site navigation        */
 /********************************/
 
-body > header nav {
+#site-header nav {
   text-transform: uppercase;
   line-height: 1;
   font-family: var(--font-family-heading);
@@ -502,20 +491,20 @@ body > header nav {
 }
 
 /* Control vertical margins manually */
-body > header nav ul,
-body > header nav li {
+#site-header nav ul,
+#site-header nav li {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-body > header nav ul {
+#site-header nav ul {
   display: flex;
   justify-content: center;
   list-style-type: none;
   padding: 0;
 }
 
-body > header nav a {
+#site-header nav a {
   display: block;
   color: var(--color-white);
   border-top: 3px solid transparent;
@@ -529,7 +518,7 @@ body.blog > header nav a.blog-link {
 }
 
 @media (min-width: 768px) {
-  body > header nav {
+  #site-header nav {
     flex-grow: 1;
     margin-top: 0;
     margin-bottom: 2px;
@@ -538,7 +527,7 @@ body.blog > header nav a.blog-link {
     border-bottom: var(--width-hair) solid var(--color-primary);
   }
 
-  body > header nav ul {
+  #site-header nav ul {
     justify-content: flex-end;
   }
 
@@ -553,7 +542,11 @@ body.blog > header nav a.blog-link {
 /*          Site footer         */
 /********************************/
 
-body > footer {
+#site-footer {
+  background-color: var(--color-black);
+}
+
+#site-footer .content-wrap {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -561,18 +554,17 @@ body > footer {
   max-width: var(--width-main);
   margin-left: auto;
   margin-right: auto;
-  background-color: var(--color-black);
 }
 
-body > footer :first-child {
+#site-footer .content-wrap :first-child {
   margin-top: 0;
 }
 
-body > footer :last-child {
+#site-footer .content-wrap :last-child {
   margin-bottom: 0;
 }
 
-body > footer p {
+#site-footer p {
   color: var(--color-neutral-600);
   font-size: var(--font-size-1);
   font-style: italic;
@@ -580,7 +572,7 @@ body > footer p {
   position: relative;
 }
 
-body > footer p:before {
+#site-footer p:before {
   content: "";
   position: absolute;
   top: 0;
@@ -592,14 +584,14 @@ body > footer p:before {
   background-repeat: no-repeat;
 }
 
-body > footer p a {
+#site-footer p a {
   color: var(--color-white);
   border-bottom: none;
   font-size: var(--font-size-1);
   color: var(--color-neutral-600);
 }
 
-body > footer ul {
+#site-footer ul {
   list-style-type: none;
   padding: 0;
   line-height: 1;
@@ -608,13 +600,13 @@ body > footer ul {
   font-size: var(--font-size-2);
 }
 
-body > footer li a {
+#site-footer li a {
   color: var(--color-white);
   border-bottom: none;
 }
 
 @media (min-width: 768px) {
-  body > footer {
+  #site-footer .content-wrap {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
@@ -622,7 +614,7 @@ body > footer li a {
   }
 
   /* Control vertical margins manually */
-  body > footer > * {
+  #site-footer .content-wrap > * {
     margin-top: 0;
     margin-bottom: 0;
   }
@@ -763,10 +755,17 @@ main > article > section {
   padding: var(--space-5) var(--space-4) var(--space-6);
 }
 
-main > article > section > * {
+/* Includes an override for prismjs */
+main > article > section > *,
+main > article > section > pre[class*="language-"] {
   max-width: var(--width-article-body);
   margin-left: auto;
   margin-right: auto;
+}
+
+main > article > section > pre[class*="language-"] {
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
 }
 
 /* Remove vertical margins around the article body */
@@ -1224,6 +1223,48 @@ body.index header.hero h1 strong {
   #blog-posts-listing ul {
     grid-template-columns: 1fr 1fr 1fr;
   }
+}
+
+/********************************/
+/*           NES posts          */
+/********************************/
+
+section.opcode {
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
+  background: var(--color-neutral-200);
+  color: var(--color-black);
+  border-radius: var(--radius-2);
+  border-collapse: collapse;
+  overflow: hidden;
+  font-size: var(--font-size-1);
+}
+
+section.opcode h5 {
+  color: var(--color-primary);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--color-white);
+}
+
+section.opcode h6 {
+  border-top: 1px solid var(--color-white);
+  padding-bottom: 0;
+  color: var(--color-neutral-700);
+}
+
+section.opcode h6 + p,
+section.opcode h6 + pre {
+  padding-top: var(--space-2);
+}
+
+section.opcode > * {
+  padding: var(--space-4);
+  margin: 0;
+}
+
+/* Overrides for prismjs */
+section.opcode pre[class*="language-"] {
+  background-color: transparent;
 }
 
 /********************************/

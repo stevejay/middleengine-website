@@ -218,8 +218,10 @@ Cons:
 
 The 'Using State' solution had the problem of requiring a state change directly after scrolling (to clear the `scrollSectionId` state) in order for the user to be able to click multiple times in succession on a particular section button. But this problem can be avoided if `scrollSectionId` is not a number or string but is instead an object, one that has a property of the section ID to scroll to:
 
-```
-{ id: 'some-section-id' }
+```jsx
+{
+  id: "some-section-id";
+}
 ```
 
 This works because, even if the ID to scroll to is the same as the previous ID, I always have to create a new object since React state cannot be mutated.
