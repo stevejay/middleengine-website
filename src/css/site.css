@@ -1124,7 +1124,7 @@ body.index header.hero h1 strong {
 
 #cta-section {
   color: var(--color-white);
-  background-color: var(--black);
+  background-color: var(--color-black);
   padding: var(--space-5) var(--space-4);
 }
 
