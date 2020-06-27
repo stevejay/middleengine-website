@@ -6,9 +6,6 @@ date: 2020-06-22
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-heroImage:
-  source: Unsplash
-  id: ZV7lnfyQLmA
 ---
 
 ## Introduction
@@ -74,6 +71,8 @@ The topmost chip is the MMU. On the lower row, from left to right, are the CIC, 
 ## Conclusion
 
 The NES has many limitations compared to today's game consoles and personal computers. It has a tiny amount of system RAM, a narrow data bus, a limited CPU, and an idiosyncratic PPU. Nevertheless, many classic games were created for it and it continues to be a much-loved console. As you will see, programming the NES is quite the exercise in nostalgia and is a rewarding introduction to assembly and 8-bit graphics. The next post will start the journey by taking a detailed look at the 6502, the CPU used in the NES.
+
+---
 
 ## Changelog
 

@@ -6,12 +6,13 @@ date: 2020-04-25
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-heroImage:
-  source: Unsplash
-  id: 842ofHC6MaI
 ---
 
-Like many developers, I use [Git](https://git-scm.com/) for source control. Normally I use a short-lived branch for each feature I code, branching it off of the _master_ branch and rebasing it as required, but sometimes I have to branch off of a branch, and in this situation rebasing can be problematic. One solution is to use the --onto option when rebasing, and this post details how the process works.
+## Introduction
+
+Like many developers, I use [Git](https://git-scm.com/) for source control. Normally I use a short-lived branch for each feature I code, branching it off of the _master_ branch and rebasing it as required, but sometimes I have to branch off of a branch, and in this situation rebasing can be problematic. One solution is to use the `--onto` option when rebasing, and this post details how the process works.
+
+## The process
 
 Let us say that I start developing a new feature. I create _branch-a_ off of _master_ and I push a couple of commits to it (B and C):
 
@@ -45,7 +46,7 @@ Now I want to continue working on _branch-b_, but I want to be working on top of
 
 The rebase affects all of commits B, C, D and E, even though I am actually only interested in commits D and E. Depending on the exact changes involved, this can result in a very confusing rebase. There can be merge conflicts between changes contained in the original commits on _branch-a_ (commits B and C) and the final combined commit on _master_, and there can be no-op commits when the changes in an original commit match those already on _master_. In the latter case, you will see the message "_No changes - did you forget to use 'git add'?_".
 
-One answer is to use the --onto option with Git rebase [as documented here](https://git-scm.com/docs/git-rebase). This allows you to specify a particular range of commits to rebase; no other commits get included in the rebase. You need to specify both the branch to rebase onto and the range of commits to rebase. There are multiple ways to specify that range, but I find the simplest is the `HEAD~x` syntax, where `x` is the number of commits to count back from the head commit. (The head commit is the most recent commit on the current branch, and `HEAD` is Git's shorthand reference for that particular commit.) With this syntax, you specify the first commit you do **not** want to be included in the rebase. So to only include the most recent commit you would specify `HEAD~1`, and to include the most recent two commits you would specify `HEAD~2`. In the example for this post, I enter the following commands in turn:
+One answer is to use the `--onto` option with Git rebase [as documented here](https://git-scm.com/docs/git-rebase). This allows you to specify a particular range of commits to rebase; no other commits get included in the rebase. You need to specify both the branch to rebase onto and the range of commits to rebase. There are multiple ways to specify that range, but I find the simplest is the `HEAD~x` syntax, where `x` is the number of commits to count back from the head commit. (The head commit is the most recent commit on the current branch, and `HEAD` is Git's shorthand reference for that particular commit.) With this syntax, you specify the first commit you do **not** want to be included in the rebase. So to only include the most recent commit you would specify `HEAD~1`, and to include the most recent two commits you would specify `HEAD~2`. In the example for this post, I enter the following commands in turn:
 
 ```shell
 # Check out the branch to be rebased (branch-b):
@@ -67,4 +68,13 @@ This results in the following state, and I am now able to continue working on _b
 
 Note that there are other ways to achieve the same result. For example, I could perform an interactive rebase of _branch-b_ in which I remove the lines for outdated commits B and C.
 
-Having learned the rebase --onto technique, I now feel more in control of Git. I have the power to move ranges of commits around at will, without the very confusing merge conflicts that I would have had in the past.
+## Conclusion
+
+Having learned the `git rebase --onto` technique, I now feel more in control of Git. I have the power to move ranges of commits around at will, without the very confusing merge conflicts that I would have had in the past.
+
+---
+
+## Changelog
+
+- 2020-04-25 Initial version
+- 2020-06-27 Minor formatting changes

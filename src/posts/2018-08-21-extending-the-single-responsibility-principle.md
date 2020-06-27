@@ -6,9 +6,6 @@ date: 2018-08-21
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-heroImage:
-  source: Unsplash
-  id: T-VS-7y_fAY
 ---
 
 If you are a software developer then you will have heard of the [SOLID principles](https://en.wikipedia.org/wiki/SOLID). SOLID is a mnemonic for five principles that are applicable to [object-oriented programming](https://en.wikipedia.org/wiki/Object-oriented_programming) (OOP) and that help you avoid some common anti-patterns. These principles are:

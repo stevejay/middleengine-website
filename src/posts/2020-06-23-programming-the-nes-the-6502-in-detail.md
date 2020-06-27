@@ -6,9 +6,6 @@ date: 2020-06-23
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-heroImage:
-  source: Unsplash
-  id: ZV7lnfyQLmA
 draft: true
 ---
 
@@ -2034,6 +2031,8 @@ If you have not done any low-level programming before, then writing games for th
 
 - [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf).
 
+---
+
 ## Changelog
 
-2020-06-23 Initial version
+- 2020-06-23 Initial version

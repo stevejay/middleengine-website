@@ -12,7 +12,6 @@ import Handlebars from "handlebars";
 import HandlebarsIntl from "handlebars-intl";
 import anchor from "markdown-it-anchor";
 import multimdTable from "markdown-it-multimd-table";
-import Unsplash from "unsplash-js";
 import revisionHash from "rev-hash";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
@@ -66,50 +65,6 @@ const handlebarsI18nData = {
   },
 };
 
-const getUnsplashImageMetaData = async (unsplashImageId) => {
-  let photoJson = null;
-  let attempts = 1;
-
-  do {
-    try {
-      const unsplash = new Unsplash.default({
-        accessKey: process.env.UNSPLASH_APP_ACCESS_KEY,
-      });
-
-      photoJson = await unsplash.photos
-        .getPhoto(unsplashImageId)
-        .then((res) => res.json());
-
-      if (photoJson.errors && photoJson.errors.length) {
-        throw new Error(
-          `Unsplash image ID ${unsplashImageId}: ${JSON.stringify(
-            photoJson.errors
-          )}`
-        );
-      }
-    } catch (err) {
-      ++attempts;
-
-      if (attempts > 3) {
-        console.error(err);
-        throw err;
-      } else {
-        photoJson = null;
-      }
-    }
-  } while (!photoJson);
-
-  return {
-    rawUrl: photoJson.urls.raw,
-    width: photoJson.width,
-    height: photoJson.height,
-    backgroundColor: photoJson.color,
-    creditUrl: photoJson.user.links.html,
-    creditName: photoJson.user.name,
-    appName: process.env.UNSPLASH_APP_NAME,
-  };
-};
-
 const processBlogPostFile = async (blogPostFile, buildContext) => {
   const markdownIt = new MarkdownIt({
     html: true,
@@ -144,14 +99,6 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
 
   const post = await readFile(blogPostFile.path, { encoding: "utf-8" });
   const content = markdownIt.render(post);
-
-  if (markdownIt.meta.heroImage) {
-    if (markdownIt.meta.heroImage.source === "Unsplash") {
-      markdownIt.meta.heroImage = await getUnsplashImageMetaData(
-        markdownIt.meta.heroImage.id
-      );
-    }
-  }
 
   const layoutContent = await readFile(
     path.join(TEMPLATES_SRC_DIR, `${markdownIt.meta.layout}.hbs`),

@@ -65,7 +65,6 @@ You can access the Web site via the URL `http://localhost/`.
 ## Services used
 
 - [Favicon Converter](https://favicon.io/favicon-converter/) for favicon generation.
-- [Unsplash](https://unsplash.com/) for hero images.
 - [DrLinkCheck](https://www.drlinkcheck.com/) for checking for broken links.
 - [SVGOMG](https://jakearchibald.github.io/svgomg/) for SVG optimisation.
 - [TinyJPG](https://tinyjpg.com/) for JPG optimisation.
@@ -79,7 +78,3 @@ Image files are versioned by appending a `vN` style suffix to the image file nam
 JavaScript and CSS files are versioned automatically by the build script. A hash value is generated from the file content and appended to the file name.
 
 The result of this versioning is that all of these files can have a very long cache control TTL value.
-
-## TODO
-
-- Fade-in of hero images when they are not already in the browser's cache, using [image loading events](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onloadstart).

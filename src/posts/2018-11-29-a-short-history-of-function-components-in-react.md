@@ -6,9 +6,6 @@ date: 2018-11-29
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-heroImage:
-  source: Unsplash
-  id: 1-29wyvvLJA
 ---
 
 As my blogging history demonstrates, I am a big fan of [React](https://reactjs.org/), the awesome JavaScript library for building user interfaces. In this post I take a quick dive into one feature of that library, the function component.

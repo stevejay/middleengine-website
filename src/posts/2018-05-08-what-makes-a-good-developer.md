@@ -6,9 +6,6 @@ date: 2018-05-08
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-heroImage:
-  source: Unsplash
-  id: YK0HPwWDJ1I
 ---
 
 "What makes a good developer?" This is a question that I was once asked in an interview. It is a pretty open-ended question, and I gave an answer that ticked off various software development best practises, but it made me wonder whether there was one basic characteristic that I could have identified. The thought interested me because the answer could be used to inform the larger development process, as in _'is this characteristic helped or hindered by this particular development practise?'_

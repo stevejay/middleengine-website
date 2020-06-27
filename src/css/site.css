@@ -55,6 +55,7 @@
   --font-size-5: 1.45rem;
   --font-size-6: 1.75rem;
   --font-size-7: 2.25rem;
+  --font-size-8: 3rem;
 
   --shadow-small: 2px 4px 8px 2px #00000088;
 }
@@ -273,6 +274,11 @@ ul > li,
 ol > li {
   margin-top: var(--space-2);
   margin-bottom: var(--space-2);
+}
+
+hr {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-6);
 }
 
 /********************************/
@@ -859,6 +865,73 @@ figure.hero figcaption a {
 
 #blog-posts-listing figure.hero:before {
   content: none;
+}
+
+/********************************/
+/*         Basic header         */
+/********************************/
+
+header.basic-hero {
+  position: relative;
+}
+
+/* Control vertical margins manually */
+header.basic-hero h1 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+header.basic-hero .hero-text-wrap {
+  width: 100%;
+  max-width: var(--width-article-body);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: var(--space-5) var(--space-4) var(--space-2);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+header.basic-hero .hero-text-wrap > * + * {
+  margin-top: var(--space-3);
+}
+
+header.basic-hero h1,
+header.basic-hero p {
+  width: 100%;
+}
+
+header.basic-hero h1 {
+  color: var(--color-primary);
+  font-size: var(--font-size-6);
+  font-family: var(--font-family-page-heading);
+  font-weight: var(--font-weight-page-heading);
+  font-style: italic;
+}
+
+@media (min-width: 768px) {
+  header.basic-hero .hero-text-wrap {
+    padding: var(--space-6) var(--space-5) var(--space-2);
+  }
+
+  header.basic-hero .hero-text-wrap > * + * {
+    margin-top: var(--space-4);
+  }
+
+  header.basic-hero h1 {
+    font-size: var(--font-size-7);
+  }
+}
+
+@media (min-width: 992px) {
+  header.basic-hero .hero-text-wrap {
+    padding: var(--space-7) 0 var(--space-4);
+  }
+
+  header.basic-hero h1 {
+    font-size: var(--font-size-8);
+  }
 }
 
 /********************************/
