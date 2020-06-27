@@ -63,7 +63,7 @@ const postImages = (md, opts) => {
       `<figure class="article-image">` +
       `  <div style="max-width: ${imageWidth}px; margin-left: auto; margin-right: auto;">` +
       `    <div style="width: 100%; height: 0; padding-bottom: ${imageRatio}%;">` +
-      `      <img src="${src}" alt="${alt}" style="width: 100%;">` +
+      `      <img src="${src}" alt="${alt}" loading="lazy" style="width: 100%;">` +
       `    </div>` +
       `  </div>` +
       (title ? `  <figcaption>${title}</figcaption>` : "") +
