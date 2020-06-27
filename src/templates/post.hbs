@@ -11,12 +11,14 @@
                 <figure class="hero" role="presentation" aria-hidden="true">
                     <div class="hero-img-wrap">
                         <picture>
-                            <source srcset="{{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=1600&h=800&q=80&dpi=1 1x,
-            {{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=1600&h=800&q=80&dpi=2 2x" media="(min-width: 768px)">
                             <source srcset="{{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=2100&h=700&q=80&dpi=1 1x,
             {{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=2100&h=700&q=80&dpi=2 2x" media="(min-width: 1400px)">
-                            <img src="{{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=800&q=80&dpi=1 1x,
-            {{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=800&q=80&dpi=2 2x" alt="" role="presentation">
+                            <source srcset="{{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=1600&h=800&q=80&dpi=1 1x,
+            {{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=1600&h=800&q=80&dpi=2 2x" media="(min-width: 768px)">
+                            <source srcset="{{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=800&q=80&dpi=1 1x,
+            {{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=800&q=80&dpi=2 2x" media="(min-width: 320px)">
+                            <img src="{{heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=800&q=80&dpi=1" alt=""
+                                role="presentation">
                         </picture>
                     </div>
                     <figcaption>

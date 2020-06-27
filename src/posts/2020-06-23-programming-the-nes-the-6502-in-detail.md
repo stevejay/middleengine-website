@@ -16,29 +16,29 @@ draft: true
 
 In the previous post I presented an overview of the NES and its subsystems. A key component is the CPU, a version of the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) CPU that omits its patented [binary coded decimal](https://en.wikipedia.org/wiki/Binary-coded_decimal) mode. In order to write games for the NES, it is necessary to have a good understanding of the functioning of the 6502 and how to program it using assembly. This post covers basic assembly, binary number theory, the processor registers, the addressing modes, the call stack, interrupts, and the opcodes.
 
-The primary reference for this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is quite a dense read, but it does include a lot of useful advice and many worked examples. In many ways this post represents a rewrite of that manual, but with what I hope are clearer explanations and examples. Since the CPU in the NES does not support the 6502's binary coded decimal mode, information in the manual regarding that mode can be ignored.
+The primary reference for this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is quite a dense read, but it does include a lot of useful advice and many worked examples. (Since the CPU in the NES does not support the 6502's binary coded decimal mode, information in the manual regarding that mode can be ignored.)
 
-If you have not already, I recommend that you read the [first post in this series](/blog/posts/2020/06/22/programming-the-nes-the-nes-in-overview) before this one.
+If you have not done so already, I recommend that you read the [first post in this series](/blog/posts/2020/06/22/programming-the-nes-the-nes-in-overview) before this one.
 
 ## Basic assembly language syntax
 
-This section is a very basic introduction to assembly language syntax. The exact syntax will depend on your choice of compiler toolchain; the information here is correct for the toolchain that I will cover later in this series.
+This section is a very basic introduction to assembly language syntax. The exact syntax will depend on your choice of compiler toolchain. The information here is correct for the toolchain that I will cover later in this series.
 
 ### Literals
 
 #### Hexadecimal literals
 
-[Hexadecimal](https://en.wikipedia.org/wiki/Hexadecimal) literal values are prefixed by a dollar sign, e.g., `$0F`, which is 15 in decimal.
+[Hexadecimal](https://en.wikipedia.org/wiki/Hexadecimal) literal values are prefixed by a dollar sign, for example `$0F`.
 
-Each digit in a hexadecimal literal represents a [nibble](https://en.wikipedia.org/wiki/Nibble). A byte consists of two nibbles, so a byte is written as two hexadecimal digits, e.g., `$3F`. A two-byte value is written as four hexadecimal digits, e.g., `$C008`.
+Each digit in a hexadecimal literal represents a [nibble](https://en.wikipedia.org/wiki/Nibble). A byte consists of two nibbles, so a byte is written as two hexadecimal digits and a two-byte value is written as four hexadecimal digits. Thus `$3F` represents a byte value and `$C008` represents a two-byte value.
 
-The first byte of a two-byte value is the [most significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_byte) (MSB) and the second byte is the [least significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte) (LSB). So for the value `$C008`, the MSB is `$C0` and the LSB is `$08`.
+The first byte of a two-byte value is the [most significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_byte) (MSB) and the second byte is the [least significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte) (LSB). Given the value `$C008`, the MSB is `$C0` and the LSB is `$08`.
 
 #### Binary literals
 
-[Binary](https://en.wikipedia.org/wiki/Binary_number) literal values are prefixed by a percent sign, e.g., `%00000100`.
+[Binary](https://en.wikipedia.org/wiki/Binary_number) literal values are prefixed by a percent sign, for example `%00000100`.
 
-A bit is set if it has the value 1 and is clear or not set if it has the value 0. If the binary value has 8 bits then it represents one byte. Occasionally you will see two-byte values written in binary, e.g., `%0000000011111111`.
+A bit is set if it has the value 1 and is clear or not set if it has the value 0. If the binary value has 8 bits then it represents one byte. Occasionally you will see two-byte values written in binary, for example `%0000000011111111`.
 
 The bits of a byte are numbered from 0 to 7, with bit #0 being the least significant (rightmost) bit and bit #7 the most significant (leftmost) bit. So bit #0 is the only bit set in the value `%00000001`, and bit #7 is the only bit set in the value `%10000000`.
 
@@ -337,7 +337,7 @@ The **Decimal Mode** (D) flag is used to control if the CPU is in binary coded d
 
 ## Addressing modes
 
-As stated earlier in this post, a program instruction represents a particular operation on a particular byte of data. The instruction's three-letter mnemonic determines the particular operation, but the byte of data to operate on also needs to be specified. Each means of specifying that byte of data is termed an addressing mode. The 6502 has thirteen of these:
+As stated earlier in this post, a program instruction represents a particular operation on a particular byte of data. The instruction's three-letter mnemonic determines the particular operation, but the byte of data to operate on also needs to be specified. Each means of specifying that byte of data is termed an addressing mode. The 6502 has thirteen such modes:
 
 - Implied
 - Accumulator
@@ -353,7 +353,7 @@ As stated earlier in this post, a program instruction represents a particular op
 - Absolute Indirect
 - Relative
 
-Each operation supports one or more of these addressing modes, although no operation supports all of them.
+Each operation supports one or more of these addressing modes.
 
 In the **Implied** addressing mode, it is the operation itself that implies the byte to operate on. For example, the CLC (Clear Carry Flag) clears the Carry flag of the Processor Status register. The byte to operate on &mdash; the Processor Status register &mdash; is implied; you cannot specify a different byte of data.
 
@@ -1681,8 +1681,8 @@ If you need to index more than 256 bytes, you can use one of the two techniques 
 If you need to branch to a location that is too far away, you can combine a JMP instruction with a contrary (a.k.a. complementary) branch instruction. The JMP instruction is used to reach the desired location, and the branch instruction is used to conditionally skip over the JMP instruction:
 
 ```asm6502
-  LDA #$00    ; Load the Accumulator with the value to test
-  BEQ no_jump ; Skip the jump if the Accumulator value is zero
+  LDA #$00               ; Load the Accumulator with the value to test
+  BEQ no_jump            ; Skip the jump if the Accumulator value is zero
   JMP some_distant_label ; Jump if that value is not zero.
 no_jump:
   ; Code here that executes if there was no jump.

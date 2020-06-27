@@ -68,7 +68,9 @@ You can access the Web site via the URL `http://localhost/`.
 - [Unsplash](https://unsplash.com/) for hero images.
 - [DrLinkCheck](https://www.drlinkcheck.com/) for checking for broken links.
 - [SVGOMG](https://jakearchibald.github.io/svgomg/) for SVG optimisation.
+- [TinyJPG](https://tinyjpg.com/) for JPG optimisation.
 - [Uptime Robot](https://uptimerobot.com/) for site monitoring.
+- [Pexels](https://www.pexels.com/) for images.
 
 ## File versioning
 

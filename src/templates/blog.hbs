@@ -16,9 +16,11 @@
                     <figure class="hero" role="presentation" aria-hidden="true">
                         <div class="hero-img-wrap">
                             <picture>
-                                <img src="{{meta.heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=400&q=80&dpi=1 1x,
-            {{meta.heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=400&q=80&dpi=2 2x" alt=""
-                                    role="presentation">
+                                <source srcset="{{meta.heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=400&q=80&dpi=1 1x,
+            {{meta.heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=400&q=80&dpi=2 2x"
+                                    media="(min-width: 320px)">
+                                <img src="{{meta.heroImage.rawUrl}}&fm=jpg&fit=crop&crop=entropy&w=800&h=400&q=80&dpi=1"
+                                    alt="" role="presentation">
                             </picture>
                         </div>
                     </figure>

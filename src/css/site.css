@@ -887,7 +887,7 @@ header.hero .hero-text-wrap {
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
-  padding: 0 var(--space-4) var(--space-4);
+  padding: 0 var(--space-5) var(--space-5);
 }
 
 header.hero .hero-text-wrap > * + * {
