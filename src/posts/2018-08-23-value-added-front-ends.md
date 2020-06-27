@@ -6,9 +6,6 @@ date: 2018-08-23
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-heroImage:
-  source: Unsplash
-  id: cYUMaCqMYvI
 ---
 
 You have probably heard, in the context of software development, of solved problems and unsolved problems. Solved problems are problems that already have solutions. An example is authentication. There are multiple SaaS providers of authentication, such as [Auth0](https://auth0.com/) and [Okta](https://www.okta.com/), and so you can just integrate one of these services instead of creating your own solution from scratch.

@@ -5,5 +5,5 @@
 # that builds the image.
 # https://docs.docker.com/docker-hub/builds/advanced/
 
-docker build -t $IMAGE_NAME --build-arg UNSPLASH_APP_NAME=$UNSPLASH_APP_NAME --build-arg UNSPLASH_APP_ACCESS_KEY=$UNSPLASH_APP_ACCESS_KEY --build-arg UNSPLASH_APP_SECRET_KEY=$UNSPLASH_APP_SECRET_KEY .
+docker build -t $IMAGE_NAME .
 exit

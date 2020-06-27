@@ -6,9 +6,6 @@ date: 2018-12-22
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-heroImage:
-  source: Unsplash
-  id: 48lwLr85ys8
 ---
 
 The [React 16.4 update](https://reactjs.org/blog/2018/05/23/react-v-16-4.html#changelog) altered how the static `getDerivedStateFromProps` lifecycle method behaved. Previously the method was only invoked if the component's props or state had changed, as can be seen in [this React lifecycle diagram](https://twitter.com/dan_abramov/status/981712092611989509) that Dan Abramov created. That method's behaviour was altered in the update such that it now gets invoked unconditionally before _every_ render of the component. The Twitter user [@ManuelBieh](https://twitter.com/ManuelBieh) updated Dan's diagram [in this tweet](https://twitter.com/ManuelBieh/status/994618772999884800) to include the change. ([This](https://github.com/facebook/react/pull/12600#pullrequestreview-114158562) is a good explanation as to why the change was made.)

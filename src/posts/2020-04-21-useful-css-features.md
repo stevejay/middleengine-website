@@ -6,10 +6,9 @@ date: 2020-04-22
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-heroImage:
-  source: Unsplash
-  id: tZc3vjPCk-Q
 ---
+
+## Introduction
 
 This post introduces a few CSS-related items that I have found useful on recent projects.
 
