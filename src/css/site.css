@@ -518,8 +518,8 @@ li code {
   padding: var(--space-2) var(--space-4);
 }
 
-body.index > header nav a.home-link,
-body.blog > header nav a.blog-link {
+body.index #site-header nav a.home-link,
+body.blog #site-header nav a.blog-link {
   border-top-color: var(--color-primary);
 }
 
@@ -537,8 +537,8 @@ body.blog > header nav a.blog-link {
     justify-content: flex-end;
   }
 
-  body.index > header nav a.home-link,
-  body.blog > header nav a.blog-link {
+  body.index #site-header nav a.home-link,
+  body.blog #site-header nav a.blog-link {
     border-top-color: transparent;
     border-bottom-color: var(--color-primary);
   }
