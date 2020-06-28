@@ -6,14 +6,13 @@ date: 2020-06-23
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-draft: true
 ---
 
 ## Introduction
 
-In the previous post I presented an overview of the NES and its subsystems. A key component is the CPU, a version of the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) CPU that omits its patented [binary coded decimal](https://en.wikipedia.org/wiki/Binary-coded_decimal) mode. In order to write games for the NES, it is necessary to have a good understanding of the functioning of the 6502 and how to program it using assembly. This post covers basic assembly, binary number theory, the processor registers, the addressing modes, the call stack, interrupts, and the opcodes.
+In the previous post I presented an overview of the NES and its subsystems. A key component is the CPU, which is a version of the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) CPU. In order to write games for the NES, it is necessary to have a good understanding of the functioning of the 6502 and how to program it using assembly. This post covers basic assembly, binary number theory, the processor registers, the addressing modes, the call stack, interrupts, and the opcodes.
 
-The primary reference for this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is quite a dense read, but it does include a lot of useful advice and many worked examples. (Since the CPU in the NES does not support the 6502's binary coded decimal mode, information in the manual regarding that mode can be ignored.)
+The primary reference for this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is quite a dense read, but it does include a lot of useful advice and many worked examples. Since the CPU in the NES does not support the 6502's binary coded decimal mode, information in the manual regarding that mode can be ignored.
 
 If you have not done so already, I recommend that you read the [first post in this series](/blog/posts/2020/06/22/programming-the-nes-the-nes-in-overview) before this one.
 
@@ -55,7 +54,7 @@ LDA #$04 ; This comment comes after an instruction
 
 ### Opcodes
 
-A program instruction represents a particular operation on a particular byte of data. The operation is identified by the [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) used in the instruction. The opcode is a byte value in the range 0 to 255 inclusive. The 6502 officially supports 151 opcodes, which can be grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). Each opcode in each group performs the same basic operation (such as adding two numbers together) but uses a different addressing modes to specify the byte of data to operate on. (Addressing modes are covered later in this post.)
+A program instruction represents a particular operation on a particular byte of data. The operation is identified by the [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) used in the instruction. The opcode is a byte value in the range 0 to 255 inclusive. The 6502 officially supports 151 opcodes and they can be grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). Each opcode in each group performs the same basic operation (such as adding two numbers together) but uses a different addressing modes to specify the byte of data to operate on. (Addressing modes are covered later in this post.)
 
 For each instruction in your program, the assembler needs to determine which of the 151 opcodes to output in the generated machine code. The operation is indicated by a three-letter mnemonic. The mnemonic is not case sensitive.
 
@@ -65,7 +64,7 @@ LDA $0211 ; This instruction has the operand $0211.
 sei       ; You can write the mnemonic in lowercase.
 ```
 
-The addressing mode is indicated by either the lack of an operand, or, if there is an operand, by the syntax used to define it. Using this combination of mnemonic and addressing mode, the assembler can identify the opcode to output. For example, in all three of the following instructions, the operation is `ADC` and the operand value is `$04`, but the additional syntax indicates to the assembler what addressing mode is used and so the particular opcode to output:
+The addressing mode is indicated by either the lack of an operand or, if there is an operand, by the syntax used to define it. Using this combination of mnemonic and addressing mode, the assembler can identify the opcode to output. For example, in all three of the following instructions the operation is `ADC` and the operand value is `$04`, but the additional syntax indicates to the assembler what addressing mode is used and so the particular opcode to output:
 
 ```asm6502
 ADC #$04     ; The opcode is $69.
@@ -73,9 +72,9 @@ ADC $04, X   ; The opcode is $61.
 ADC ($04), Y ; The opcode is $71.
 ```
 
-The assembler will follow the opcode by the operand, if there is one. The operand is one or two bytes in size, so every machine instruction is either one, two, or three bytes in size.
+The assembler will follow the opcode by the operand, if there is one. The operand is one or two bytes in size so every machine instruction is either one, two, or three bytes in size.
 
-The 6503 is little endian, so any addresses in the program get encoded LSB first and MSB second. For example, if an operation has the operand of the address `$1234`, `$12` being the MSB and `$34` being the LSB, the assembler will encode that address in the machine code as `$3412`.
+The 6503 is little endian so any addresses in the program get encoded LSB first and MSB second. For example, if an operation has the operand of the address `$1234`, `$12` being the MSB and `$34` being the LSB, then the assembler will encode that address in the machine code as `$3412`.
 
 ### Labels
 
@@ -116,7 +115,7 @@ Some assemblers support other types of label. A [cheap local label](https://cc65
 
 ### Constants
 
-Programming in assembly can involve using a lot of magic values, for example the addresses of particular bytes in the CPU address space that are used to control attached devices. Assemblers usually support declaring numeric constants, allowing you to refer to such values by a name and so improve the readability of your code:
+Programming in assembly can involve using a lot of magic values, for example the addresses of particular bytes in the CPU address space that are used to control the attached devices. Assemblers usually support declaring numeric constants, allowing you to refer to such values by a name and so improve the readability of your code:
 
 ```asm6502
 PPUCTRL            = $2000     ; An address constant.
@@ -133,7 +132,7 @@ It is common to use uppercase for the names of constants.
 
 ### Embedded bytes
 
-Your program code will consist mainly of instructions, but sometimes data needs to be embedded into it. For example, you might need to embed colour data. An assembler will normally include a means of doing this. For example, the following assembly embeds the specified data into the program code:
+Your program code will consist mainly of instructions but sometimes data needs to be embedded into it. For example, you might need to embed colour data. An assembler will normally include a means of doing this. The following assembly embeds the specified data into the program code:
 
 ```asm6502
 .byte $02,$30,$20,$20 ; Embeds these four byte values.
@@ -141,7 +140,7 @@ Your program code will consist mainly of instructions, but sometimes data needs 
 .addr some_label      ; Embeds the address associated with the label.
 ```
 
-In this particular assembler dialect, `.byte`, `.word` and `.addr` are control commands, instructions for the assembler itself.
+In this particular assembler dialect `.byte`, `.word` and `.addr` are control commands, which are instructions for the assembler itself.
 
 ## Binary number theory
 
@@ -156,7 +155,7 @@ A byte consists of 8 bits, from bit #0, the least significant bit, to bit #7, th
 %11111111 ; Largest 8-bit unsigned value (255 in decimal).
 ```
 
-An alternative interpretation is that they represent a signed value, with bit #7 indicating if the value is negative &mdash; when bit #7 is set &mdash; or positive &mdash; when bit #7 is not set. The magnitude of this positive or negative value is given by bits #0 to #6. This particular representation of signed values in binary is called [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement).
+An alternative interpretation is that they represent a signed value, with bit #7 indicating if the value is negative &mdash; when bit #7 is set &mdash; or positive &mdash; when bit #7 is not set. The magnitude of this positive or negative value is given by bits #0 to #6. The particular representation of signed values in binary used in the 6502 is called [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement).
 
 The following values illustrate this representation:
 
@@ -189,11 +188,11 @@ For signed multi-byte values, regardless of the total bit count, it is always bi
 
 ### Adding unsigned binary values
 
-When we add two decimal numbers, the digits of the numbers to add are added column by column, from right to left. For each column where the total is 10 or greater, we have to carry the one to the left and use the remainder as the column's result:
+When we add two decimal numbers, the digits of the numbers to add are added column by column from right to left. For each column where the total is 10 or greater, we have to carry the one to the left and use the remainder as the column's result:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/addition-carry-decimal-2x.png "Addition example in decimal")
 
-In the above example, the addition in the units column is 5 plus 7 which equals 12, so the 1 is carried to the tens column.
+In the above example the addition in the units column is 5 plus 7 which equals 12, so the 1 is carried to the tens column.
 
 This all still holds when adding binary numbers. Here is the same addition using unsigned byte values:
 
@@ -209,9 +208,9 @@ There is a 9th bit, a carry bit, that is not included in the result. To capture 
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/addition-overflow-16bit-binary-2x.png "Addition using 16-bit values")
 
-However, because the 6502 is an 8-bit CPU, we can only add byte values. The solution is to combine multiple additions, starting with the LSBs and finishing with the MSBs, all the while tracking any carry bits between bytes. For example, to add `$80FF` and `$0003` (`33,023 + 3` in decimal), we first add the LSBs: `$FF` and `$03`. The result is `$02` plus a carry bit. Next we add the MSBs, `$80` and `$00`, making sure to also add `$01` for the carry bit. The result is `$81` with no carry bit, so the combined result is `$8102`, or 33,026 in decimal. This is a complete result because no carry bit was created when adding the MSBs.
+However, because the 6502 is an 8-bit CPU, we can only add byte values. The solution is to combine multiple additions, starting with the LSBs and finishing with the MSBs, all the while tracking any carry bits between bytes. For example, to add `$80FF` and `$0003` (33,023 + 3 in decimal), we first add the LSBs: `$FF` and `$03`. The result is `$02` plus a carry bit. Next we add the MSBs, `$80` and `$00`, making sure to also add `$01` for the carry bit. The result is `$81` with no carry bit so the combined result is `$8102`, or 33,026 in decimal. This is a complete result because no carry bit was created when adding the MSBs.
 
-Now let us try adding `$FFFE` and `$0003` (`65,534 + 3` in decimal). First we add the LSBs, `$FE` and `$03`. The result is `$01` plus a carry bit. Next we add the MSBs, `$FF` and `$00`, making sure to also add `$01` for the carry bit. The result is `$00` plus a carry bit. The combined result is `$0001` (1 in decimal), but this is not the correct result (65,537 in decimal) because a carry bit remains. We would have to perform this calculation using 24-bit values to get the correct result.
+Now let us try adding `$FFFE` and `$0003` (65,534 + 3 in decimal). First we add the LSBs, `$FE` and `$03`. The result is `$01` plus a carry bit. Next we add the MSBs, `$FF` and `$00`, making sure to also add `$01` for the carry bit. The result is `$00` plus a carry bit. The combined result is `$0001` (1 in decimal), but this is not the correct result (65,537 in decimal) because a carry bit remains. We would have to perform this calculation using 24-bit values to get the correct result.
 
 ### Adding signed binary values
 
@@ -229,7 +228,7 @@ Note that a remaining carry bit does not indicate an invalid result, as it does 
 
 We have to use 16-bit signed values in the above calculation to get the correct result. As you might expect, we have to add signed multi-byte values one byte at a time, starting with the LSBs and finishing with the MSBs, all the while tracking any carry bits between bytes. When performing the final addition of the MSBs, we need to check for overflow to ensure that the result is valid. We also ignore any carry bit that remains from this final addition.
 
-To illustrate adding 16-bit signed values, let us add `$80FF` and `$FFFE` (`-32,513 + -2` in decimal). We first add the LSBs: `$FF` and `$FE`. The result is `$FD` plus a carry bit. Next we add the MSBs, `$80` and `$FF`, making sure to also add `$01` for the carry bit. The result is `$80` with a carry bit. We ignore the carry bit, so the combined result is `$80FD`, or -32,515 in decimal. Now we need to check if overflow occurred. We added two negative values so the result should be negative too. The result `$80FD` does indeed represent a negative value (bit #7 of the MSB is set), so overflow has not occurred and the result is valid.
+To illustrate adding 16-bit signed values, let us add `$80FF` and `$FFFE` (-32,513 + -2 in decimal). We first add the LSBs: `$FF` and `$FE`. The result is `$FD` plus a carry bit. Next we add the MSBs, `$80` and `$FF`, making sure to also add `$01` for the carry bit. The result is `$80` with a carry bit. We ignore the carry bit, so the combined result is `$80FD`, or -32,515 in decimal. Now we need to check if overflow occurred. We added two negative values so the result should be negative too. The result `$80FD` does indeed represent a negative value (bit #7 of the MSB is set), so overflow has not occurred and the result is valid.
 
 ### Subtracting binary values
 
@@ -237,7 +236,7 @@ In subtraction, the number we are subtracting from is called the minuend and the
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/subtraction-borrow-decimal-2x.png "Borrowing when subtracting decimal values")
 
-The calculation in the units column is `5 - 7` which equals -2, so 1 is borrowed from the tens column and the calculation is now `15 - 7`.
+The calculation in the units column is 5 - 7 which equals -2, so 1 is borrowed from the tens column and the calculation is now 15 - 7.
 
 This all holds when subtracting binary values. The following shows the same subtraction as above but performed in binary:
 
@@ -245,7 +244,7 @@ This all holds when subtracting binary values. The following shows the same subt
 
 As you can see, borrowing still applies as necessary.
 
-Mathematical operations are performed by the 6502's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU). Designing an ALU that performs both addition and subtraction adds to its complexity. Instead, subtraction can be implemented as the addition of a negated value. We do this by taking the subtrahend (the number we want to subtract by), negating it, and then adding it instead of subtracting it. For example, say we want to calculate `+35 - +7`, which equals +28. Negating +7 gives -7, and if we now write the calculation as `+35 + -7`, we get the same answer (+28).
+Mathematical operations are performed by the 6502's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU). Designing an ALU that performs both addition and subtraction adds to its complexity. Instead, subtraction can be implemented as the addition of a negated value. We do this by taking the subtrahend (the number we want to subtract by), negating it, and then adding it instead of subtracting it. For example, say we want to calculate +35 - +7, which equals +28. Negating +7 gives -7, and if we now write the calculation as +35 + -7, we get the same answer (+28).
 
 For this technique to work in the binary world of the 6502, we need to know how to negate a signed binary value. As explained earlier in this post, the two's complement representation is used for signed values, and so the following process applies:
 
@@ -254,17 +253,17 @@ For this technique to work in the binary world of the 6502, we need to know how 
 
 Finding the one's complement of a binary value means inverting all of its bits. (For each bit, 1 becomes 0 and 0 becomes 1.) The symbol for the one's complement of a number is the tilde, i.e., ~.
 
-In the example above, we wanted to calculate `+35 - +7`. Using two's complement representation, this is `%00100011 - %00000111`. The one's complement of the subtrahend is `%11111000`, or -8 in decimal. We now add one to it, to give `%11111001`, or -7 in decimal. The subtraction now becomes an addition: `%00100011 + %11111001`, or `+35 + -7`:
+In the example above, we wanted to calculate +35 - +7. Using two's complement representation, this is `%00100011` - `%00000111`. The one's complement of the subtrahend is `%11111000`, or -8 in decimal. We now add one to it, to give `%11111001`, or -7 in decimal. The subtraction now becomes an addition: `%00100011` + `%11111001`, or +35 + -7:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/method-of-complements-binary-2x.png "Subtraction as addition")
 
 As you can see, the answer is `%00011100`, or +28 in decimal.
 
-As with addition, if we want to subtract multi-byte values then we have to perform the operation one byte at a time, starting with the LSBs and finishing with the MSBs, tracking any borrows between bytes while doing so. But since a subtraction is implemented by the ALU as an addition, it is actually carry bits that get generated, inversely to the borrows that would get generated by subtraction. Let us see why this is.
+As with addition, if we want to subtract multi-byte values then we have to perform the operation one byte at a time, starting with the LSBs and finishing with the MSBs and tracking any borrows between bytes while doing so. But since a subtraction is implemented by the ALU as an addition, it is actually carry bits that get generated and inversely to the borrows that would be generated by subtraction. Let us see why this is.
 
-To calculate `$00 - $01`, we need to borrow a bit from the next most significant byte. If we do this then `$00 - $01` gives a result of `$FF`, and we know that the next most significant byte needs to be reduced by one. But `$00 - $01` gets transformed by the ALU into `$00 + (~$01 + $01)`. That calculation simplifies to `$00 + $FF`, and so the result is `$FF` with no carry bit.
+To calculate `$00` - `$01`, we need to borrow a bit from the next most significant byte. If we do this then `$00` - `$01` gives a result of `$FF`, and we know that the next most significant byte needs to be reduced by one. But `$00` - `$01` gets transformed by the ALU into `$00` + (~`$01` + `$01`). That calculation simplifies to `$00` + `$FF`, and so the result is `$FF` with no carry bit.
 
-Conversely, to calculate `$FF - $FF`, we do not need to borrow a bit from the next most significant byte; the result is \$00 with no borrow. But `$FF - $FF` gets transformed by the ALU into `$FF + (~$FF + $01)`. That calculation simplifies to `$FF + $01`, and so the result is `$00` with a carry bit.
+Conversely, to calculate `$FF` - `$FF`, we do not need to borrow a bit from the next most significant byte; the result is `$00` with no borrow. But `$FF` - `$FF` gets transformed by the ALU into `$FF` + (~`$FF` + `$01`). That calculation simplifies to `$FF` + `$01`, and so the result is `$00` with a carry bit.
 
 When we come to add the next most significant bytes, if there is a carry bit to add then we know that this represents the lack of a borrow bit. If there is not a carry bit to add then we know that this represents the presence of a borrow bit. The carry bit is the inverse of the borrow bit.
 
@@ -273,13 +272,13 @@ We can simplify the calculation for each byte by incorporating the carry bit int
 1. Find the one's complement of the number.
 2. Add one if we are adding the LSBs or if there is a carry bit.
 
-Let us see how this works for some multi-byte signed values. First let us calculate `+255 - -1`, which is `$00FF - $FFFF` in hex. First we subtract the LSBs: `$FF - $FF`. This gets rewritten using addition as `$FF + (~$FF + $01)`, with `$01` being added because we are adding the LSBs. The result of this LSB calculation is `$00` with a carry bit. Now we subtract the MSBs: `$00 - $FF`. This gets rewritten using addition as `$00 + (~$FF + $01)`, with `$01` being added because there was a carry bit from adding the LSBs. The result of this MSB calculation is `$01` with no carry bit. Therefore the combined result is `$0100`, or +256 in decimal.
+Let us see how this works for some multi-byte signed values. First let us calculate +255 - -1, which is `$00FF` - `$FFFF` in hex. First we subtract the LSBs: `$FF` - `$FF`. This gets rewritten using addition as `$FF` + (~`$FF` + `$01`), with `$01` being added because we are adding the LSBs. The result of this LSB calculation is `$00` with a carry bit. Now we subtract the MSBs: `$00` - `$FF`. This gets rewritten using addition as `$00` + (~`$FF` + `$01`), with `$01` being added because there was a carry bit from adding the LSBs. The result of this MSB calculation is `$01` with no carry bit. Therefore the combined result is `$0100`, or +256 in decimal.
 
-Now let us calculate `+256 - +1`, which is `$0100 - $0001` in hex. First we subtract the LSBs: `$00 - $01`. This gets rewritten using addition as `$00 + (~$01 + $01)`, with `$01` being added because we are adding the LSBs. The result of this LSB calculation is `$FF` with no carry bit. Now we subtract the MSBs: `$01 - $00`. This gets rewritten using addition as `$01 + ~$00`, without the addition of `$01` as there was no carry bit from adding the LSBs. The result of this MSB calculation is `$00` with a carry bit. We know to ignore that carry bit because we are adding signed values, therefore the combined result is `$00FF`, or +255 in decimal.
+Now let us calculate +256 - +1, which is `$0100` - `$0001` in hex. First we subtract the LSBs: `$00` - `$01`. This gets rewritten using addition as `$00` + (~`$01` + `$01`), with `$01` being added because we are adding the LSBs. The result of this LSB calculation is `$FF` with no carry bit. Now we subtract the MSBs: `$01` - `$00`. This gets rewritten using addition as `$01` + ~`$00`, without the addition of `$01` as there was no carry bit from adding the LSBs. The result of this MSB calculation is `$00` with a carry bit. We know to ignore that carry bit because we are adding signed values, therefore the combined result is `$00FF`, or +255 in decimal.
 
 In both cases, we need to make a final check to ensure that overflow has not occurred when adding the MSBs.
 
-The rule for overflow when subtracting is different to the rule for overflow when adding. When subtracting one number from another, overflow occurs when their signs differ and the sign of the result is the same as the sign of the number you are subtracting by. In the case of the first example, `+255 - -1`, the signs do differ but the result (+256) is positive while the number being subtracted by (-1) is negative; overflow has not occurred. In the case of the second example, `+256 - +1`, the signs are the same and so overflow cannot occur.
+The rule for overflow when subtracting is different to the rule for overflow when adding. When subtracting one number from another, overflow occurs when their signs differ and the sign of the result is the same as the sign of the number you are subtracting by. In the case of the first example, +255 - -1, the signs do differ but the result (+256) is positive while the number being subtracted by (-1) is negative; overflow has not occurred. In the case of the second example, +256 - +1, the signs are the same and so overflow cannot occur.
 
 ### Increasing bit counts
 
@@ -389,7 +388,7 @@ LDA $027E, Y  ; Absolute, Y
 LDA $7E, Y    ; Zero Page, Y
 ```
 
-These indexed addressing modes are useful when you need to loop through some part of the address space. They allow you to write fewer instructions as compared to an [unrolled loop](https://en.wikipedia.org/wiki/Loop_unrolling), although this is at the expense of increased execution time. But be aware: in the zero page form the result is always an address within the zero page. For example, if the instruction `LDA $FF, X` is executed when the X register contains the value `$02`, then the address accessed is not `$0101` (`$FF + $02`) but is instead `$0001`. Only the LSB of the address changes when indexing within the zero page.
+These indexed addressing modes are useful when you need to loop through some part of the address space. They allow you to write fewer instructions as compared to an [unrolled loop](https://en.wikipedia.org/wiki/Loop_unrolling), although this is at the expense of increased execution time. But be aware: in the zero page form the result is always an address within the zero page. For example, if the instruction `LDA $FF, X` is executed when the X register contains the value `$02`, then the address accessed is not `$0101` (`$FF` + `$02`) but is instead `$0001`. Only the LSB of the address changes when indexing within the zero page.
 
 Up to now the addressing modes that specify the address of the byte to operate on have done so by hard-coding that address within the instruction. But what if it is only at runtime that you will know the address to use? Or what if you are creating a subroutine and the address needs to vary depending on the current program state? These are the scenarios that the various indirect addressing modes support.
 
@@ -928,7 +927,7 @@ LDA #$FB  ; Load $FB as an immediate value into the Accumulator.
 ADC $00   ; Add value at address $0000 to the Accumulator.
 ```
 
-After this code runs, the Carry flag is set and the Overflow flag is not set. We are adding signed values so we are only interested in checking for overflow. Since the Overflow flag is not set, the result is valid. On the other hand, if the above addition was changed to `$80 + $FB`, or `-128 + -5` in decimal, then the Overflow flag would be set and the result would be invalid. The answer to this is to use 16-bit signed values:
+After this code runs, the Carry flag is set and the Overflow flag is not set. We are adding signed values so we are only interested in checking for overflow. Since the Overflow flag is not set, the result is valid. On the other hand, if the above addition was changed to `$80` + `$FB`, or -128 + -5 in decimal, then the Overflow flag would be set and the result would be invalid. The answer to this is to use 16-bit signed values:
 
 ```asm6502
 ; $FF80 + $FFFB (-128 + -5 in decimal)
@@ -1198,7 +1197,7 @@ ORA #$10 ; Perform the OR operation with the mask %00010000.
 STA $00  ; Save the altered value back to memory at address $0000.
 ```
 
-After this code runs, the value in memory at address \$0000 is `%10011111`, or `$9F` in hex.
+After this code runs, the value in memory at address `$0000` is `%10011111`, or `$9F` in hex.
 
 The EOR operation can be used to flip bits in a given byte. This requires loading a suitable bitmask into the Accumulator, one in which the bits to be flipped are ones and all other bits are zeros. This example assembly shows how to flip all the bits of a given byte:
 
@@ -1894,11 +1893,11 @@ It is required that you include a handler in your program code for each of these
 
 The three addresses, or vectors, in the table are organised as follows:
 
-| Addresses      | Vector  |
-| -------------- | ------- |
-| $FFFA to $FFFB | NMI     |
-| $FFFC to $FFFD | Reset   |
-| $FFFE to $FFFF | IRQ/BRK |
+| Addresses       | Vector  |
+| --------------- | ------- |
+| $FFFA and $FFFB | NMI     |
+| $FFFC and $FFFD | Reset   |
+| $FFFE and $FFFF | IRQ/BRK |
 
 As is standard for the 6502, these addresses are stored in little-endian format. The following is an example of creating the interrupt vector table in assembly:
 
@@ -1999,7 +1998,7 @@ BNE your_break_routine ; Branch to your break interrupt handling.
 
 ### The no-op operation
 
-The final operation to cover is NOP, the no-op operation. At first glance, an instruction that does nothing seems to be of little use, but Wikipedia describes the following possibilities:
+The final operation to cover is NOP, the no-op operation. At first glance an instruction that does nothing seems to be of little use, but Wikipedia describes the following possibilities:
 
 "A NOP is most commonly used for timing purposes, to force memory alignment, to prevent hazards, to occupy a branch delay slot, to render void an existing instruction such as a jump, or as a place-holder to be replaced by active instructions later on in program development (or to replace removed instructions when reorganising would be problematic or time-consuming)." Wikipedia, https://en.wikipedia.org/wiki/NOP_(code)
 
@@ -2035,4 +2034,4 @@ If you have not done any low-level programming before then writing games for the
 
 ## Changelog
 
-- 2020-06-23 Initial version
+- 2020-06-23 Draft version
