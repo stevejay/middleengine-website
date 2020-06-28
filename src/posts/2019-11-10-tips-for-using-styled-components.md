@@ -8,7 +8,7 @@ author:
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
 ---
 
-The library [Styled Components](https://styled-components.com/) is one of a number of CSS-in-JS solutions for styling Web apps. I have previously been a big fan of [CSS Modules](https://github.com/css-modules/css-modules) but, having used Styled Components on a recent project, I am now a convert. I have found some rough edges along the way, so I thought I would post about how I have improved my Styled Components usage, including usage with TypeScript.
+The library [Styled Components](https://styled-components.com/) is one of a number of CSS-in-JS solutions for styling Web apps. I have previously been a big fan of [CSS Modules](https://github.com/css-modules/css-modules) but, having used Styled Components on a recent project, I am now a convert. I have found some rough edges along the way so I thought I would post about how I have improved my Styled Components usage, including usage with TypeScript.
 
 ## Theming
 
@@ -98,7 +98,7 @@ You might find this version easier to read. The technique is mentioned in the St
 
 ## Helper libraries
 
-If you are writing styled components from scratch then, rather than using some components library that is build using Styled Components, I suggest you also use either [Styled System](https://styled-system.com/theme-specification/) or [XStyled System](https://xstyled.dev/docs/theme-specification/). Both have the same basic benefits:
+If you are writing styled components from scratch (rather than using some components library that is build using Styled Components) then I suggest that you also use either [Styled System](https://styled-system.com/theme-specification/) or [XStyled System](https://xstyled.dev/docs/theme-specification/). Both have the same basic benefits:
 
 - Simplifying the creation of Styled Components that expose style props.
 - Providing a succinct syntax for responsive styles.
@@ -106,11 +106,11 @@ If you are writing styled components from scratch then, rather than using some c
 
 The reason two libraries exist for this purpose rather than just one is summarised on [this page](https://xstyled.dev/docs/motivation/) on the XStyled System site.
 
-Regarding TypeScript, Styled System and XStyled System have declarations in the [Definitely Typed](https://github.com/DefinitelyTyped/DefinitelyTyped) repository
+Both Styled System and XStyled System have TypeScript declarations in the [Definitely Typed](https://github.com/DefinitelyTyped/DefinitelyTyped) repository
 
 ## Using helper libraries To add style properties
 
-Sometimes you want a styled component to be configurable via props. For example, you might want to create a generalized `Box` flexbox component that supports props for various flexbox, background, and spacing CSS properties. You could of course opt to do this manually:
+Sometimes you want a styled component to be configurable via props. For example, you might want to create a generalized `Box` flexbox component that supports props for various flexbox, background, and spacing CSS properties. You could of course do this manually:
 
 ```ts
 type Props = {
@@ -164,7 +164,7 @@ This approach has problems:
 
 - The CSS is verbose.
 - You have to manually access theme values and pass them as prop values.
-- The props do not support responsive values. For example, what if you wanted the padding to be larger on a desktop display?
+- The props do not support responsive values. What if you wanted the padding to be larger on a desktop display?
 
 To solve these problems, you could instead use XStyled System or Styled System:
 
@@ -203,28 +203,23 @@ const Box = styled.div<Props>`
 `;
 ```
 
-The exact names of the functions and props types differ between the two libraries, but the effect is the same. The resulting styled component is both easier to write and easier to use:
+The exact names of the functions and props types differ between the two libraries but the effect is the same. The resulting styled component is both easier to write and easier to use:
 
 ```ts
 import React from "react";
 
-const SomeComponent = () => {
-  // Note: variable used here because
-  // syntax highlighting was breaking:
-  const padding = { xs: 3, lg: 5 };
-  return (
-    <Box
-      flexDirection="column"
-      backgroundColor="primary900"
-      padding={padding}
-    />
-  );
-};
+const SomeComponent = () => (
+  <Box
+    flexDirection="column"
+    backgroundColor="primary900"
+    padding={{ xs: 3, lg: 5 }}
+  />
+);
 ```
 
 The only caveat is that there is no strong typing of theme keys, like `primary900` in the above example, but I think the advantages outweigh this disadvantage.
 
-Both libraries include some functions that add multiple properties to your styled component, such as `space` which includes multiple margin and padding props, but there are also finer grained functions that add only one or a few properties, such as `marginTop`. This gives you the flexibility to make your styled component as flexible or constrained as it needs to be. For example, I only wanted a single `marginTop` prop to be exposed by the following styled component:
+Both libraries include some functions that add multiple properties to your styled component, such as `space` which includes multiple margin and padding props, but there are also finer grained functions like `marginTop` that add only one or a few properties. This gives you the flexibility to make your styled component as flexible or constrained as it needs to be. For example, I only wanted a single `marginTop` prop to be exposed by the following styled component:
 
 ```ts
 import styled from "styled-components/macro";
@@ -245,22 +240,17 @@ const Stack = styled.div<MarginTopProps>`
 This also allows me to support responsive `marginTop` prop values:
 
 ```ts
-const SomeComponent = () => {
-  // Note: variable used here because
-  // syntax highlighting was breaking:
-  const marginTop = { xs: 2, lg: 4 };
-  return (
-    <Stack marginTop={marginTop}>
-      <div>One</div>
-      <div>Two</div>
-    </Stack>
-  );
-};
+const SomeComponent = () => (
+  <Stack marginTop={{ xs: 2, lg: 4 }}>
+    <div>One</div>
+    <div>Two</div>
+  </Stack>
+);
 ```
 
 ## Custom style properties in helper libraries
 
-In the previous section, I created a `Stack` component with a single `marginTop` prop. I might prefer to give that prop a different name, one that better reflects what it represents. For example, I might want to name the prop `verticalSpacing`.
+In the previous section I created a `Stack` component with a single `marginTop` prop. I might prefer to give that prop a different name, one that better reflects what it represents. For example, I might want to name the prop `verticalSpacing`.
 
 XStyled System exports a `style` function for this purpose:
 
@@ -278,7 +268,7 @@ const verticalSpacing = style({
 type Props = { verticalSpacing: MarginTopProps["marginTop"] };
 ```
 
-Styled System provides similar functionality via the `system` function, as described [here](https://styled-system.com/custom-props/):
+Styled System provides similar functionality via the `system` function as described [here](https://styled-system.com/custom-props/):
 
 ```ts
 import { system, MarginTopProps } from "styled-system";
@@ -313,7 +303,7 @@ const StyledExample = styled.div`
 `;
 ```
 
-Alternatively you can use the [th function](https://xstyled.dev/docs/system-utilities/#theme-getters), which has the same getter functions attached to it:
+Alternatively you can use the [th function](https://xstyled.dev/docs/system-utilities/#theme-getters) which has the same getter functions attached to it:
 
 ```ts
 import { th } from "@xstyled/system";
@@ -328,7 +318,7 @@ const StyledExample = styled.div`
 `;
 ```
 
-Compared to accessing the `theme` prop via lambda functions, the getters are a more compact syntax, but they have the disadvantage of not supporting strongly typed theme property access. For example, the string `"display"` in `getFont("display")` may or may not be an actual theme prop alias, and there is no autocomplete in your IDE. However, these getter functions in XStyled System have the useful feature of processing their argument according to the same algorithm as the custom style properties, excluding the support for responsive values.
+Compared to accessing the `theme` prop via lambda functions, the getters are a more compact syntax but they have the disadvantage of not supporting strongly typed theme property access. For example, the string `"display"` in `getFont("display")` may or may not be an actual theme prop alias, and there is no autocomplete in your IDE. However, these getter functions in XStyled System have the useful feature of processing their argument according to the same algorithm as the custom style properties, excluding the support for responsive values.
 
 This can be very useful. Imagine that I want to allow the user of my component to specify the margin value around it via a prop, but the final value that the `margin` CSS property will have is an adjusted version of that value:
 
@@ -351,7 +341,7 @@ const StyledExample = styled.div<Props>`
 `;
 ```
 
-An advantage of the `margin` style property is that it allows the prop value to be specified as a theme space index or alias, like `2` or `large`, or as a regular CSS value like `1.5rem` or `30px`. At the moment, only the latter style is allowed. But by using a getter, I can offer this functionality:
+An advantage of the `margin` style property is that it allows the prop value to be specified as a theme space index or alias, like `2` or `large`, or as a regular CSS value like `1.5rem` or `30px`. At the moment only the latter style is allowed. But by using a getter I can offer this functionality:
 
 ```ts
 import { getSpace } from "@xstyled/system";
@@ -365,7 +355,7 @@ const StyledExample = styled.div<Props>`
 `;
 ```
 
-I can use it like so:
+I use it like so:
 
 ```ts
 // A theme space prop index
@@ -425,7 +415,7 @@ const SomeComponent = () => (
 
 ## Mixins
 
-Mixins are straightforward to create, but I thought that I would cover them for the sake of completeness.
+Mixins are straightforward to create but I thought that I would cover them for the sake of completeness.
 
 Here is an example mixin for a set of CSS rules for visually hiding an element while still making it visible to screen readers:
 
@@ -477,3 +467,10 @@ const SomeComponent = styled.span<Props>`
 ## Conclusion
 
 Hopefully you have found this post useful for expanding your knowledge of Styled Components and its ecosystem, and you have learnt some patterns to use with it.
+
+---
+
+## Changelog
+
+- 2019-11-10 Initial version
+- 2020-06-28: Minor formatting and grammatical changes
