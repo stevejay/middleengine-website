@@ -8,20 +8,24 @@ author:
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
 ---
 
-The code review is a necessary step in the software development process. Code written by a developer or developer pair is submitted as a pull request for review by a peer in order to catch errors and omissions, for change suggestions, and to disseminate system and programming knowledge. Thus the team collectively enhance themselves and the code base that they work on.
+## Introduction
 
-In my opinion, a successful code review:
+The code review is a necessary step in the software development process. Code written by a developer or developer pair is submitted as a pull request for review by a peer in order to catch errors and omissions, for change suggestions, and to disseminate system and programming knowledge. In this way the team collectively enhance themselves and the code base that they work on. In this post I discuss best practise regarding the code review process.
+
+## The keys to success
+
+In my opinion a successful code review:
 
 - Has been assisted by the submitter.
 - Is timely.
 - Is performed by one developer working preferably for a maximum of one hour on the task.
 - Consists of feedback that is constructive and considerate.
 
-The following sections expand on each of these points. In particular, this advice is driven by how code reviews were organized in the most recent role I worked, an approach that I found sensible and highly effective.
+This advice is driven by how code reviews were organized in the most recent role I worked, an approach that I found sensible and highly effective. The remainder of this post expands on each of these points.
 
 ## Submitter assistance
 
-It is not only the reviewer who can leave comments on a pull request. The author of the pull request can leave comments too, for example explaining their approach and flagging changes that require particular attention by the reviewer. When I am developing a feature, I am normally very aware of which changes are controversial and I look to highlight them when creating my pull requests.
+It is not only the reviewer who can leave comments on a pull request. The author of the pull request can leave comments too, for example explaining their approach and flagging changes that require particular attention by the reviewer. When I am developing a feature, I am very aware of which changes are controversial and I highlight them when creating my pull requests.
 
 ## Timeliness of the review
 
@@ -35,7 +39,7 @@ The following is an effective process for ensuring timeliness:
 
 ![](/images/2020-04-21-practical-advice-for-code-reviews/pr-notification-2x.png "A pull request notification in Slack with the 'looking' reaction")
 
-Ideally there would be a developer available to review the pull request shortly after it is submitted, say within 15 minutes, so that the review is performed promptly. However, it may be that the other developers are all focussed on their own work and so breaking off to review the pull request would involve a disruptive context switch. A developer in this situation can start a thread on the Slack notification to leave a comment about when they expect to be able to start the review.
+Ideally there would be a developer available to begin the review shortly after it is submitted, say within 15 to 30 minutes. However, it may be that the developers are all focussed on their own work and so breaking off to review the pull request would involve a disruptive context switch. A developer in this situation can start a thread on the Slack notification to leave a comment about when they expect to be able to start the review.
 
 As discussed above, frequent pull requests that have fewer changes are preferable to fewer pull requests that have many changes. Code reviews need to be performed promptly to assist this style of development. Pull requests with fewer changes also lead to quicker code reviews, and so to shorter context switches for reviewers.
 
@@ -45,7 +49,7 @@ In one role I worked, each pull request was being reviewed by four or five devel
 
 ## Constructiveness and consideration
 
-Submitting a code review can be stressful, particularly if the submitter is inexperienced in regard to the proposed changes. It is incumbent on the reviewer to adopt a positive attitude and assume the best about the code and the submitter.
+Submitting a code review can be stressful, particularly if the submitter is inexperienced in regards to the proposed changes. It is incumbent on the reviewer to adopt a positive attitude and assume the best about the code and the submitter.
 
 As a reviewer, your aim is not to get the pull request written as you would have written it. Often there are multiple ways to solve a problem that are largely equally valid. When requesting or suggesting an alternative, it should be because there are benefits and these should be spelled out in the comment. Furthermore, it should not be necessary to comment on aspects like code formatting since the team should already have an established set of coding standards that are automatically enforced.
 
@@ -63,3 +67,4 @@ Ultimately the team as a whole benefits from these code review best practises. T
 
 - 2020-04-21 Initial version
 - 2020-06-23 Minor wording change
+- 2020-06-28 Minor wording change
