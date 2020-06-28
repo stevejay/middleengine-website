@@ -2025,7 +2025,7 @@ The result depends on the exact unofficial value used. For some, the result is a
 
 ## Conclusion
 
-If you have not done any low-level programming before, then writing games for the NES, and so programming the 6502, involves learning a number of new concepts. This has been a long post and it has covered some tricky details, but the information presented here will provide a solid base for your future programming of the NES.
+If you have not done any low-level programming before then writing games for the NES, and so programming the 6502, involves learning a number of new concepts. This has been a long post and it has covered some tricky details, but the information presented here will provide a solid base for your future programming of the NES.
 
 ## Further reading
 
