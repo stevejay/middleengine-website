@@ -26,7 +26,7 @@ This section is a very basic introduction to assembly language syntax. The exact
 
 [Binary](https://en.wikipedia.org/wiki/Binary_number) literal values are prefixed by a percent sign, for example `%00000100`.
 
-A bit is set if it has the value 1 and is clear or not set if it has the value 0. If the binary value has 8 bits then it represents one byte. Occasionally you will see two-byte values written in binary, for example `%0000000011111111`.
+A bit is set if it has the value 1 and is clear or not set if it has the value 0. If the binary value has 8 bits then it represents one byte. Occasionally you will see two-byte values written in binary, for example `%0000000011111111`{lang=asm6502}.
 
 The bits of a byte are numbered from 0 to 7, with bit #0 being the least significant (rightmost) bit and bit #7 the most significant (leftmost) bit:
 
@@ -446,7 +446,9 @@ The 6502 supports 151 opcodes, grouped into [56 operations](http://www.6502.org/
 
 ### Running the assembly code examples
 
-I include a number of examples of 6502 assembly to demonstrate various algorithms and patterns. Most of them can be run as-is in a 6502 emulator. The easiest option is to use [this browser-based 6502 emulator](http://biged.github.io/6502js/). Note that it has limitations, such as not supporting binary literals and declaring constants. To use it:
+I include a number of examples of 6502 assembly to demonstrate various algorithms and patterns. Most of them can be run as-is in a 6502 emulator. The easiest option is to use [this browser-based 6502 emulator](http://biged.github.io/6502js/). Note that it has limitations, such as not supporting binary literals and constants.
+
+To use the emulator:
 
 1. Copy and paste or manually enter the assembly code into the large text area.
 2. Click the Assemble button. You can check for any assembler errors in the message box at the bottom of the page.
@@ -458,96 +460,103 @@ The state of the registers after the program runs is shown in the righthand colu
 
 Some of the Processor Status register flags can be set and/or cleared by the programmer. This is generally only useful in specific situations, such as when performing addition or subtraction, or when handling an interrupt. For the sake of completeness I have included the operations for setting and clearing the Decimal Mode flag. (Recall that the CPU in the NES does not support the binary coded decimal mode.)
 
-<section class="opcode">
-    <h5>SEC (Set Carry Flag)</h5>
-    <p>
-    Sets the Carry flag of the Processor Status register.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-        <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEC</span>    <span class="token comment">; Implied</span></code></pre>
-</section>
+::: opcode
 
-<section class="opcode">
-    <h5>CLC (Clear Carry Flag)</h5>
-    <p>
-    Clears the Carry flag of the Processor Status register.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-        <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLC</span>    <span class="token comment">; Implied</span></code></pre>
-</section>
+##### SEC (Set Carry Flag)
 
-<section class="opcode">
-    <h5>CLV (Clear Overflow Flag)</h5>
-    <p>
-    Clears the Overflow flag.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-        <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLV</span>    <span class="token comment">; Implied</span></code></pre>
-</section>
+Sets the Carry flag of the Processor Status register.
 
-<section class="opcode">
-    <h5>SEI (Set Interrupt Disable Flag)</h5>
-    <p>
-    Sets the Interrupt Disable flag.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-        <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SEI</span>    <span class="token comment">; Implied</span></code></pre>
-</section>
+###### Supported addressing modes
 
-<section class="opcode">
-    <h5>CLI (Clear Interrupt Disable Flag)</h5>
-    <p>
-    Clears the Interrupt Disable flag.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-        <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLI</span>    <span class="token comment">; Implied</span></code></pre>
-</section>
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `SEC`{lang=asm6502} |
 
-<section class="opcode">
-    <h5>SED (Set Decimal Mode)</h5>
-    <p>
-    Sets the Decimal Mode flag.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-    <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">SED</span>    <span class="token comment">; Implied</span></code></pre>
-</section>
+:::
 
-<section class="opcode">
-    <h5>CLD (Clear Decimal Mode)</h5>
-    <p>
-    Clears the Decimal Mode flag.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-        <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">CLD</span>    <span class="token comment">; Implied</span></code></pre>
-</section>
+::: opcode
+
+##### CLC (Clear Carry Flag)
+
+Clears the Carry flag of the Processor Status register.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `CLC`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### CLV (Clear Overflow Flag)
+
+Clears the Overflow flag of the Processor Status register.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `CLV`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### SEI (Set Interrupt Disable Flag)
+
+Sets the Interrupt Disable flag of the Processor Status register.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `SEI`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### CLI (Clear Interrupt Disable Flag)
+
+Clears the Interrupt Disable flag of the Processor Status register.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `CLI`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### SED (Set Decimal Mode)
+
+Sets the Decimal Mode flag of the Processor Status register.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `SED`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### CLD (Clear Decimal Mode)
+
+Clears the Decimal Mode flag of the Processor Status register.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `CLD`{lang=asm6502} |
+
+:::
 
 ### Operations for transferring bytes of data
 
@@ -559,30 +568,33 @@ The following diagram shows the supported transfers:
 
 As you can see, it is not possible to transfer directly between the X and Y registers.
 
-<section class="opcode">
-    <h5>LDA (Load Accumulator with memory)</h5>
-    <p>
-    Loads the specified byte into the Accumulator.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <p>
-    Sets the Zero flag if the specified byte is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the specified byte.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Immediate; Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
-    </p>
-    <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LDA</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
-<span class="token opcode property">LDA</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
-<span class="token opcode property">LDA</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
-<span class="token opcode property">LDA</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
-<span class="token opcode property">LDA</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
-<span class="token opcode property">LDA</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
-<span class="token opcode property">LDA</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
-<span class="token opcode property">LDA</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
-</code></pre>
-</section>
+::: opcode
+
+##### LDA (Load Accumulator with memory)
+
+Loads the specified byte into the Accumulator.
+
+###### Processor Status register changes
+
+| Flag          | Effect                                                |
+| ------------- | ----------------------------------------------------- |
+| Zero flag     | Set if the specified byte is zero, otherwise cleared. |
+| Negative flag | Updated to the value of bit #7 of the specified byte. |
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction          |
+| --------------- | ---------------------------- |
+| Immediate       | `LDA #$00`{lang=asm6502}     |
+| Absolute        | `LDA $0000`{lang=asm6502}    |
+| Zero Page       | `LDA $00`{lang=asm6502}      |
+| Absolute, X     | `LDA $0000, X`{lang=asm6502} |
+| Absolute, Y     | `LDA $0000, Y`{lang=asm6502} |
+| Zero Page, X    | `LDA $00, X`{lang=asm6502}   |
+| (Indirect, X)   | `LDA ($00, X)`{lang=asm6502} |
+| (Indirect), Y   | `LDA ($00), Y`{lang=asm6502} |
+
+:::
 
 <section class="opcode">
     <h5>LDX (Load Index Register X with memory)</h5>
@@ -590,9 +602,19 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Loads the specified byte into the X register.
     </p>
     <h6>Processor Status register changes</h6>
-    <p>
-    Sets the Zero flag if the specified byte is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the specified byte.
-    </p>
+    <table>
+        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Zero flag</td>
+                <td>Set if the specified byte is zero, otherwise cleared.</td>
+            </tr>
+            <tr>
+                <td>Negative flag</td>
+                <td>Updated to the value of bit #7 of the specified byte.</td>
+            </tr>
+        </tbody>
+    </table>
     <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, Y; and Zero Page, Y.
@@ -612,9 +634,19 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Loads the specified byte into the Y register.
     </p>
     <h6>Processor Status register changes</h6>
-    <p>
-    Sets the Zero flag if the specified byte is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the specified byte.
-    </p>
+    <table>
+        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Zero flag</td>
+                <td>Set if the specified byte is zero, otherwise cleared.</td>
+            </tr>
+            <tr>
+                <td>Negative flag</td>
+                <td>Updated to the value of bit #7 of the specified byte.</td>
+            </tr>
+        </tbody>
+    </table>
     <h6>Supported addressing modes</h6>
     <p>
     Immediate; Absolute; Zero Page; Absolute, X; and Zero Page, X.
@@ -698,9 +730,19 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Copies the value in the Accumulator to the X register.
     </p>
     <h6>Processor Status register changes</h6>
-    <p>
-    Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
-    </p>
+    <table>
+        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Zero flag</td>
+                <td>Set if the copied byte is zero, otherwise cleared.</td>
+            </tr>
+            <tr>
+                <td>Negative flag</td>
+                <td>Updated to the value of bit #7 of the copied byte.</td>
+            </tr>
+        </tbody>
+    </table>
     <h6>Supported addressing modes</h6>
     <p>
     Implied only.
@@ -716,9 +758,19 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Copies the value in the Accumulator to the Y register.
     </p>
     <h6>Processor Status register changes</h6>
-    <p>
-    Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
-    </p>
+    <table>
+        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Zero flag</td>
+                <td>Set if the copied byte is zero, otherwise cleared.</td>
+            </tr>
+            <tr>
+                <td>Negative flag</td>
+                <td>Updated to the value of bit #7 of the copied byte.</td>
+            </tr>
+        </tbody>
+    </table>
     <h6>Supported addressing modes</h6>
     <p>
     Implied only.
@@ -734,9 +786,19 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Copies the value in the X register to the Accumulator.
     </p>
     <h6>Processor Status register changes</h6>
-    <p>
-    Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
-    </p>
+    <table>
+        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Zero flag</td>
+                <td>Set if the copied byte is zero, otherwise cleared.</td>
+            </tr>
+            <tr>
+                <td>Negative flag</td>
+                <td>Updated to the value of bit #7 of the copied byte.</td>
+            </tr>
+        </tbody>
+    </table>
     <h6>Supported addressing modes</h6>
     <p>
     Implied only.
@@ -752,9 +814,19 @@ As you can see, it is not possible to transfer directly between the X and Y regi
     Copies the value in the Y register to the Accumulator.
     </p>
     <h6>Processor Status register changes</h6>
-    <p>
-    Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
-    </p>
+    <table>
+        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Zero flag</td>
+                <td>Set if the copied byte is zero, otherwise cleared.</td>
+            </tr>
+            <tr>
+                <td>Negative flag</td>
+                <td>Updated to the value of bit #7 of the copied byte.</td>
+            </tr>
+        </tbody>
+    </table>
     <h6>Supported addressing modes</h6>
     <p>
     Implied only.
@@ -790,9 +862,19 @@ The final two operations below are for data transfers between the X register and
     Copies the value in the Stack Pointer to the X register.
     </p>
     <h6>Processor Status register changes</h6>
-    <p>
-    Sets the Zero flag if the copied value is zero, otherwise clears it. Updates the Negative flag to the value of bit #7 of the copied value.
-    </p>
+    <table>
+        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Zero flag</td>
+                <td>Set if the copied byte is zero, otherwise cleared.</td>
+            </tr>
+            <tr>
+                <td>Negative flag</td>
+                <td>Updated to the value of bit #7 of the copied byte.</td>
+            </tr>
+        </tbody>
+    </table>
     <h6>Supported addressing modes</h6>
     <p>
     Implied only.
@@ -2024,6 +2106,8 @@ The result depends on the exact unofficial value used. For some, the result is a
 ## Conclusion
 
 If you have not done any low-level programming before then writing games for the NES, and so programming the 6502, involves learning a number of new concepts. This has been a long post and it has covered some tricky details, but the information presented here will provide a solid base for your future programming of the NES.
+
+Test code TODO remove `%0000`{lang=asm6502} and this continues.
 
 ## Further reading
 
