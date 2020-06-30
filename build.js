@@ -20,7 +20,6 @@ import fetch from "node-fetch";
 import postcss from "postcss";
 import cssvariables from "postcss-css-variables";
 import responsiveImages from "./markdown-it-plugins/responsive-images.js";
-// import prismBackticks from "./markdown-it-plugins/markdown-it-prism-backticks.js";
 
 global.fetch = fetch;
 dotenv.config();
