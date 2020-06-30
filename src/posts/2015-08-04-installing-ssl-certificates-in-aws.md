@@ -20,7 +20,7 @@ Now I wanted to add the SSL certificate to AWS, but I got confused about what to
 
 First, copy the content of the _pem_ file into the _Private Key_ field:
 
-```shell
+```bash
 -----BEGIN RSA PRIVATE KEY-----
 ...A bunch of encoded information...
 -----END RSA PRIVATE KEY-----
@@ -28,7 +28,7 @@ First, copy the content of the _pem_ file into the _Private Key_ field:
 
 Then copy the content of the _ServerCertificate.cer_ file into the _Public Key Certificate_ field:
 
-```shell
+```bash
 -----BEGIN CERTIFICATE-----
 ...A bunch of encoded information...
 -----END CERTIFICATE-----
@@ -36,7 +36,7 @@ Then copy the content of the _ServerCertificate.cer_ file into the _Public Key C
 
 Finally, copy the content of the _CACertificate-1.cer_ and _CACertificate-2.cer_ files&#8212;in that order&#8212;into the _Certificate Chain_ field:
 
-```shell
+```bash
 -----BEGIN CERTIFICATE-----
 ...A bunch of encoded information from CACertificate-1.cer...
 -----END CERTIFICATE-----

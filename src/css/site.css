@@ -422,15 +422,15 @@ table caption {
 /*             Code             */
 /********************************/
 
-/* Overrides for prismjs */
+/* Overrides for prismjs in code blocks */
 pre[class*="language-"] {
   font-size: var(--font-size-1);
   background-color: var(--color-neutral-100);
 }
 
-/* Code embedded in body text */
-p code,
-li code {
+/* Inline code */
+:not(pre) > code,
+:not(pre) > code[class*="language-"] {
   padding: 0.05em 0.25em;
   border-radius: var(--radius-1);
   background-color: var(--color-neutral-200);
@@ -1326,7 +1326,7 @@ section.opcode h6 {
 }
 
 section.opcode h6 + p,
-section.opcode h6 + pre {
+section.opcode h6 + table {
   padding-top: var(--space-2);
 }
 
@@ -1335,9 +1335,46 @@ section.opcode > * {
   margin: 0;
 }
 
-/* Overrides for prismjs */
-section.opcode pre[class*="language-"] {
+section.opcode code {
   background-color: transparent;
+}
+
+section.opcode table {
+  display: block;
+}
+
+section.opcode table thead {
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: auto;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+section.opcode table thead tr {
+  border-bottom: none;
+}
+
+section.opcode table tbody tr + tr {
+  border-top: none;
+}
+
+section.opcode table td {
+  padding: 2px var(--space-4);
+  vertical-align: top;
+}
+
+section.opcode table td:first-of-type {
+  padding-left: 0;
+}
+
+section.opcode table td:last-of-type {
+  padding-right: 0;
 }
 
 /********************************/

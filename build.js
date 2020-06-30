@@ -6,8 +6,10 @@ import path from "path";
 import MarkdownIt from "markdown-it";
 import meta from "markdown-it-meta";
 import attribution from "markdown-it-attribution";
-import Prism from "prismjs";
-import loadLanguages from "prismjs/components/index.js";
+import markdownItContainer from "markdown-it-container";
+import markdownItPrism from "markdown-it-prism";
+import markdownItPrismBackticks from "markdown-it-prism-backticks";
+import markdownItAttrs from "markdown-it-attrs";
 import Handlebars from "handlebars";
 import HandlebarsIntl from "handlebars-intl";
 import anchor from "markdown-it-anchor";
@@ -18,8 +20,6 @@ import fetch from "node-fetch";
 import postcss from "postcss";
 import cssvariables from "postcss-css-variables";
 import responsiveImages from "./markdown-it-plugins/responsive-images.js";
-
-loadLanguages(["asm6502", "ts", "scss", "jsx", "shell"]);
 
 global.fetch = fetch;
 dotenv.config();
@@ -66,24 +66,12 @@ const handlebarsI18nData = {
 };
 
 const processBlogPostFile = async (blogPostFile, buildContext) => {
-  const markdownIt = new MarkdownIt({
-    html: true,
-    linkify: false,
-    highlight: (text, lang) => {
-      const code = Prism.languages[lang]
-        ? Prism.highlight(text, Prism.languages[lang])
-        : markdownIt.utils.escapeHtml(text);
-
-      const classAttr = lang
-        ? ` class="${markdownIt.options.langPrefix}${lang}"`
-        : "";
-
-      return `<pre${classAttr}><code${classAttr}>${code}</code></pre>`;
-    },
-  })
+  const markdownIt = new MarkdownIt({ html: true, linkify: false })
+    .use(markdownItPrism)
+    .use(markdownItPrismBackticks)
     .use(meta)
     .use(anchor, {
-      level: 1,
+      level: [1, 2, 3, 4],
       permalink: true,
       permalinkClass: "header-anchor",
       permalinkSymbol: "#",
@@ -95,6 +83,14 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
       multiline: false,
       rowspan: false,
       headerless: false,
+    })
+    .use(markdownItAttrs)
+    .use(markdownItContainer, "div", {
+      validate: (params) => params.trim().match(/^opcode$/),
+      render: (tokens, idx) =>
+        tokens[idx].nesting === 1
+          ? '<section class="opcode">\n'
+          : "</section>\n",
     });
 
   const post = await readFile(blogPostFile.path, { encoding: "utf-8" });
