@@ -1,9 +1,5 @@
 "use strict";
-// import Prism from "prismjs";
 import loadLanguages from "prismjs/components/index.js";
-
-// Parse backticks
-// From: https://github.com/markdown-it/markdown-it/blob/master/lib/rules_inline/backticks.js
 
 function loadPrismLang(lang) {
   if (!lang) return undefined;
@@ -55,8 +51,8 @@ function backticksHandler(state, silent) {
     if (matchEnd - matchStart === marker.length) {
       // Look for a lang:
 
-      var possibleLang = state.src.slice(matchEnd);
-      var languageMatch = possibleLang.match(/^{lang=([\w_-]+)}/);
+      var possibleLanguage = state.src.slice(matchEnd);
+      var languageMatch = possibleLanguage.match(/^{lang=([\w_-]+)}/);
       var language = languageMatch ? languageMatch[1] : null;
       var prismLang = null;
 

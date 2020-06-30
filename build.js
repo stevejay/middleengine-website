@@ -8,6 +8,7 @@ import meta from "markdown-it-meta";
 import attribution from "markdown-it-attribution";
 import markdownItContainer from "markdown-it-container";
 import markdownItPrism from "markdown-it-prism";
+import markdownItPrismBackticks from "markdown-it-prism-backticks";
 import markdownItAttrs from "markdown-it-attrs";
 import Handlebars from "handlebars";
 import HandlebarsIntl from "handlebars-intl";
@@ -19,7 +20,7 @@ import fetch from "node-fetch";
 import postcss from "postcss";
 import cssvariables from "postcss-css-variables";
 import responsiveImages from "./markdown-it-plugins/responsive-images.js";
-import prismBackticks from "./markdown-it-plugins/markdown-it-prism-backticks.js";
+// import prismBackticks from "./markdown-it-plugins/markdown-it-prism-backticks.js";
 
 global.fetch = fetch;
 dotenv.config();
@@ -68,7 +69,7 @@ const handlebarsI18nData = {
 const processBlogPostFile = async (blogPostFile, buildContext) => {
   const markdownIt = new MarkdownIt({ html: true, linkify: false })
     .use(markdownItPrism)
-    .use(prismBackticks)
+    .use(markdownItPrismBackticks)
     .use(meta)
     .use(anchor, {
       level: [1, 2, 3, 4],

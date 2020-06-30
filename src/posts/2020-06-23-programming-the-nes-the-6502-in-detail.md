@@ -10,6 +10,8 @@ author:
 
 ## Introduction
 
+An example assembly instruction is `LDA #$22`{lang=asm6502}.
+
 In the previous post I presented an overview of the NES and its subsystems. A key component is the CPU, which is a version of the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) CPU. In order to write games for the NES, it is necessary to have a good understanding of the functioning of the 6502 and how to program it using assembly. This post covers basic assembly, binary number theory, the processor registers, the addressing modes, the call stack, interrupts, and the opcodes.
 
 The primary reference for this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is quite a dense read, but it does include a lot of useful advice and many worked examples. Since the CPU in the NES does not support the 6502's binary coded decimal mode, information in the manual regarding that mode can be ignored.
@@ -566,7 +568,7 @@ The following diagram shows the supported transfers:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/transfer-opcodes-2x.png "The transfers supported by the data transfer operations")
 
-As you can see, it is not possible to transfer directly between the X and Y registers.
+As this diagram shows, it is not possible to transfer directly between the X and Y registers.
 
 ::: opcode
 
@@ -596,293 +598,244 @@ Loads the specified byte into the Accumulator.
 
 :::
 
-<section class="opcode">
-    <h5>LDX (Load Index Register X with memory)</h5>
-    <p>
-    Loads the specified byte into the X register.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <table>
-        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
-        <tbody>
-            <tr>
-                <td>Zero flag</td>
-                <td>Set if the specified byte is zero, otherwise cleared.</td>
-            </tr>
-            <tr>
-                <td>Negative flag</td>
-                <td>Updated to the value of bit #7 of the specified byte.</td>
-            </tr>
-        </tbody>
-    </table>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Immediate; Absolute; Zero Page; Absolute, Y; and Zero Page, Y.
-    </p>
-    <h6>Example instructions</h6>
-    <pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LDX</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
-<span class="token opcode property">LDX</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
-<span class="token opcode property">LDX</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
-<span class="token opcode property">LDX</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
-<span class="token opcode property">LDX</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">Y</span>    <span class="token comment">; Zero Page, Y</span>
-</code></pre>
-</section>
+::: opcode
 
-<section class="opcode">
-    <h5>LDY (Load Index Register Y with memory)</h5>
-    <p>
-    Loads the specified byte into the Y register.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <table>
-        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
-        <tbody>
-            <tr>
-                <td>Zero flag</td>
-                <td>Set if the specified byte is zero, otherwise cleared.</td>
-            </tr>
-            <tr>
-                <td>Negative flag</td>
-                <td>Updated to the value of bit #7 of the specified byte.</td>
-            </tr>
-        </tbody>
-    </table>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Immediate; Absolute; Zero Page; Absolute, X; and Zero Page, X.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">LDY</span> <span class="token hexnumber string">#$04</span>      <span class="token comment">; Immediate</span>
-<span class="token opcode property">LDY</span> <span class="token hexnumber string">$0C00</span>     <span class="token comment">; Absolute</span>
-<span class="token opcode property">LDY</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
-<span class="token opcode property">LDY</span> <span class="token hexnumber string">$0C00</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
-<span class="token opcode property">LDY</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
-</code></pre>
-</section>
+##### LDX (Load Index Register X with memory)
 
-<section class="opcode">
-    <h5>STA (Store Accumulator in memory)</h5>
-    <p>
-    Copies the value in the Accumulator to the specified memory location.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <p>
-    Does not update any flags.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Absolute; Zero Page; Absolute, X; Absolute, Y; Zero Page, X; (Indirect, X); and (Indirect), Y.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">STA</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
-<span class="token opcode property">STA</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
-<span class="token opcode property">STA</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
-<span class="token opcode property">STA</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
-<span class="token opcode property">STA</span> <span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>    <span class="token comment">; Zero Page, X</span>
-<span class="token opcode property">STA</span> (<span class="token hexnumber string">$04</span>, <span class="token register variable">X</span>)  <span class="token comment">; (Indirect, X)</span>
-<span class="token opcode property">STA</span> (<span class="token hexnumber string">$04</span>), <span class="token register variable">Y</span>  <span class="token comment">; (Indirect), Y</span>
-</code></pre>
-</section>
+Loads the specified byte into the X register.
 
-<section class="opcode">
-    <h5>STX (Store Index Register X in memory)</h5>
-    <p>
-    Copies the value in the X register to the specified memory location.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <p>
-    Does not update any flags.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Absolute; Zero Page; and Absolute, Y.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">STX</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
-<span class="token opcode property">STX</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
-<span class="token opcode property">STX</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">Y</span>  <span class="token comment">; Absolute, Y</span>
-</code></pre>
-</section>
+###### Processor Status register changes
 
-<section class="opcode">
-    <h5>STY (Store Index Register Y in memory)</h5>
-    <p>
-    Copies the value in the Y register to the specified memory location.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <p>
-    Does not update any flags.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Absolute; Zero Page; and Absolute, X.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">STY</span> <span class="token hexnumber string">$0700</span>     <span class="token comment">; Absolute</span>
-<span class="token opcode property">STY</span> <span class="token hexnumber string">$04</span>       <span class="token comment">; Zero Page</span>
-<span class="token opcode property">STY</span> <span class="token hexnumber string">$0700</span>, <span class="token register variable">X</span>  <span class="token comment">; Absolute, X</span>
-</code></pre>
-</section>
+| Flag          | Effect                                                |
+| ------------- | ----------------------------------------------------- |
+| Zero flag     | Set if the specified byte is zero, otherwise cleared. |
+| Negative flag | Updated to the value of bit #7 of the specified byte. |
 
-<section class="opcode">
-    <h5>TAX (Transfer Accumulator to Index Register X)</h5>
-    <p>
-    Copies the value in the Accumulator to the X register.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <table>
-        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
-        <tbody>
-            <tr>
-                <td>Zero flag</td>
-                <td>Set if the copied byte is zero, otherwise cleared.</td>
-            </tr>
-            <tr>
-                <td>Negative flag</td>
-                <td>Updated to the value of bit #7 of the copied byte.</td>
-            </tr>
-        </tbody>
-    </table>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAX</span>    <span class="token comment">; Implied</span>
-</code></pre>
-</section>
+###### Supported addressing modes
 
-<section class="opcode">
-    <h5>TAY (Transfer Accumulator to Index Register Y)</h5>
-    <p>
-    Copies the value in the Accumulator to the Y register.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <table>
-        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
-        <tbody>
-            <tr>
-                <td>Zero flag</td>
-                <td>Set if the copied byte is zero, otherwise cleared.</td>
-            </tr>
-            <tr>
-                <td>Negative flag</td>
-                <td>Updated to the value of bit #7 of the copied byte.</td>
-            </tr>
-        </tbody>
-    </table>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TAY</span>    <span class="token comment">; Implied</span>
-</code></pre>
-</section>
+| Addressing mode | Example instruction          |
+| --------------- | ---------------------------- |
+| Immediate       | `LDX #$00`{lang=asm6502}     |
+| Absolute        | `LDX $0000`{lang=asm6502}    |
+| Zero Page       | `LDX $00`{lang=asm6502}      |
+| Absolute, Y     | `LDX $0000, Y`{lang=asm6502} |
+| Zero Page, Y    | `LDX $00, Y`{lang=asm6502}   |
 
-<section class="opcode">
-    <h5>TXA (Transfer Index Register X to Accumulator)</h5>
-    <p>
-    Copies the value in the X register to the Accumulator.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <table>
-        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
-        <tbody>
-            <tr>
-                <td>Zero flag</td>
-                <td>Set if the copied byte is zero, otherwise cleared.</td>
-            </tr>
-            <tr>
-                <td>Negative flag</td>
-                <td>Updated to the value of bit #7 of the copied byte.</td>
-            </tr>
-        </tbody>
-    </table>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXA</span>    <span class="token comment">; Implied</span>
-</code></pre>
-</section>
+:::
 
-<section class="opcode">
-    <h5>TYA (Transfer Index Register Y to Accumulator)</h5>
-    <p>
-    Copies the value in the Y register to the Accumulator.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <table>
-        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
-        <tbody>
-            <tr>
-                <td>Zero flag</td>
-                <td>Set if the copied byte is zero, otherwise cleared.</td>
-            </tr>
-            <tr>
-                <td>Negative flag</td>
-                <td>Updated to the value of bit #7 of the copied byte.</td>
-            </tr>
-        </tbody>
-    </table>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TYA</span>    <span class="token comment">; Implied</span>
-</code></pre>
-</section>
+::: opcode
+
+##### LDY (Load Index Register Y with memory)
+
+Loads the specified byte into the Y register.
+
+###### Processor Status register changes
+
+| Flag          | Effect                                                |
+| ------------- | ----------------------------------------------------- |
+| Zero flag     | Set if the specified byte is zero, otherwise cleared. |
+| Negative flag | Updated to the value of bit #7 of the specified byte. |
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction          |
+| --------------- | ---------------------------- |
+| Immediate       | `LDY #$00`{lang=asm6502}     |
+| Absolute        | `LDY $0000`{lang=asm6502}    |
+| Zero Page       | `LDY $00`{lang=asm6502}      |
+| Absolute, X     | `LDY $0000, X`{lang=asm6502} |
+| Zero Page, X    | `LDY $00, X`{lang=asm6502}   |
+
+:::
+
+::: opcode
+
+##### STA (Store Accumulator in memory)
+
+Copies the value in the Accumulator to the specified memory location.
+
+###### Processor Status register changes
+
+Does not update any flags.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction          |
+| --------------- | ---------------------------- |
+| Absolute        | `STA $0000`{lang=asm6502}    |
+| Zero Page       | `STA $00`{lang=asm6502}      |
+| Absolute, X     | `STA $0000, X`{lang=asm6502} |
+| Absolute, Y     | `STA $0000, Y`{lang=asm6502} |
+| Zero Page, X    | `STA $00, X`{lang=asm6502}   |
+| (Indirect, X)   | `STA ($00, X)`{lang=asm6502} |
+| (Indirect), Y   | `STA ($00), Y`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### STX (Store Index Register X in memory)
+
+Copies the value in the X register to the specified memory location.
+
+###### Processor Status register changes
+
+Does not update any flags.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction          |
+| --------------- | ---------------------------- |
+| Absolute        | `STX $0000`{lang=asm6502}    |
+| Zero Page       | `STX $00`{lang=asm6502}      |
+| Absolute, Y     | `STX $0000, Y`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### STY (Store Index Register Y in memory)
+
+Copies the value in the Y register to the specified memory location.
+
+###### Processor Status register changes
+
+Does not update any flags.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction          |
+| --------------- | ---------------------------- |
+| Absolute        | `STY $0000`{lang=asm6502}    |
+| Zero Page       | `STY $00`{lang=asm6502}      |
+| Absolute, X     | `STY $0000, X`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### TAX (Transfer Accumulator to Index Register X)
+
+Copies the value in the Accumulator to the X register.
+
+###### Processor Status register changes
+
+| Flag          | Effect                                             |
+| ------------- | -------------------------------------------------- |
+| Zero flag     | Set if the copied byte is zero, otherwise cleared. |
+| Negative flag | Updated to the value of bit #7 of the copied byte. |
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `TAX`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### TAY (Transfer Accumulator to Index Register Y)
+
+Copies the value in the Accumulator to the Y register.
+
+###### Processor Status register changes
+
+| Flag          | Effect                                             |
+| ------------- | -------------------------------------------------- |
+| Zero flag     | Set if the copied byte is zero, otherwise cleared. |
+| Negative flag | Updated to the value of bit #7 of the copied byte. |
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `TAY`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### TXA (Transfer Index Register X to Accumulator)
+
+Copies the value in the X register to the Accumulator.
+
+###### Processor Status register changes
+
+| Flag          | Effect                                             |
+| ------------- | -------------------------------------------------- |
+| Zero flag     | Set if the copied byte is zero, otherwise cleared. |
+| Negative flag | Updated to the value of bit #7 of the copied byte. |
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `TXA`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### TYA (Transfer Index Register Y to Accumulator)
+
+Copies the value in the Y register to the Accumulator.
+
+###### Processor Status register changes
+
+| Flag          | Effect                                             |
+| ------------- | -------------------------------------------------- |
+| Zero flag     | Set if the copied byte is zero, otherwise cleared. |
+| Negative flag | Updated to the value of bit #7 of the copied byte. |
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `TYA`{lang=asm6502} |
+
+:::
 
 The final two operations below are for data transfers between the X register and the Stack Pointer. Their usage is covered later in this post in the section on the call stack.
 
-<section class="opcode">
-    <h5>TXS (Transfer Index Register X to Stack Pointer)</h5>
-    <p>
-    Copies the value in the X register to the Stack Pointer.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <p>
-    Does not update any flags.
-    </p>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TXS</span>    <span class="token comment">; Implied</span>
-</code></pre>
-</section>
+::: opcode
 
-<section class="opcode">
-    <h5>TSX (Transfer Stack Pointer to Index Register X)</h5>
-    <p>
-    Copies the value in the Stack Pointer to the X register.
-    </p>
-    <h6>Processor Status register changes</h6>
-    <table>
-        <thead class="visually-hidden"><tr><th>Flag</th><th>Effect</th></tr></thead>
-        <tbody>
-            <tr>
-                <td>Zero flag</td>
-                <td>Set if the copied byte is zero, otherwise cleared.</td>
-            </tr>
-            <tr>
-                <td>Negative flag</td>
-                <td>Updated to the value of bit #7 of the copied byte.</td>
-            </tr>
-        </tbody>
-    </table>
-    <h6>Supported addressing modes</h6>
-    <p>
-    Implied only.
-    </p>
-    <h6>Example instructions</h6>
-<pre class="language-asm6502"><code class="language-asm6502"><span class="token opcode property">TSX</span>    <span class="token comment">; Implied</span>
-</code></pre>
-</section>
+##### TXS (Transfer Index Register X to Stack Pointer)
+
+Copies the value in the X register to the Stack Pointer.
+
+###### Processor Status register changes
+
+Does not update any flags.
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `TXS`{lang=asm6502} |
+
+:::
+
+::: opcode
+
+##### TSX (Transfer Stack Pointer to Index Register X)
+
+Copies the value in the Stack Pointer to the X register.
+
+###### Processor Status register changes
+
+| Flag          | Effect                                             |
+| ------------- | -------------------------------------------------- |
+| Zero flag     | Set if the copied byte is zero, otherwise cleared. |
+| Negative flag | Updated to the value of bit #7 of the copied byte. |
+
+###### Supported addressing modes
+
+| Addressing mode | Example instruction |
+| --------------- | ------------------- |
+| Implied         | `TSX`{lang=asm6502} |
+
+:::
 
 The following assembly demonstrates how these data transfer operations can be used to store a given 16-bit value in memory and then copy it to a another memory location:
 
@@ -2106,8 +2059,6 @@ The result depends on the exact unofficial value used. For some, the result is a
 ## Conclusion
 
 If you have not done any low-level programming before then writing games for the NES, and so programming the 6502, involves learning a number of new concepts. This has been a long post and it has covered some tricky details, but the information presented here will provide a solid base for your future programming of the NES.
-
-Test code TODO remove `%0000`{lang=asm6502} and this continues.
 
 ## Further reading
 
