@@ -1335,7 +1335,9 @@ section.opcode > * {
   margin: 0;
 }
 
-section.opcode code {
+section.opcode :not(pre) > code,
+section.opcode :not(pre) > code[class*="language-"] {
+  padding: 0;
   background-color: transparent;
 }
 
