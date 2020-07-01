@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! -f /usr/share/nginx/html/css/site-*.css ]; then
-  echo "/usr/share/nginx/html/css/site-*.css file not found!"
+  echo "/usr/share/nginx/html/css/site.*.css file not found!"
   exit 1
 fi
 
