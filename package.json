@@ -5,18 +5,23 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "watch": "chokidar \"src/**/*\" --initial true -c \"npm run build\"",
+    "watch-old": "chokidar \"src/**/*\" --initial true -c \"npm run build\"",
+    "watch": "node ./build.js --watch ",
     "build": "node ./build.js",
     "serve": "ws --directory build --static.extensions html --port 8001",
     "upgrade-interactive": "npm-check --update"
   },
   "devDependencies": {
     "@nodelib/fs.walk": "^1.2.4",
+    "autoprefixer": "^9.8.4",
+    "chokidar": "^3.4.0",
     "chokidar-cli": "^2.1.0",
+    "cssnano": "^4.1.10",
     "dotenv": "^8.2.0",
     "fs-extra": "^9.0.0",
     "handlebars": "^4.7.6",
     "handlebars-intl": "^1.1.2",
+    "koa": "^2.13.0",
     "local-web-server": "^4.0.0",
     "lodash": "^4.17.15",
     "markdown-it": "^10.0.0",
@@ -29,16 +34,23 @@
     "markdown-it-multimd-table": "^4.0.1",
     "markdown-it-prism": "^2.0.5",
     "markdown-it-prism-backticks": "^1.0.0",
+    "minimist": "^1.2.5",
     "node-fetch": "^2.6.0",
-    "normalize.css": "^8.0.1",
+    "node-graceful": "^3.0.0",
     "npm-check": "^5.9.2",
     "postcss": "^7.0.27",
     "postcss-css-variables": "^0.17.0",
+    "postcss-preset-env": "^6.7.0",
+    "postcss-use": "^3.0.0",
     "prismjs": "^1.20.0",
     "probe-image-size": "^5.0.0",
     "rev-hash": "^3.0.0"
   },
   "engines": {
     "node": ">= 12.0.0"
-  }
+  },
+  "browserslist": [
+    "last 2 versions"
+  ],
+  "dependencies": {}
 }

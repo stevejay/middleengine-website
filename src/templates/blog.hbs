@@ -13,7 +13,7 @@
             <ul>
                 {{#each latestBlogPosts}}
                 <li>
-                    <h3><a href="{{absPath}}">{{meta.title}}</a></h3>
+                    <h3><a href="{{urlPath}}">{{meta.title}}</a></h3>
                     <div class="byline">
                         By&nbsp;
                         <address class="author"><a rel="author" href="{{meta.author.url}}">{{meta.author.name}}</a>
@@ -22,12 +22,12 @@
                             title="{{formatDate meta.date "short"}}">{{formatDate meta.date "short"}}</time>
                     </div>
                     <p>{{meta.summary}}</p>
-                    <a href="{{absPath}}">Read this post</a>
+                    <a href="{{urlPath}}">Read this post</a>
                 </li>
                 {{/each}}
                 {{#each olderBlogPosts}}
                 <li>
-                    <h3><a href="{{absPath}}">{{meta.title}}</a></h3>
+                    <h3><a href="{{urlPath}}">{{meta.title}}</a></h3>
                     <div class="byline">
                         By&nbsp;
                         <address class="author"><a rel="author" href="{{meta.author.url}}">{{meta.author.name}}</a>
@@ -36,7 +36,7 @@
                             title="{{formatDate meta.date "short"}}">{{formatDate meta.date "short"}}</time>
                     </div>
                     <p>{{meta.summary}}</p>
-                    <a href="{{absPath}}">Read this post</a>
+                    <a href="{{urlPath}}">Read this post</a>
                 </li>
                 {{/each}}
             </ul>
