@@ -12,12 +12,7 @@ You also need an account at Docker Hub. This is the service that will build the 
 
 ## Local development
 
-Run two console windows:
-
-1. One building the Web site on file changes, via the command `npm run watch`.
-2. One serving the built Web site, via the command `npm run serve`.
-
-You should be able to view the site via the URL `http://127.0.0.1:8001`.
+To run the site locally with auto reloading on changes, run the command `npm run watch`. The port used is automatically assigned and a message appears to tell you what URL to use to access the site. Generally this will be `http://localhost:3000`.
 
 ## Deployment
 

@@ -963,7 +963,7 @@ LDA #$FB  ; Load $FB as an immediate value into the Accumulator.
 ADC $00   ; Add value at address $0000 to the Accumulator.
 ```
 
-After this code runs, the Carry flag is set and the Overflow flag is not set. We are adding signed values so we are only interested in checking for overflow. Since the Overflow flag is not set, the result is valid. On the other hand, if the above addition was changed to `$80` + `$FB`, or -128 + -5 in decimal, then the Overflow flag would be set and the result would be invalid. The answer to this is to use 16-bit signed values:
+After this code runs, the Carry flag is set and the Overflow flag is not set. We are adding signed values so we are only interested in checking for overflow. Since the Overflow flag is not set, the result is valid. On the other hand, if the above addition was changed to `$80` + `$FB`, or -128 + -5 in decimal, then the Overflow flag would be set and the result would be invalid. The answer is to use 16-bit signed values:
 
 ```asm6502
 ; $FF80 + $FFFB (-128 + -5 in decimal)
@@ -991,7 +991,7 @@ LDA $00   ; Load LSB of first value into the Accumulator.
 ADC $02   ; Add LSB of second value to the Accumulator.
 STA $04   ; Store LSB of result in memory at address $0004.
 
-; Add the MSBs, including the carry bit from the first addition.
+; Add the MSBs, including any carry bit from the first addition.
 LDA $01   ; Load MSB of first value into the Accumulator.
 ADC $03   ; Add MSB of second value to the Accumulator.
 STA $05   ; Store LSB of result in memory at address $0005.
@@ -1035,7 +1035,7 @@ ADC $00   ; Add value at address $0000 to the delta value in the Accumulator.
 STA $03   ; Store Accumulator in memory at address $0003.
 TXA       ; Transfer the high byte in the X register to the Accumulator.
 
-ADC $01   ; Add value at address $0001 to the Accumulator .
+ADC $01   ; Add value at address $0001 to the Accumulator.
 STA $04   ; Store Accumulator in memory at address $0004.
 ```
 

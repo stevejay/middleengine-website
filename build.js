@@ -1,54 +1,57 @@
-import _ from "lodash";
-import fsWalk from "@nodelib/fs.walk";
-import util from "util";
-import fs from "fs-extra";
-import path from "path";
-import MarkdownIt from "markdown-it";
-import meta from "markdown-it-meta";
-import attribution from "markdown-it-attribution";
-import markdownItContainer from "markdown-it-container";
-import markdownItPrism from "markdown-it-prism";
-import markdownItPrismBackticks from "markdown-it-prism-backticks";
-import markdownItAttrs from "markdown-it-attrs";
-import Handlebars from "handlebars";
-import HandlebarsIntl from "handlebars-intl";
-import anchor from "markdown-it-anchor";
-import multimdTable from "markdown-it-multimd-table";
-import revisionHash from "rev-hash";
-import dotenv from "dotenv";
-import fetch from "node-fetch";
-import postcss from "postcss";
-import cssvariables from "postcss-css-variables";
-import responsiveImages from "./markdown-it-plugins/responsive-images.js";
+const _ = require("lodash");
+const minimist = require("minimist");
+const mimetype = require("mimetype");
+const Graceful = require("node-graceful");
+const chokidar = require("chokidar");
+const express = require("express");
+const http = require("http");
+const reload = require("reload");
+const getPort = require("get-port");
+const fsWalk = require("@nodelib/fs.walk");
+const util = require("util");
+const fs = require("fs-extra");
+const path = require("path");
+const MarkdownIt = require("markdown-it");
+const meta = require("markdown-it-meta");
+const attribution = require("markdown-it-attribution");
+const markdownItContainer = require("markdown-it-container");
+const markdownItPrism = require("markdown-it-prism");
+const markdownItPrismBackticks = require("markdown-it-prism-backticks");
+const markdownItAttrs = require("markdown-it-attrs");
+const Handlebars = require("handlebars");
+const HandlebarsIntl = require("handlebars-intl");
+const anchor = require("markdown-it-anchor");
+const multimdTable = require("markdown-it-multimd-table");
+const revisionHash = require("rev-hash");
+const dotenv = require("dotenv");
+const fetch = require("node-fetch");
+const postcss = require("postcss");
+const postCssUse = require("postcss-use");
+const responsiveImages = require("./markdown-it-plugins/responsive-images.js");
 
+Graceful.captureExceptions = true;
+Graceful.captureRejections = true;
 global.fetch = fetch;
 dotenv.config();
 
 const walk = util.promisify(fsWalk.walk);
-const mkdir = util.promisify(fs.mkdir);
 const ensureDir = util.promisify(fs.ensureDir);
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const copyFile = util.promisify(fs.copyFile);
-const copy = util.promisify(fs.copy);
 
 const DOMAIN = "https://www.middle-engine.com";
 const LATEST_POSTS_LENGTH = 6;
 const BUILD_DIR = "./build";
-const CSS_BUILD_DIR = path.join(BUILD_DIR, "css");
-const JS_BUILD_DIR = path.join(BUILD_DIR, "js");
-const POSTS_BUILD_DIR = path.join(BUILD_DIR, "blog/posts");
-const IMAGES_BUILD_DIR = path.join(BUILD_DIR, "images");
-
+const EXCLUDED_STATIC_FILES = [".DS_Store"];
+const POSTCSS_FILE_EXTENSIONS = [".css"];
 const SRC_DIR = "./src";
-const CSS_SRC_DIR = path.join(SRC_DIR, "css");
-const JS_SRC_DIR = path.join(SRC_DIR, "js");
-const POSTS_SRC_DIR = path.join(SRC_DIR, "posts");
-const TEMPLATES_SRC_DIR = path.join(SRC_DIR, "templates");
+const STATIC_SRC_DIR = "./src/static";
+const POSTS_SRC_DIR = "./src/posts";
+const TEMPLATES_SRC_DIR = "./src/templates";
 const PARTIALS_SRC_DIR = path.join(SRC_DIR, "templates");
-const IMAGES_SRC_DIR = path.join(SRC_DIR, "images");
-const FAVICON_SRC_DIR = path.join(SRC_DIR, "favicon");
 const POST_NAME_REGEXP = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})-(?<name>.+)$/;
+const WATCH_DEBOUNCE_MS = 250;
 
 HandlebarsIntl.registerWith(Handlebars);
 
@@ -107,7 +110,6 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
   const context = { ...buildContext, ...markdownIt.meta, content };
   const options = { data: { intl: handlebarsI18nData } };
   const html = template(context, options);
-
   const fileName = path.parse(blogPostFile.path).name;
 
   const srcPathParts = fileName.match(POST_NAME_REGEXP);
@@ -118,22 +120,22 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
   }
 
   const buildPostDir = createPostDirectoryPath(markdownIt.meta.date);
-  await ensureDir(path.join(POSTS_BUILD_DIR, buildPostDir));
-
   const buildPostName = srcPathParts.groups.name;
-  const filePath = path.join(
-    POSTS_BUILD_DIR,
-    buildPostDir,
-    `${buildPostName}.html`
-  );
-  await writeFile(filePath, html, { encoding: "utf-8" });
+  const urlPath = `/blog/posts/${buildPostDir}/${buildPostName}`;
+  const filePath = `${urlPath}.html`;
 
-  const absPath = `/blog/posts/${buildPostDir}/${buildPostName}`;
   if (markdownIt.meta.draft) {
-    console.log("Draft blog post", `http://127.0.0.1:8001${absPath}`);
+    console.log("Draft blog post", `http://127.0.0.1:8001${urlPath}`);
   }
 
-  return { absPath, meta: markdownIt.meta };
+  return {
+    key: urlPath,
+    srcFile: blogPostFile.path,
+    src: html,
+    filePath,
+    urlPath,
+    meta: markdownIt.meta,
+  };
 };
 
 const createPostDirectoryPath = (postDate) =>
@@ -143,37 +145,38 @@ const createPostDirectoryPath = (postDate) =>
     "0"
   )}/${_.padStart(postDate.getUTCDate(), 2, "0")}`;
 
-const createHTMLFile = async (buildContext, templateFileName, destFileName) => {
-  const layoutContent = await readFile(
-    path.join(TEMPLATES_SRC_DIR, templateFileName),
-    {
-      encoding: "utf-8",
-    }
-  );
-
+const generateHTMLFile = async (buildContext, templateFileName, urlPath) => {
+  const srcFile = path.join(TEMPLATES_SRC_DIR, templateFileName);
+  const layoutContent = await readFile(srcFile, { encoding: "utf-8" });
   const template = Handlebars.compile(layoutContent);
   const options = { data: { intl: handlebarsI18nData } };
   const html = template(buildContext, options);
+  const filePath = urlPath.endsWith("/")
+    ? `${urlPath}index.html`
+    : `${urlPath}.html`;
 
-  await writeFile(path.join(BUILD_DIR, destFileName), html, {
-    encoding: "utf-8",
+  buildContext.outputFiles.push({
+    key: urlPath,
+    srcFile: `./${srcFile}`,
+    src: html,
+    filePath,
+    urlPath,
   });
 };
 
-const createSitemapFile = async (buildContext) => {
+const generateSitemapFile = async (buildContext) => {
   const sitemapEntries = [`${DOMAIN}/`, `${DOMAIN}/blog`];
 
   buildContext.publishedBlogPosts.forEach((postData) => {
-    sitemapEntries.push(`${DOMAIN}${postData.absPath}`);
+    sitemapEntries.push(`${DOMAIN}${postData.urlPath}`);
   });
 
-  await writeFile(
-    path.join(BUILD_DIR, "sitemap.txt"),
-    sitemapEntries.join("\n"),
-    {
-      encoding: "utf-8",
-    }
-  );
+  buildContext.outputFiles.push({
+    key: "/sitemap.txt",
+    src: sitemapEntries.join("\n"),
+    filePath: "/sitemap.txt",
+    urlPath: "/sitemap.txt",
+  });
 };
 
 const autoRegisterPartial = async (partialFile) => {
@@ -201,93 +204,82 @@ const autoRegisterAllPartials = async () => {
   await Promise.all(partialFiles.map(autoRegisterPartial));
 };
 
-const createBuildDirectory = async () => {
-  // Create the basic build directory structure
-  await fs.emptyDir(BUILD_DIR);
-  await mkdir(CSS_BUILD_DIR);
-  await mkdir(JS_BUILD_DIR);
+const processStaticFile = async (staticFile) => {
+  const pathMatch = staticFile.path.match(
+    /^(?<base>.+?)(?<flags>\.HASH)?(?<extension>\.[^\.]+)$/
+  );
+
+  if (!pathMatch) {
+    throw new Error(
+      `Static file processor failed to match path parts for file '${staticFile.path}'`
+    );
+  }
+
+  const base = pathMatch.groups["base"];
+  const flags = pathMatch.groups["flags"];
+  const extension = pathMatch.groups["extension"];
+
+  const result = {
+    key: `/${path.relative(STATIC_SRC_DIR, staticFile.path)}`,
+    srcFile: staticFile.path,
+    filePath: `/${path.relative(STATIC_SRC_DIR, staticFile.path)}`,
+    urlPath: `/${path.relative(STATIC_SRC_DIR, staticFile.path)}`,
+  };
+
+  if (POSTCSS_FILE_EXTENSIONS.includes(extension)) {
+    const content = fs.readFileSync(staticFile.path);
+    const processedCSS = await postcss([
+      postCssUse({ modules: "*" }),
+    ]).process(content, { from: undefined });
+    result.src = processedCSS.css;
+  }
+
+  if (flags && flags === ".HASH") {
+    if (!result.src) {
+      result.src = fs.readFileSync(result.srcFile);
+    }
+    const contentHash = revisionHash(result.src);
+    result.filePath = `/${path.relative(
+      STATIC_SRC_DIR,
+      `${base}.${contentHash}${extension}`
+    )}`;
+    result.urlPath = `/${path.relative(
+      STATIC_SRC_DIR,
+      `${base}.${contentHash}${extension}`
+    )}`;
+  }
+
+  return result;
 };
 
-const addHashToFilePath = (filePath, hash) => {
-  const fileExt = path.extname(filePath);
-
-  return `${filePath.substr(
-    0,
-    filePath.length - fileExt.length
-  )}-${hash}${fileExt}`;
-};
-
-const copyFileWithAddedHash = async (srcFilePath, destRelFilePath) => {
-  const hash = revisionHash(fs.readFileSync(srcFilePath));
-  const destRelFilePathWithHash = addHashToFilePath(destRelFilePath, hash);
-  await copyFile(srcFilePath, path.join(BUILD_DIR, destRelFilePathWithHash));
-  return destRelFilePathWithHash;
-};
-
-const copyPostCSSProcessedFile = async (srcFilePath, destRelFilePath) => {
-  const content = await readFile(srcFilePath, { encoding: "utf-8" });
-  const processedCSS = postcss([cssvariables()]).process(content).css;
-  const hash = revisionHash(processedCSS);
-  const destRelFilePathWithHash = addHashToFilePath(destRelFilePath, hash);
-  await writeFile(path.join(BUILD_DIR, destRelFilePathWithHash), processedCSS, {
-    encoding: "utf-8",
+const processStaticFilesDirectory = async (buildContext) => {
+  const staticFiles = await walk(STATIC_SRC_DIR, {
+    entryFilter: (node) =>
+      node.dirent.isFile() && !EXCLUDED_STATIC_FILES.includes(node.name),
   });
-  return destRelFilePathWithHash;
-};
 
-const generateResourceFiles = async (buildContext) => {
-  await copyFile(
-    path.join(SRC_DIR, "robots.txt"),
-    path.join(BUILD_DIR, "robots.txt")
-  );
+  const promises = staticFiles.map(processStaticFile);
+  const results = await Promise.all(promises);
 
-  await copy(IMAGES_SRC_DIR, IMAGES_BUILD_DIR, {
-    filter: (src) => !src.endsWith(".excalidraw"),
+  results.forEach((result) => {
+    buildContext.outputFiles.push(result);
   });
-
-  await copy(FAVICON_SRC_DIR, BUILD_DIR);
-
-  const siteCSS = await copyPostCSSProcessedFile(
-    path.join(CSS_SRC_DIR, "site.css"),
-    "/css/site.css"
-  );
-  buildContext.head.staticFiles.siteCSS = siteCSS;
-
-  const normalizeCSS = await copyFileWithAddedHash(
-    "./node_modules/normalize.css/normalize.css",
-    "/css/normalize.css"
-  );
-  buildContext.head.staticFiles.normalizeCSS = normalizeCSS;
-
-  const cookieBannerJS = await copyFileWithAddedHash(
-    path.join(JS_SRC_DIR, "cookie-banner.js"),
-    "/js/cookie-banner.js"
-  );
-  buildContext.head.staticFiles.cookieBannerJS = cookieBannerJS;
-
-  const turbolinksJS = await copyFileWithAddedHash(
-    path.join(JS_SRC_DIR, "turbolinks.js"),
-    "/js/turbolinks.js"
-  );
-  buildContext.head.staticFiles.turbolinksJS = turbolinksJS;
 };
 
-const generateHTMLFiles = async (buildContext) => {
-  await autoRegisterAllPartials();
-
+const generateBlogPostHTMLFiles = async (buildContext) => {
   const blogPostFiles = await walk(POSTS_SRC_DIR, {
     entryFilter: (node) => node.dirent.isFile() && node.name.endsWith(".md"),
     stats: true,
   });
 
-  const blogPosts = await Promise.all(
+  const results = await Promise.all(
     blogPostFiles.map((blogPostFile) =>
       processBlogPostFile(blogPostFile, buildContext)
     )
   );
 
-  const publishedBlogPosts = _.chain(blogPosts)
-    .filter((blogPost) => !blogPost.meta.draft)
+  const publishedBlogPosts = _.chain(results)
+    .filter((result) => !result.meta.draft)
     .orderBy(["meta.date", "meta.title"], ["desc", "asc"])
     .value();
 
@@ -298,30 +290,126 @@ const generateHTMLFiles = async (buildContext) => {
   );
   buildContext.olderBlogPosts = publishedBlogPosts.slice(LATEST_POSTS_LENGTH);
 
-  await createHTMLFile(buildContext, "index.html.hbs", "index.html");
-  await createHTMLFile(buildContext, "blog.hbs", "blog.html");
-  await createHTMLFile(buildContext, "legal.hbs", "legal.html");
-  await createHTMLFile(buildContext, "privacy.hbs", "privacy.html");
-  await createSitemapFile(buildContext);
+  results.forEach((result) => {
+    buildContext.outputFiles.push(result);
+  });
 };
 
-// MAIN ENTRY POINT:
-void (async () => {
-  try {
-    const buildContext = {
-      head: { staticFiles: {} },
-      publishedBlogPosts: [],
-      latestBlogPosts: [],
-      olderBlogPosts: [],
-    };
+const outputBuildFiles = async (buildContext) => {
+  await fs.emptyDir(BUILD_DIR);
 
-    await createBuildDirectory();
-    await generateResourceFiles(buildContext);
-    await generateHTMLFiles(buildContext);
-    console.log("Completed");
-    process.exit(0);
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
+  for (var i = 0; i < buildContext.outputFiles.length; ++i) {
+    const outputFile = buildContext.outputFiles[i];
+    const filePath = path.join(BUILD_DIR, outputFile.filePath);
+    await ensureDir(path.dirname(filePath));
+
+    if (outputFile.src) {
+      await writeFile(filePath, outputFile.src, { encoding: "utf-8" });
+    } else if (outputFile.srcFile) {
+      await copyFile(outputFile.srcFile, filePath);
+    }
+  }
+};
+
+const generateBuildContext = async () => {
+  await autoRegisterAllPartials();
+
+  const buildContext = {
+    publishedBlogPosts: [],
+    latestBlogPosts: [],
+    olderBlogPosts: [],
+    outputFiles: [],
+  };
+
+  await processStaticFilesDirectory(buildContext);
+
+  Handlebars.registerHelper("staticFile", (key) => {
+    const index = buildContext.outputFiles.findIndex((x) => x.key === key);
+    if (index === -1) {
+      throw new Error(`Could not find static file for key '${key}'.`);
+    }
+    return buildContext.outputFiles[index].urlPath;
+  });
+
+  await generateBlogPostHTMLFiles(buildContext);
+  await generateHTMLFile(buildContext, "index.html.hbs", "/");
+  await generateHTMLFile(buildContext, "blog.hbs", "/blog");
+  await generateHTMLFile(buildContext, "legal.hbs", "/legal");
+  await generateHTMLFile(buildContext, "privacy.hbs", "/privacy");
+  await generateSitemapFile(buildContext);
+
+  console.log("Built build context");
+  return buildContext;
+};
+
+void (async () => {
+  var argv = minimist(process.argv.slice(2));
+
+  if (argv.watch) {
+    let buildContext = null;
+    const port = await getPort({ port: [3000, 3001, 3002] });
+    const app = express();
+    app.set("port", port);
+
+    app.get("*", function (req, res, next) {
+      const urlPath = req.path;
+
+      if (urlPath === "/reload/reload.js") {
+        next();
+        return;
+      }
+
+      if (!buildContext) {
+        res.sendStatus(503);
+        return;
+      }
+
+      const index = buildContext.outputFiles.findIndex(
+        (outputFile) => outputFile.urlPath === urlPath
+      );
+
+      if (index === -1) {
+        res.sendStatus(404);
+        return;
+      }
+
+      const outputFile = buildContext.outputFiles[index];
+      res.type(mimetype.lookup(outputFile.filePath, true, "text/plain"));
+      res.set("Cache-Control", "max-age=0");
+
+      if (outputFile.src) {
+        res.send(outputFile.src);
+      } else {
+        const content = fs.readFileSync(
+          path.join(STATIC_SRC_DIR, outputFile.filePath)
+        );
+        res.send(content);
+      }
+    });
+
+    const server = http.createServer(app);
+    const reloadReturned = await reload(app);
+
+    server.listen(app.get("port"), function () {
+      console.log(`Site listening at http://localhost:${port}`);
+    });
+
+    const debouncedGenerateBuildContext = _.debounce(async () => {
+      buildContext = await generateBuildContext();
+      reloadReturned.reload();
+    }, WATCH_DEBOUNCE_MS);
+
+    chokidar.watch(SRC_DIR).on("all", async () => {
+      debouncedGenerateBuildContext();
+    });
+
+    Graceful.on("exit", () => {
+      debouncedGenerateBuildContext.cancel();
+      console.log("Exiting gracefully");
+    });
+  } else {
+    const buildContext = await generateBuildContext();
+    await outputBuildFiles(buildContext);
+    Graceful.exit(0);
   }
 })();
