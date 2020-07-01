@@ -311,7 +311,7 @@ const outputBuildFiles = async (buildContext) => {
   }
 };
 
-const generateBuildContext = async () => {
+const generateBuildContext = async (watchMode) => {
   await autoRegisterAllPartials();
 
   const buildContext = {
@@ -319,6 +319,7 @@ const generateBuildContext = async () => {
     latestBlogPosts: [],
     olderBlogPosts: [],
     outputFiles: [],
+    watchMode,
   };
 
   await processStaticFilesDirectory(buildContext);
@@ -343,7 +344,7 @@ const generateBuildContext = async () => {
 };
 
 void (async () => {
-  var argv = minimist(process.argv.slice(2));
+  const argv = minimist(process.argv.slice(2));
 
   if (argv.watch) {
     let buildContext = null;
@@ -351,7 +352,7 @@ void (async () => {
     const app = express();
     app.set("port", port);
 
-    app.get("*", function (req, res, next) {
+    app.get("*", (req, res, next) => {
       const urlPath = req.path;
 
       if (urlPath === "/reload/reload.js") {
@@ -395,7 +396,7 @@ void (async () => {
     });
 
     const debouncedGenerateBuildContext = _.debounce(async () => {
-      buildContext = await generateBuildContext();
+      buildContext = await generateBuildContext(true);
       reloadReturned.reload();
     }, WATCH_DEBOUNCE_MS);
 
@@ -408,7 +409,7 @@ void (async () => {
       console.log("Exiting gracefully");
     });
   } else {
-    const buildContext = await generateBuildContext();
+    const buildContext = await generateBuildContext(false);
     await outputBuildFiles(buildContext);
     Graceful.exit(0);
   }
