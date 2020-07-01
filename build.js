@@ -92,7 +92,7 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
       validate: (params) => params.trim().match(/^opcode$/),
       render: (tokens, idx) =>
         tokens[idx].nesting === 1
-          ? '<section class="opcode">\n'
+          ? '<section class="opcode-detail">\n'
           : "</section>\n",
     });
 
@@ -230,7 +230,7 @@ const processStaticFile = async (staticFile) => {
     const content = fs.readFileSync(staticFile.path);
     const processedCSS = await postcss([
       postCssUse({ modules: "*" }),
-    ]).process(content, { from: undefined });
+    ]).process(content, { from: staticFile.path, to: staticFile.path });
     result.src = processedCSS.css;
   }
 
@@ -396,8 +396,12 @@ void (async () => {
     });
 
     const debouncedGenerateBuildContext = _.debounce(async () => {
-      buildContext = await generateBuildContext(true);
-      reloadReturned.reload();
+      try {
+        buildContext = await generateBuildContext(true);
+        reloadReturned.reload();
+      } catch (err) {
+        console.error(`Build error: ${err.message}`);
+      }
     }, WATCH_DEBOUNCE_MS);
 
     chokidar.watch(SRC_DIR).on("all", async () => {
