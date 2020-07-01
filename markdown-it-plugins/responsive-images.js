@@ -1,6 +1,6 @@
-import path from "path";
-import fs from "fs-extra";
-import probeImageSize from "probe-image-size";
+const path = require("path");
+const fs = require("fs-extra");
+const probeImageSize = require("probe-image-size");
 
 const localImageRegExp = /^\/images\//;
 const pixelDensityRegExp = /-(\d)x\.[^.]+$/;
@@ -77,4 +77,4 @@ postImages.defaults = {
   imageRootPath: "./src/static",
 };
 
-export default postImages;
+module.exports = postImages;

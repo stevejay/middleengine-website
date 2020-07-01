@@ -1,29 +1,33 @@
-import _ from "lodash";
-import minimist from "minimist";
-import Graceful from "node-graceful";
-import chokidar from "chokidar";
-import Koa from "koa";
-import fsWalk from "@nodelib/fs.walk";
-import util from "util";
-import fs from "fs-extra";
-import path from "path";
-import MarkdownIt from "markdown-it";
-import meta from "markdown-it-meta";
-import attribution from "markdown-it-attribution";
-import markdownItContainer from "markdown-it-container";
-import markdownItPrism from "markdown-it-prism";
-import markdownItPrismBackticks from "markdown-it-prism-backticks";
-import markdownItAttrs from "markdown-it-attrs";
-import Handlebars from "handlebars";
-import HandlebarsIntl from "handlebars-intl";
-import anchor from "markdown-it-anchor";
-import multimdTable from "markdown-it-multimd-table";
-import revisionHash from "rev-hash";
-import dotenv from "dotenv";
-import fetch from "node-fetch";
-import postcss from "postcss";
-import postCssUse from "postcss-use";
-import responsiveImages from "./markdown-it-plugins/responsive-images.js";
+const _ = require("lodash");
+const minimist = require("minimist");
+const mimetype = require("mimetype");
+const Graceful = require("node-graceful");
+const chokidar = require("chokidar");
+const express = require("express");
+const http = require("http");
+const reload = require("reload");
+const getPort = require("get-port");
+const fsWalk = require("@nodelib/fs.walk");
+const util = require("util");
+const fs = require("fs-extra");
+const path = require("path");
+const MarkdownIt = require("markdown-it");
+const meta = require("markdown-it-meta");
+const attribution = require("markdown-it-attribution");
+const markdownItContainer = require("markdown-it-container");
+const markdownItPrism = require("markdown-it-prism");
+const markdownItPrismBackticks = require("markdown-it-prism-backticks");
+const markdownItAttrs = require("markdown-it-attrs");
+const Handlebars = require("handlebars");
+const HandlebarsIntl = require("handlebars-intl");
+const anchor = require("markdown-it-anchor");
+const multimdTable = require("markdown-it-multimd-table");
+const revisionHash = require("rev-hash");
+const dotenv = require("dotenv");
+const fetch = require("node-fetch");
+const postcss = require("postcss");
+const postCssUse = require("postcss-use");
+const responsiveImages = require("./markdown-it-plugins/responsive-images.js");
 
 Graceful.captureExceptions = true;
 Graceful.captureRejections = true;
@@ -231,9 +235,10 @@ const processStaticFile = async (staticFile) => {
   }
 
   if (flags && flags === ".HASH") {
-    const contentHash = revisionHash(
-      result.src || fs.readFileSync(result.srcFile)
-    );
+    if (!result.src) {
+      result.src = fs.readFileSync(result.srcFile);
+    }
+    const contentHash = revisionHash(result.src);
     result.filePath = `/${path.relative(
       STATIC_SRC_DIR,
       `${base}.${contentHash}${extension}`
@@ -334,56 +339,77 @@ const generateBuildContext = async () => {
   await generateSitemapFile(buildContext);
 
   console.log("Built build context");
-
   return buildContext;
 };
 
-// MAIN ENTRY POINT:
 void (async () => {
   var argv = minimist(process.argv.slice(2));
 
   if (argv.watch) {
-    let buildContext = null; // await generateBuildContext();
+    let buildContext = null;
+    const port = await getPort({ port: [3000, 3001, 3002] });
+    const app = express();
+    app.set("port", port);
 
-    await new Promise((resolve) => {
-      //   const app = new Koa();
+    app.get("*", function (req, res, next) {
+      const urlPath = req.path;
 
-      //   app.use(async (ctx) => {
-      //     ctx.body = "Hello World";
-      //   });
+      if (urlPath === "/reload/reload.js") {
+        next();
+        return;
+      }
 
-      //   app.listen(3000);
+      if (!buildContext) {
+        res.sendStatus(503);
+        return;
+      }
 
-      const debouncedGenerateBuildContext = _.debounce(async () => {
-        buildContext = await generateBuildContext();
-      }, WATCH_DEBOUNCE_MS);
+      const index = buildContext.outputFiles.findIndex(
+        (outputFile) => outputFile.urlPath === urlPath
+      );
 
-      chokidar.watch(SRC_DIR).on("all", async (event, path) => {
-        // console.log(event, path);
-        debouncedGenerateBuildContext();
-      });
+      if (index === -1) {
+        res.sendStatus(404);
+        return;
+      }
 
-      Graceful.on("exit", () => {
-        debouncedGenerateBuildContext.cancel();
-        resolve();
-        console.log("Exiting gracefully");
-      });
+      const outputFile = buildContext.outputFiles[index];
+      res.type(mimetype.lookup(outputFile.filePath, true, "text/plain"));
+      res.set("Cache-Control", "max-age=0");
+
+      if (outputFile.src) {
+        res.send(outputFile.src);
+      } else {
+        const content = fs.readFileSync(
+          path.join(STATIC_SRC_DIR, outputFile.filePath)
+        );
+        res.send(content);
+      }
+    });
+
+    const server = http.createServer(app);
+    const reloadReturned = await reload(app);
+
+    server.listen(app.get("port"), function () {
+      console.log(`Site listening at http://localhost:${port}`);
+    });
+
+    const debouncedGenerateBuildContext = _.debounce(async () => {
+      buildContext = await generateBuildContext();
+      reloadReturned.reload();
+    }, WATCH_DEBOUNCE_MS);
+
+    chokidar.watch(SRC_DIR).on("all", async () => {
+      debouncedGenerateBuildContext();
+    });
+
+    Graceful.on("exit", () => {
+      debouncedGenerateBuildContext.cancel();
+      console.log("Exiting gracefully");
     });
   } else {
     const buildContext = await generateBuildContext();
     await outputBuildFiles(buildContext);
     Graceful.exit(0);
   }
-
-  // buildContext.outputFiles.forEach((x) => {
-  //   //   delete x.src;
-  //   //   delete x.meta;
-  //   console.log(x.filePath);
-  // });
-
-  // key: destFileName,
-  // srcFile: `./${srcFile}`,
-  // src: html,
-  // filePath: destFileName,
-  // urlPath: destFileName,
 })();
