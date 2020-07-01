@@ -5,6 +5,11 @@ if [ ! -f /usr/share/nginx/html/css/site.*.css ]; then
   exit 1
 fi
 
+if [ ! -f /usr/share/nginx/html/js/cookie-banner.*.js ]; then
+  echo "/usr/share/nginx/html/js/cookie-banner.*.js file not found!"
+  exit 1
+fi
+
 filelist="\
   /usr/share/nginx/html/images/logo-v1.svg \
   /usr/share/nginx/html/index.html \
