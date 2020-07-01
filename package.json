@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "watch-old": "chokidar \"src/**/*\" --initial true -c \"npm run build\"",
-    "watch": "node ./build.js --watch ",
+    "watch": "node ./build.js --watch",
     "build": "node ./build.js",
     "serve": "ws --directory build --static.extensions html --port 8001",
     "upgrade-interactive": "npm-check --update"
