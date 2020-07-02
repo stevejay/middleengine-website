@@ -12,22 +12,26 @@ const util = require("util");
 const fs = require("fs-extra");
 const path = require("path");
 const MarkdownIt = require("markdown-it");
-const meta = require("markdown-it-meta");
-const attribution = require("markdown-it-attribution");
+const markdownItMeta = require("markdown-it-meta");
+const markdownItAttribution = require("markdown-it-attribution");
 const markdownItContainer = require("markdown-it-container");
 const markdownItPrism = require("markdown-it-prism");
 const markdownItPrismBackticks = require("markdown-it-prism-backticks");
+const markdownItAnchor = require("markdown-it-anchor");
 const markdownItAttrs = require("markdown-it-attrs");
+const markdownItMultimdTable = require("markdown-it-multimd-table");
 const Handlebars = require("handlebars");
 const HandlebarsIntl = require("handlebars-intl");
-const anchor = require("markdown-it-anchor");
-const multimdTable = require("markdown-it-multimd-table");
 const revisionHash = require("rev-hash");
 const dotenv = require("dotenv");
 const fetch = require("node-fetch");
 const postcss = require("postcss");
-const postCssUse = require("postcss-use");
-const responsiveImages = require("./markdown-it-plugins/responsive-images.js");
+const postCssImport = require("postcss-import");
+const postCssCssVariables = require("postcss-css-variables");
+const postCssPresetEnv = require("postcss-preset-env");
+const postCssAutoprefixer = require("autoprefixer");
+const postCssCssNano = require("cssnano");
+const markdownItResponsiveImages = require("./markdown-it-plugins/responsive-images.js");
 
 Graceful.captureExceptions = true;
 Graceful.captureRejections = true;
@@ -69,20 +73,23 @@ const handlebarsI18nData = {
 };
 
 const processBlogPostFile = async (blogPostFile, buildContext) => {
+  // A new MarkdownIt instance needs to be created for each post
+  // as posts are processed concurrently and the instance is not
+  // safe to share in that situation.
   const markdownIt = new MarkdownIt({ html: true, linkify: false })
     .use(markdownItPrism)
     .use(markdownItPrismBackticks)
-    .use(meta)
-    .use(anchor, {
+    .use(markdownItMeta)
+    .use(markdownItAnchor, {
       level: [1, 2, 3, 4],
       permalink: true,
       permalinkClass: "header-anchor",
       permalinkSymbol: "#",
       permalinkBefore: true,
     })
-    .use(attribution, { removeMarker: false })
-    .use(responsiveImages)
-    .use(multimdTable, {
+    .use(markdownItAttribution, { removeMarker: false })
+    .use(markdownItResponsiveImages)
+    .use(markdownItMultimdTable, {
       multiline: false,
       rowspan: false,
       headerless: false,
@@ -99,14 +106,15 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
   const post = await readFile(blogPostFile.path, { encoding: "utf-8" });
   const content = markdownIt.render(post);
 
+  // TODO could have a build-time template cache.
   const layoutContent = await readFile(
     path.join(TEMPLATES_SRC_DIR, `${markdownIt.meta.layout}.hbs`),
     {
       encoding: "utf-8",
     }
   );
-
   const template = Handlebars.compile(layoutContent);
+
   const context = { ...buildContext, ...markdownIt.meta, content };
   const options = { data: { intl: handlebarsI18nData } };
   const html = template(context, options);
@@ -204,7 +212,7 @@ const autoRegisterAllPartials = async () => {
   await Promise.all(partialFiles.map(autoRegisterPartial));
 };
 
-const processStaticFile = async (staticFile) => {
+const processStaticFile = async (staticFile, buildContext) => {
   const pathMatch = staticFile.path.match(
     /^(?<base>.+?)(?<flags>\.HASH)?(?<extension>\.[^\.]+)$/
   );
@@ -229,12 +237,18 @@ const processStaticFile = async (staticFile) => {
   if (POSTCSS_FILE_EXTENSIONS.includes(extension)) {
     const content = fs.readFileSync(staticFile.path);
     const processedCSS = await postcss([
-      postCssUse({ modules: "*" }),
+      postCssImport(),
+      postCssCssVariables(),
+      postCssPresetEnv({ stage: 0 }),
+      postCssAutoprefixer(),
+      postCssCssNano(),
     ]).process(content, { from: staticFile.path, to: staticFile.path });
     result.src = processedCSS.css;
   }
 
-  if (flags && flags === ".HASH") {
+  // Only generate hashes if not in watch mode - there's no point
+  // doing this work in watch mode.
+  if (!buildContext.watchMode && flags && flags === ".HASH") {
     if (!result.src) {
       result.src = fs.readFileSync(result.srcFile);
     }
@@ -258,7 +272,9 @@ const processStaticFilesDirectory = async (buildContext) => {
       node.dirent.isFile() && !EXCLUDED_STATIC_FILES.includes(node.name),
   });
 
-  const promises = staticFiles.map(processStaticFile);
+  const promises = staticFiles.map((staticFile) =>
+    processStaticFile(staticFile, buildContext)
+  );
   const results = await Promise.all(promises);
 
   results.forEach((result) => {
