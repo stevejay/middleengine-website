@@ -51,7 +51,7 @@ const POSTS_SRC_DIR = "./src/posts";
 const TEMPLATES_SRC_DIR = "./src/templates";
 const PARTIALS_SRC_DIR = path.join(SRC_DIR, "templates");
 const POST_NAME_REGEXP = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})-(?<name>.+)$/;
-const WATCH_DEBOUNCE_MS = 250;
+const WATCH_DEBOUNCE_MS = 500;
 
 HandlebarsIntl.registerWith(Handlebars);
 
@@ -395,10 +395,22 @@ void (async () => {
       console.log(`Site listening at http://localhost:${port}`);
     });
 
+    let buildInProgress = false;
+    let buildPending = false;
+
     const debouncedGenerateBuildContext = _.debounce(async () => {
       try {
-        buildContext = await generateBuildContext(true);
-        reloadReturned.reload();
+        if (buildInProgress) {
+          buildPending = true;
+        } else {
+          do {
+            buildInProgress = true;
+            buildPending = false;
+            buildContext = await generateBuildContext(true);
+            reloadReturned.reload();
+            buildInProgress = false;
+          } while (buildPending);
+        }
       } catch (err) {
         console.error(`Build error: ${err.message}`);
       }
