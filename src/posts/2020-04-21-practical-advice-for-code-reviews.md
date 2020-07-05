@@ -41,7 +41,7 @@ The following is an effective process for ensuring timeliness:
 
 Ideally there would be a developer available to begin the review shortly after it is submitted, say within 15 to 30 minutes. However, it may be that the developers are all focussed on their own work and so breaking off to review the pull request would involve a disruptive context switch. A developer in this situation can start a thread on the Slack notification to leave a comment about when they expect to be able to start the review.
 
-As discussed above, frequent pull requests that have fewer changes are preferable to fewer pull requests that have many changes. Code reviews need to be performed promptly to assist this style of development. Pull requests with fewer changes also lead to quicker code reviews, and so to shorter context switches for reviewers.
+As discussed above, frequent pull requests that have fewer changes are preferable to fewer pull requests that have many changes. Code reviews need to be performed promptly to assist this style of development. Pull requests with fewer changes also lead to quicker code reviews, and so to shorter context switches for reviewers. Small pull requests and the timeliness of code reviews are [promoted in the Google Engineering Practises documentation](https://google.github.io/eng-practices/review/reviewer/speed.html) as best practises.
 
 ## Review effort
 
@@ -68,3 +68,4 @@ Ultimately the team as a whole benefits from these code review best practises. T
 - 2020-04-21 Initial version
 - 2020-06-23 Minor wording change
 - 2020-06-28 Minor wording change
+- 2020-07-05 Added Google link

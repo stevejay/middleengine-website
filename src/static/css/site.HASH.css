@@ -1,7 +1,5 @@
-@use postcss-css-variables;
-@use postcss-preset-env(stage: 0);
-@use autoprefixer;
-@use cssnano;
+@import "../../../node_modules/normalize.css/normalize.css";
+@import "../../../node_modules/prismjs/themes/prism-solarizedlight.css";
 
 @custom-media --viewport-wide-phone (min-width: 576px);
 @custom-media --viewport-tablet (min-width: 768px);
