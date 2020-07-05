@@ -133,7 +133,7 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
   const filePath = `${urlPath}.html`;
 
   if (markdownIt.meta.draft) {
-    console.log("Draft blog post", `http://127.0.0.1:8001${urlPath}`);
+    console.log(`Draft blog post URL: ${urlPath}`);
   }
 
   return {
