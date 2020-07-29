@@ -65,11 +65,22 @@ You can access the Web site via the URL `http://localhost/`.
 - [TinyJPG](https://tinyjpg.com/) for JPG optimisation.
 - [Uptime Robot](https://uptimerobot.com/) for site monitoring.
 - [Pexels](https://www.pexels.com/) for images.
+- [GIF maker](https://gifmaker.me/).
+- [GIF cropper](https://ezgif.com/crop).
 
 ## File versioning
 
 Image files are versioned by appending a `vN` style suffix to the image file name, and manually incrementing the number `N` when the image is updated.
 
-JavaScript and CSS files are versioned automatically by the build script. A hash value is generated from the file content and appended to the file name.
+JavaScript and CSS files are versioned automatically by the build script if they are in the `src/static` directory and have the value `.HASH` just before the file extension, e.g., `src/static/css/site.HASH.css`. A hash value is generated from the file content and replaces the `HASH` part of the file name.
 
 The result of this versioning is that all of these files can have a very long cache control TTL value.
+
+## TODO
+
+- Callicode - Building Docker Containers for Go Applications
+
+- better subtraction explanation: https://stackoverflow.com/questions/29193303/6502-emulation-proper-way-to-implement-adc-and-sbc
+
+  https://en.wikipedia.org/wiki/Carry_flag#Vs._borrow_flag
+  subtract with carry
