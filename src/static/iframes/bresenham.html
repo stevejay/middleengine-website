@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Bresenham Visualizer</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"
+      integrity="sha512-k8F8QynmFNURwbUJC8drKA+fo3YfNvjqKzStdydD6au+MzvxBoRnxH8E31RJXwDY9DrnEiPhh9wBoDSIxhkyHQ=="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript">
+      const imageRadius = 11;
+      const imageWidth = imageRadius * 2 + 1;
+      const imageHeight = imageWidth;
+      const imageCenterX = imageRadius;
+      const imageCenterY = imageRadius;
+      const originX = 5;
+      const originY = 5;
+      const visualisationScale = 20;
+      let currentOffsetX = null;
+      let currentOffsetY = null;
+
+      const CONSTRAINED_LINE_STEPS = [
+        0,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+      ];
+
+      const CONSTRAINED_LINE_RADIAN_STEPS = [
+        0,
+        Math.atan2(1, 6),
+        Math.atan2(1, 5),
+        Math.atan2(1, 4),
+        Math.atan2(1, 3),
+        Math.atan2(1, 2),
+        Math.PI * 0.25, // 0.7853
+        Math.PI * 0.5 - Math.atan2(1, 2), // 1.24905
+        Math.PI * 0.5 - Math.atan2(1, 3), // 1.3734
+        Math.PI * 0.5 - Math.atan2(1, 4), // 1.4289
+        Math.PI * 0.5 - Math.atan2(1, 5), // 1.4289
+        Math.PI * 0.5 - Math.atan2(1, 6), // 1.4289
+        Math.PI * 0.5, // 1.57079
+        //   Math.PI * 0.5 + 0.24498,
+        //   Math.PI * 0.5 + 0.32175,
+        //   Math.PI * 0.5 + 0.46365,
+        Math.PI * 0.75,
+        //   Math.PI * 0.75 + 0.321751837,
+        //   Math.PI * 0.75 + 0.463651837,
+        //   Math.PI * 0.75 + 0.540416837,
+        Math.PI,
+        //   Math.PI + 0.24498,
+        //   Math.PI + 0.32175,
+        //   Math.PI + 0.46365,
+        Math.PI * 1.25,
+        //   Math.PI * 1.25 + 0.321751837,
+        //   Math.PI * 1.25 + 0.463651837,
+        //   Math.PI * 1.25 + 0.540416837,
+        Math.PI * 1.5,
+        //   Math.PI * 1.5 + 0.24498,
+        //   Math.PI * 1.5 + 0.32175,
+        //   Math.PI * 1.5 + 0.46365,
+        Math.PI * 1.75,
+        //   Math.PI * 1.75 + 0.321751837,
+        //   Math.PI * 1.75 + 0.463651837,
+        //   Math.PI * 1.75 + 0.540416837,
+        Math.PI * 2,
+      ];
+
+      function getIndexOfClosestNumberInArray(num, arr) {
+        let index = 0;
+        let curr = arr[0];
+        let diff = Math.abs(num - curr);
+        for (let val = 0; val < arr.length; val++) {
+          const newdiff = Math.abs(num - arr[val]);
+          if (newdiff < diff) {
+            diff = newdiff;
+            curr = arr[val];
+            index = val;
+          }
+        }
+        return index;
+      }
+
+      function drawGrid() {
+        const canvas = document.getElementById("canvas");
+        const context = canvas.getContext("2d");
+        // context.clearRect(0, 0, canvas.width, canvas.height);
+        context.imageSmoothingEnabled = false;
+        context.fillStyle = "black";
+
+        for (let i = 0; i < imageHeight; ++i) {
+          const x = Math.floor(i * (canvas.width / imageWidth));
+          context.fillRect(x, 0, 1, canvas.height - 1);
+        }
+
+        for (let i = 0; i < imageHeight; ++i) {
+          const y = Math.floor(i * (canvas.height / imageHeight));
+          context.fillRect(0, y, canvas.width - 1, 1);
+        }
+      }
+
+      function handlePointerMove(event) {
+        const {
+          offsetX,
+          offsetY,
+          currentTarget: { width, height },
+        } = event;
+        // const useAltered = !!document.getElementById("use-altered").checked;
+        const useAltered = false;
+
+        if (offsetX === currentOffsetY && offsetY === currentOffsetY) {
+          return;
+        }
+
+        currentOffsetX = offsetX;
+        currentOffsetY = offsetY;
+
+        const imageOffsetX =
+          Math.max(
+            0,
+            Math.min(imageWidth - 1, Math.floor(offsetX / (width / imageWidth)))
+          ) - imageCenterX;
+
+        const imageOffsetY =
+          Math.max(
+            0,
+            Math.min(
+              imageHeight - 1,
+              Math.floor(offsetY / (height / imageHeight))
+            )
+          ) - imageCenterY;
+
+        const x0 = originX;
+        const y0 = originY;
+        let x1 = originX + imageOffsetX;
+        let y1 = originY + imageOffsetY;
+
+        let angleRadians = Math.atan2(y0 - y1, x1 - x0);
+        if (angleRadians < 0) {
+          angleRadians += Math.PI * 2;
+        }
+        const constrainedIndex = getIndexOfClosestNumberInArray(
+          angleRadians,
+          CONSTRAINED_LINE_RADIAN_STEPS
+        );
+
+        const step = CONSTRAINED_LINE_STEPS[constrainedIndex];
+
+        // y1 = step > 0 ? y0 - Math.trunc(Math.abs(x1 - x0) / step) : y0;
+        const overrideAdx = null; // step === 0 ? 10 : step - 1; //6;
+        const overrideAdy = null; // step === 0 ? -1 : 1; //1;
+
+        const func = useAltered ? bresenhamVariation : bresenham;
+        const result = func(x0, y0, x1, y1, overrideAdx, overrideAdy);
+
+        const context = imageCanvas.getContext("2d");
+        context.clearRect(0, 0, imageWidth, imageHeight);
+        context.fillStyle = "#bbb";
+
+        result.forEach(({ x, y }) => {
+          const imageRelativeX = x + (imageCenterX - originX);
+          const imageRelativeY = y + (imageCenterY - originY);
+          context.fillRect(imageRelativeX, imageRelativeY, 1, 1);
+        });
+
+        const uiCanvas = document.getElementById("canvas");
+        const uiCanvasContext = uiCanvas.getContext("2d");
+        uiCanvasContext.globalCompositeOperation = "copy";
+        uiCanvasContext.imageSmoothingEnabled = false;
+        uiCanvasContext.drawImage(
+          imageCanvas,
+          0,
+          0,
+          imageWidth,
+          imageHeight,
+          0,
+          0,
+          uiCanvas.width,
+          uiCanvas.height
+        );
+        uiCanvasContext.globalCompositeOperation = "source-over";
+        uiCanvasContext.imageSmoothingEnabled = true;
+
+        drawGrid();
+        const gridCanvas = document.getElementById("canvas");
+        const gridCanvasContext = gridCanvas.getContext("2d");
+        gridCanvasContext.imageSmoothingEnabled = true;
+        gridCanvasContext.strokeStyle = "red";
+        gridCanvasContext.beginPath();
+        if (useAltered) {
+          const dx = x1 - x0;
+          const dy = y1 - y0;
+          const sx = dx > 0 ? 1 : -1;
+          const sy = dy > 0 ? 1 : -1;
+          const adx = Math.abs(dx) + 1;
+          const ady = Math.abs(dy) + 1;
+          let adjustedX0, adjustedY0, adjustedX1, adjustedY1;
+
+          if (adx > ady) {
+            const epsilon = ((ady - adx) / adx) * 0.5;
+            adjustedX0 = x0 + 0.5 - originX + imageCenterX;
+            adjustedY0 =
+              y0 + 0.5 + (sy > 0 ? epsilon : -epsilon) - originY + imageCenterY;
+            adjustedX1 = x1 + 0.5 - originX + imageCenterX;
+            adjustedY1 =
+              y1 + 0.5 - (sy > 0 ? epsilon : -epsilon) - originY + imageCenterY;
+          } else {
+            const epsilon = ((adx - ady) / ady) * 0.5;
+            adjustedX0 =
+              x0 + 0.5 + (sx > 0 ? epsilon : -epsilon) - originX + imageCenterX;
+            adjustedY0 = y0 + 0.5 - originY + imageCenterY;
+            adjustedX1 =
+              x1 + 0.5 - (sx > 0 ? epsilon : -epsilon) - originX + imageCenterX;
+            adjustedY1 = y1 + 0.5 - originY + imageCenterY;
+          }
+
+          gridCanvasContext.moveTo(
+            adjustedX0 * (gridCanvas.width / imageWidth) + 0.5,
+            adjustedY0 * (gridCanvas.height / imageHeight) + 0.5
+          );
+          gridCanvasContext.lineTo(
+            adjustedX1 * (gridCanvas.width / imageWidth) + 0.5,
+            adjustedY1 * (gridCanvas.height / imageHeight) + 0.5
+          );
+        } else {
+          gridCanvasContext.moveTo(
+            (x0 + 0.5 - originX + imageCenterX) *
+              (gridCanvas.width / imageWidth) +
+              0.5,
+            (y0 + 0.5 - originY + imageCenterY) *
+              (gridCanvas.height / imageHeight) +
+              0.5
+          );
+          gridCanvasContext.lineTo(
+            (x1 + 0.5 - originX + imageCenterX) *
+              (gridCanvas.width / imageWidth) +
+              0.5,
+            (y1 + 0.5 - originY + imageCenterY) *
+              (gridCanvas.height / imageHeight) +
+              0.5
+          );
+        }
+        gridCanvasContext.stroke();
+      }
+
+      function bresenham(x0, y0, x1, y1) {
+        var dx = x1 - x0;
+        var dy = y1 - y0;
+        var adx = Math.abs(dx);
+        var ady = Math.abs(dy);
+        var sx = dx > 0 ? 1 : -1;
+        var sy = dy > 0 ? 1 : -1;
+        var eps = 0;
+        var arr = [];
+        if (adx > ady) {
+          // The X-axis is the fast axis.
+          for (let x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
+            arr.push({ x, y });
+            eps += ady;
+            if (eps << 1 >= adx) {
+              y += sy;
+              eps -= adx;
+            }
+          }
+        } else {
+          // The Y-axis is the fast axis.
+          for (let x = x0, y = y0; sy < 0 ? y >= y1 : y <= y1; y += sy) {
+            arr.push({ x, y });
+            eps += adx;
+            if (eps << 1 >= ady) {
+              x += sx;
+              eps -= ady;
+            }
+          }
+        }
+        return arr;
+      }
+
+      function bresenhamVariation(x0, y0, x1, y1) {
+        var dx = x1 - x0;
+        var dy = y1 - y0;
+        var adx = (Math.abs(dx) + 1) << 1;
+        var ady = (Math.abs(dy) + 1) << 1;
+        var sx = dx > 0 ? 1 : -1;
+        var sy = dy > 0 ? 1 : -1;
+        var arr = [];
+        if (adx > ady) {
+          // The X-axis is the fast axis.
+          var eps = (ady - adx) >> 1;
+          for (let x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
+            arr.push({ x, y });
+            eps += ady;
+            if (eps << 1 >= adx) {
+              y += sy;
+              eps -= adx;
+            }
+          }
+        } else {
+          // The Y-axis is the fast axis.
+          let eps = (adx - ady) >> 1;
+          for (let x = x0, y = y0; sy < 0 ? y >= y1 : y <= y1; y += sy) {
+            arr.push({ x, y });
+            eps += adx;
+            if (eps << 1 >= ady) {
+              x += sx;
+              eps -= ady;
+            }
+          }
+        }
+        return arr;
+      }
+
+      function handleLoad() {
+        const visualisationWrapper = document.querySelector(".canvas-wrap");
+        visualisationWrapper.style.width = `${
+          visualisationScale * imageWidth
+        }px`;
+        visualisationWrapper.style.height = `${
+          visualisationScale * imageHeight
+        }px`;
+
+        const canvas = document.getElementById("canvas");
+        canvas.width = visualisationScale * imageWidth;
+        canvas.height = visualisationScale * imageHeight;
+        canvas.addEventListener("pointermove", handlePointerMove);
+
+        imageCanvas = document.createElement("canvas");
+        imageCanvas.width = imageWidth;
+        imageCanvas.height = imageHeight;
+        drawGrid();
+
+        document.addEventListener("keydown", (event) => {
+          if (event.code === "KeyP") {
+            const canvas = document.getElementById("canvas");
+            canvas.toBlob(function (blob) {
+              saveAs(blob, `${Date.now()}.png`);
+            });
+          }
+        });
+      }
+    </script>
+    <style type="text/css">
+      .canvas-wrap {
+        position: relative;
+        background-color: #eee;
+      }
+
+      #canvas {
+        position: absolute;
+      }
+    </style>
+  </head>
+  <body onload="handleLoad()">
+    <!-- <form id="form">
+      <input type="checkbox" id="use-altered" name="useAltered" />
+      <label for="use-altered">Use altered Bresenham algorithm</label>
+      <input
+        type="number"
+        id="initialEpsilon"
+        name="initialEpsilon"
+        min="-20"
+        max="20"
+        value="0"
+      />
+      <label for="initialEpsilon">Initial epsilon value</label>
+      <input type="number" id="x" name="x" min="-40" max="40" value="0" />
+      <label for="x">Destination X</label>
+      <input type="number" id="y" name="y" min="-40" max="40" value="0" />
+      <label for="y">Destination Y</label>
+      <button type="submit">Submit</button>
+    </form> -->
+    <div class="canvas-wrap">
+      <canvas id="canvas"></canvas>
+    </div>
+  </body>
+</html>
