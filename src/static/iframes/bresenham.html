@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Bresenham line algorithm visualiser</title>
+    <script type="text/javascript">
+      var imageRadius = 11;
+      var imageWidth = imageRadius * 2 + 1;
+      var imageHeight = imageWidth;
+      var imageCenterX = imageRadius;
+      var imageCenterY = imageRadius;
+      var originX = 5;
+      var originY = 5;
+      var visualisationScale = 20;
+      var currentOffsetX = null;
+      var currentOffsetY = null;
+
+      function handlePointerDown(event) {
+        var {
+          offsetX,
+          offsetY,
+          currentTarget: { width, height },
+        } = event;
+
+        var algorithmVersion = document.getElementById("algorithm").value;
+        var drawAlteredLine = algorithmVersion === "variation";
+        var algorithmFunc =
+          algorithmVersion === "original" ? bresenham : bresenhamVariation;
+
+        if (offsetX === currentOffsetY && offsetY === currentOffsetY) {
+          return;
+        }
+
+        currentOffsetX = offsetX;
+        currentOffsetY = offsetY;
+
+        var imageOffsetX =
+          Math.max(
+            0,
+            Math.min(imageWidth - 1, Math.floor(offsetX / (width / imageWidth)))
+          ) - imageCenterX;
+
+        var imageOffsetY =
+          Math.max(
+            0,
+            Math.min(
+              imageHeight - 1,
+              Math.floor(offsetY / (height / imageHeight))
+            )
+          ) - imageCenterY;
+
+        var x0 = originX;
+        var y0 = originY;
+        var x1 = originX + imageOffsetX;
+        var y1 = originY + imageOffsetY;
+        var result = algorithmFunc(x0, y0, x1, y1);
+
+        var context = imageCanvas.getContext("2d");
+        context.clearRect(0, 0, imageWidth, imageHeight);
+        context.fillStyle = "#bbb";
+
+        result.forEach(({ x, y }) => {
+          var imageRelativeX = x + (imageCenterX - originX);
+          var imageRelativeY = y + (imageCenterY - originY);
+          context.fillRect(imageRelativeX, imageRelativeY, 1, 1);
+        });
+
+        var canvas = document.getElementById("canvas");
+        var canvasContext = canvas.getContext("2d");
+        canvasContext.globalCompositeOperation = "copy";
+        canvasContext.imageSmoothingEnabled = false;
+        canvasContext.drawImage(
+          imageCanvas,
+          0,
+          0,
+          imageWidth,
+          imageHeight,
+          0,
+          0,
+          canvas.width - 1,
+          canvas.height - 1
+        );
+        canvasContext.globalCompositeOperation = "source-over";
+        canvasContext.imageSmoothingEnabled = true;
+        drawGrid();
+        canvasContext.strokeStyle = "red";
+        canvasContext.beginPath();
+        if (drawAlteredLine) {
+          var dx = x1 - x0;
+          var dy = y1 - y0;
+          var sx = dx > 0 ? 1 : -1;
+          var sy = dy > 0 ? 1 : -1;
+          var adx = Math.abs(dx) + 1;
+          var ady = Math.abs(dy) + 1;
+          var adjustedX0, adjustedY0, adjustedX1, adjustedY1;
+
+          if (adx > ady) {
+            var epsilon = ((ady - adx) / adx) * 0.5;
+            adjustedX0 = x0 + 0.5 - originX + imageCenterX;
+            adjustedY0 =
+              y0 + 0.5 + (sy > 0 ? epsilon : -epsilon) - originY + imageCenterY;
+            adjustedX1 = x1 + 0.5 - originX + imageCenterX;
+            adjustedY1 =
+              y1 + 0.5 - (sy > 0 ? epsilon : -epsilon) - originY + imageCenterY;
+          } else {
+            var epsilon = ((adx - ady) / ady) * 0.5;
+            adjustedX0 =
+              x0 + 0.5 + (sx > 0 ? epsilon : -epsilon) - originX + imageCenterX;
+            adjustedY0 = y0 + 0.5 - originY + imageCenterY;
+            adjustedX1 =
+              x1 + 0.5 - (sx > 0 ? epsilon : -epsilon) - originX + imageCenterX;
+            adjustedY1 = y1 + 0.5 - originY + imageCenterY;
+          }
+
+          canvasContext.moveTo(
+            adjustedX0 * (canvas.width / imageWidth) + 0.5,
+            adjustedY0 * (canvas.height / imageHeight) + 0.5
+          );
+          canvasContext.lineTo(
+            adjustedX1 * (canvas.width / imageWidth) + 0.5,
+            adjustedY1 * (canvas.height / imageHeight) + 0.5
+          );
+        } else {
+          canvasContext.moveTo(
+            (x0 + 0.5 - originX + imageCenterX) * (canvas.width / imageWidth) +
+              0.5,
+            (y0 + 0.5 - originY + imageCenterY) *
+              (canvas.height / imageHeight) +
+              0.5
+          );
+          canvasContext.lineTo(
+            (x1 + 0.5 - originX + imageCenterX) * (canvas.width / imageWidth) +
+              0.5,
+            (y1 + 0.5 - originY + imageCenterY) *
+              (canvas.height / imageHeight) +
+              0.5
+          );
+        }
+        canvasContext.stroke();
+      }
+
+      function drawGrid() {
+        var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        context.imageSmoothingEnabled = false;
+        context.fillStyle = "black";
+        context.strokeStyle = "gray";
+
+        for (var i = 0; i <= imageHeight; ++i) {
+          var x = Math.floor(i * ((canvas.width - 1) / imageWidth));
+          context.fillRect(x, 0, 1, canvas.height - 1);
+        }
+
+        for (var i = 0; i <= imageHeight; ++i) {
+          var y = Math.floor(i * ((canvas.height - 1) / imageHeight));
+          context.fillRect(0, y, canvas.width - 1, 1);
+        }
+
+        context.beginPath();
+        context.arc(
+          (canvas.width - 1) * 0.5 + 0.5,
+          (canvas.height - 1) * 0.5 + 0.5,
+          6,
+          0,
+          2 * Math.PI
+        );
+        context.stroke();
+      }
+
+      function bresenham(x0, y0, x1, y1) {
+        var dx = x1 - x0;
+        var dy = y1 - y0;
+        var adx = Math.abs(dx);
+        var ady = Math.abs(dy);
+        var sx = dx > 0 ? 1 : -1;
+        var sy = dy > 0 ? 1 : -1;
+        var eps = 0;
+        var arr = [];
+        if (adx > ady) {
+          // The X-axis is the fast axis.
+          for (var x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
+            arr.push({ x, y });
+            eps += ady;
+            if (eps << 1 >= adx) {
+              y += sy;
+              eps -= adx;
+            }
+          }
+        } else {
+          // The Y-axis is the fast axis.
+          for (var x = x0, y = y0; sy < 0 ? y >= y1 : y <= y1; y += sy) {
+            arr.push({ x, y });
+            eps += adx;
+            if (eps << 1 >= ady) {
+              x += sx;
+              eps -= ady;
+            }
+          }
+        }
+        return arr;
+      }
+
+      function bresenhamVariation(x0, y0, x1, y1) {
+        var dx = x1 - x0;
+        var dy = y1 - y0;
+        var adx = (Math.abs(dx) + 1) << 1;
+        var ady = (Math.abs(dy) + 1) << 1;
+        var sx = dx > 0 ? 1 : -1;
+        var sy = dy > 0 ? 1 : -1;
+        var arr = [];
+        if (adx > ady) {
+          // The X-axis is the fast axis.
+          var eps = (ady - adx) >> 1;
+          for (var x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
+            arr.push({ x, y });
+            eps += ady;
+            if (eps << 1 >= adx) {
+              y += sy;
+              eps -= adx;
+            }
+          }
+        } else {
+          // The Y-axis is the fast axis.
+          var eps = (adx - ady) >> 1;
+          for (var x = x0, y = y0; sy < 0 ? y >= y1 : y <= y1; y += sy) {
+            arr.push({ x, y });
+            eps += adx;
+            if (eps << 1 >= ady) {
+              x += sx;
+              eps -= ady;
+            }
+          }
+        }
+        return arr;
+      }
+
+      function handleLoad() {
+        var width = visualisationScale * imageWidth + 1;
+        var height = visualisationScale * imageHeight + 1;
+
+        var canvasWrap = document.querySelector(".canvas-wrap");
+        canvasWrap.style.width = `${width}px`;
+        canvasWrap.style.height = `${height}px`;
+
+        var canvas = document.getElementById("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.addEventListener("pointerdown", handlePointerDown);
+
+        imageCanvas = document.createElement("canvas");
+        imageCanvas.width = imageWidth;
+        imageCanvas.height = imageHeight;
+        drawGrid();
+      }
+    </script>
+    <style type="text/css">
+      body {
+        margin: 0;
+      }
+
+      .canvas-wrap {
+        margin-top: 16px;
+        position: relative;
+        background-color: #eee;
+      }
+
+      #canvas {
+        position: absolute;
+      }
+
+      /* Select element styling from https://css-tricks.com/styling-a-select-like-its-2019/ */
+      .select-css {
+        display: block;
+        font-size: 16px;
+        font-family: sans-serif;
+        font-weight: 700;
+        color: #444;
+        line-height: 1.3;
+        padding: 0.6em 1.4em 0.5em 0.8em;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        border: 1px solid #aaa;
+        box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
+        border-radius: 0.5em;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: #fff;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"),
+          linear-gradient(to bottom, #ffffff 0%, #e5e5e5 100%);
+        background-repeat: no-repeat, repeat;
+        /* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
+        background-position: right 0.7em top 50%, 0 0;
+        /* icon size, then gradient */
+        background-size: 0.65em auto, 100%;
+      }
+      /* Hide arrow icon in IE browsers */
+      .select-css::-ms-expand {
+        display: none;
+      }
+      /* Hover style */
+      .select-css:hover {
+        border-color: #888;
+      }
+      /* Focus style */
+      .select-css:focus {
+        border-color: #aaa;
+        /* It'd be nice to use -webkit-focus-ring-color here but it doesn't work on box-shadow */
+        box-shadow: 0 0 1px 3px rgba(59, 153, 252, 0.7);
+        box-shadow: 0 0 0 3px -moz-mac-focusring;
+        color: #222;
+        outline: none;
+      }
+
+      /* Set options to normal weight */
+      .select-css option {
+        font-weight: normal;
+      }
+
+      /* Support for rtl text, explicit support for Arabic and Hebrew */
+      *[dir="rtl"] .select-css,
+      :root:lang(ar) .select-css,
+      :root:lang(iw) .select-css {
+        background-position: left 0.7em top 50%, 0 0;
+        padding: 0.6em 0.8em 0.5em 1.4em;
+      }
+
+      /* Disabled styles */
+      .select-css:disabled,
+      .select-css[aria-disabled="true"] {
+        color: graytext;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22graytext%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"),
+          linear-gradient(to bottom, #ffffff 0%, #e5e5e5 100%);
+      }
+
+      .select-css:disabled:hover,
+      .select-css[aria-disabled="true"] {
+        border-color: #aaa;
+      }
+    </style>
+  </head>
+  <body onload="handleLoad()">
+    <select name="algorithm" id="algorithm" class="select-css">
+      <option value="original">Use original algorithm</option>
+      <option value="variation">Use variation algorithm</option>
+    </select>
+    <div class="canvas-wrap">
+      <canvas id="canvas"></canvas>
+    </div>
+  </body>
+</html>

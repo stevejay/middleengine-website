@@ -233,7 +233,8 @@ figure {
   margin-bottom: var(--space-6);
 }
 
-pre {
+pre,
+iframe {
   margin-top: var(--space-5);
   margin-bottom: var(--space-5);
 }
@@ -426,6 +427,14 @@ pre[class*="language-"] {
   padding: 0.05em 0.25em;
   border-radius: var(--radius-1);
   background-color: var(--color-neutral-200);
+}
+
+/********************************/
+/*            iframe            */
+/********************************/
+
+iframe {
+  border: 0;
 }
 
 /********************************/

@@ -47,7 +47,7 @@ const copyFile = util.promisify(fs.copyFile);
 const DOMAIN = "https://www.middle-engine.com";
 const LATEST_POSTS_LENGTH = 6;
 const BUILD_DIR = "./build";
-const EXCLUDED_STATIC_FILES = [".DS_Store"];
+const EXCLUDED_STATIC_FILE_EXTENSIONS = [".DS_Store", ".sketch", ".excalidraw"];
 const POSTCSS_FILE_EXTENSIONS = [".css"];
 const SRC_DIR = "./src";
 const STATIC_SRC_DIR = "./src/static";
@@ -269,7 +269,8 @@ const processStaticFile = async (staticFile, buildContext) => {
 const processStaticFilesDirectory = async (buildContext) => {
   const staticFiles = await walk(STATIC_SRC_DIR, {
     entryFilter: (node) =>
-      node.dirent.isFile() && !EXCLUDED_STATIC_FILES.includes(node.name),
+      node.dirent.isFile() &&
+      !EXCLUDED_STATIC_FILE_EXTENSIONS.includes(path.extname(node.name)),
   });
 
   const promises = staticFiles.map((staticFile) =>
