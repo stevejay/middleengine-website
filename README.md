@@ -79,8 +79,4 @@ The result of this versioning is that all of these files can have a very long ca
 ## TODO
 
 - Callicode - Building Docker Containers for Go Applications
-
-- better subtraction explanation: https://stackoverflow.com/questions/29193303/6502-emulation-proper-way-to-implement-adc-and-sbc
-
-  https://en.wikipedia.org/wiki/Carry_flag#Vs._borrow_flag
-  subtract with carry
+- Better subtraction explanation, referring to [this emulator info](https://stackoverflow.com/questions/29193303/6502-emulation-proper-way-to-implement-adc-and-sbc). Also [this info](https://en.wikipedia.org/wiki/Carry_flag#Vs._borrow_flag) on Wikipedia on 'subtract with carry'.
