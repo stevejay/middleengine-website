@@ -6,36 +6,33 @@ date: 2020-07-28
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-draft: true
 ---
 
 ## Introduction
 
-I have recently been working on a [pixel art](https://en.wikipedia.org/wiki/Pixel_art) editor. This editor has a variety of tools, including for drawing simple graphics primitives like lines, rectangles, and ellipses. An algorithm for line-drawing that is commonly used in pixel art is [Bresenham's line algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm). This post explains why this is, how the algorithm works, and a possible variation.
+I have recently been working on a [pixel art](https://en.wikipedia.org/wiki/Pixel_art) editor. This editor includes a variety of tools, one of which is a tool for drawing straight lines. An algorithm for line-drawing that is commonly used in pixel art is [Bresenham's line algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm). This post explains why this is, how the algorithm works, and a variation that you might prefer to use.
 
 ## Line-drawing and rasterisation
 
-In a vector graphics editor, a line drawn by the user is represented mathematically and so always appears smooth regardless of the magnification level. This is in contrast to a raster graphics editor, such as Adobe Photoshop, where the image is represented using discrete pixels that you can see if you zoom into it:
+In a vector graphics editor, a line drawn by the user is represented mathematically and so always appears smooth regardless of the current magnification level. This is in contrast to a raster graphics editor, such as Adobe Photoshop, where the image is made up of discrete pixels that you can see if you enlarge it:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/01_vector-vs-raster-2x.png "Vector graphics compared to raster graphics when magnified")
 
-When a user draws a line in a raster graphics editor, this geometry needs to be [rasterised](https://en.wikipedia.org/wiki/Rasterisation) to determine which pixels in the image should be filled. Normally the aim is to produce a smooth result and so [anti-aliasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing) is applied as part of this process. The user might also want to draw lines that start and end on fractional coordinates. This is in contrast to pixel art, where the jagged look of non- anti-aliased rasterisation is normally preferred and where the coordinate values are integer values.
+When a user draws a line in a raster graphics editor, it needs to be [rasterised](https://en.wikipedia.org/wiki/Rasterisation) to determine which pixels should be filled. Often the aim is to produce a smooth result and so [anti-aliasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing) is applied as part of the process. The user might also want to be able to draw lines that start and end on fractional coordinates. Pixel art is different — the jagged look of non- anti-aliased rasterisation is preferred, and lines are always drawn from whole pixel to whole pixel.
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/02_aliased-vs-non-aliased-with-originals-2x.png "Comparing rasterisation performed with and without anti-aliasing")
 
-The line rasterisation algorithm that is often used for the non- anti-aliased look is [Bresenham's line algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm). It was invented by Jack Elton Bresenham in 1962. The algorithm does not accept or output fractional coordinate values and so the result has the desired [jaggies](https://en.wikipedia.org/wiki/Jaggies). The algorithm also only uses integer operations, which was a particularly useful feature at the time of invention when floating point arithmetic was computationally expensive. The following animation shows the result of using the algorithm to rasterise a variety of lines:
+The line rasterisation algorithm that is often used for the non- anti-aliased look is [Bresenham's line algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm). It was invented by Jack Elton Bresenham in 1962. The algorithm does not accept or output fractional coordinate values and so the result has the desired [jaggies](https://en.wikipedia.org/wiki/Jaggies). The algorithm also uses only integer operations, which was a particularly useful feature at a time when floating point arithmetic was computationally expensive to perform. The following animation shows the rasterisation result for a variety of lines when using this algorithm:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/03_bresenham-12x12-example.gif "Examples of line rasterisation using Bresenham's line algorithm")
 
 ## A worked example
 
-Explanations of the algorithm available on the Web at Wikipedia, YouTube and other sites usually focus on deriving the equation that underlies it. I have found it more useful to understand the algorithm by working through an example rasterisation.
-
-Let us try to rasterise the following line:
+Explanations of the algorithm available on the Web at Wikipedia, YouTube and other sites usually focus on deriving the equation that underlies it. I have found it more useful to understand the algorithm by working through an example rasterisation. The line that we will rasterise is the following:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/04_bresenham-guide-2x.png "The line to be rasterised")
 
-An observation we can make about this line is that, as we rasterise it, we will **always** be incrementing the X-axis coordinate but we will only **sometimes** be incrementing the Y-axis coordinate. This is because the change in X, which is 3, is greater than the change in Y, which is 2. The change in X is termed delta X, or ΔX, and the change in Y is termed delta Y, or ΔY. We use the Bresenham line algorithm to answer the question of when the Y-axis coordinate value should be incremented.
+We can observe that, in rasterising this line, we will **always** be incrementing the X-axis coordinate but we will only **sometimes** be incrementing the Y-axis coordinate. This is because the change in X, which is 3, is greater than the change in Y, which is 2. The change in X is termed delta X, or ΔX, and the change in Y is termed delta Y, or ΔY. Here we use the Bresenham line algorithm to answer the question of exactly when the Y-axis coordinate value should be incremented.
 
 Conventionally, the 'always' axis is called the fast axis and the 'sometimes' axis is called the slow axis:
 
@@ -53,35 +50,41 @@ The directional vector of the example line is shown below, confirming that the f
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/08_bresenham-guide-2x.png "The directional vector of the example line")
 
-Having classified the axes, we can start the rasterisation process. The first step is easy: the pixel at the start of the line is always filled. For the example line, this is the pixel at (0, 0). The problem is to determine the next pixel to be filled. We know that the next X-axis coordinate value is 1 because the X-axis is the fast axis. For the Y-axis, we either do or do not increment its coordinate value. This gives us a choice between two possible pixels to fill: the pixel at (1, 0) or the pixel at (1, 1):
+Having classified the axes, we can start the rasterisation process. The first step is easy: the pixel at the start of the line is always filled. For the example line, this is the pixel at (0, 0). The problem now is to determine the next pixel to be filled. We know that the next X-axis coordinate value is 1 because the X-axis is the fast axis. For the Y-axis, we either do or do not increment its coordinate value. This gives us a choice between two possible pixels to fill: the pixel at (1, 0) or the pixel at (1, 1):
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/09_bresenham-guide-2x.png "Possible next pixels when X equals 1")
 
-It is possible to think of each pixel as being a point rather than a square. If we do this, we can see that the line to rasterise passes somewhere between the two possible pixels:
+It is possible to think of each pixel as being a point rather than a square. If we do this, we can see that the line being rasterised passes somewhere between the two possible pixels:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/10_bresenham-guide-2x.png "Thinking of the pixels as points")
 
-The aim now is to determine which of the two pixels is the pixel that the line is closest to when it passes between them. If we draw a line between those two pixels, then the line to rasterise will intersect it at some point:
+The aim now is to determine which of the two pixels is the pixel that the line is closest to when it passes between them. If we draw a line between those two pixels, then the line being rasterised will intersect it at some point:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/11_bresenham-guide-2x.png "The intersection point between the two possible next pixels")
 
-The midpoint is of course exactly between these two pixels:
+The midpoint of the line between the two pixels is of course exactly between them:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/12_bresenham-guide-2x.png "The midpoint between the two possible pixels")
 
-We can now define a rule: only increment the Y coordinate value if the intersection point is equal to or above the midpoint. In this example, the intersection point is above the midpoint and so we would fill the pixel at (1, 1) rather than the pixel at (1, 0).
+We can now define a rule: only increment the Y coordinate value if the intersection point is equal to or above the midpoint. In this example, the intersection point is above the midpoint and so we know to fill the pixel at (1, 1) rather than the pixel at (1, 0).
 
-How do we express this mathematically? We can do so using just rates of change, which has the advantage of avoiding floating point values in the calculation. The line to rasterise has a ΔX of 3 and a ΔY of 2. The line that passes through the midpoint has a ΔX of 3 and a ΔY of ΔX/2, which is 1.5. The following diagram illustrates these values:
+How do we express this mathematically? We could put exact figures into the calculation:
 
-![](/images/2020-07-28-bresenhams-line-algorithm/13_bresenham-guide-2x.png "Using rates of change to determine the intersection point")
+![](/images/2020-07-28-bresenhams-line-algorithm/12b_bresenham-guide-2x.png "Using exact figures")
 
-We will use epsilon, which has the symbol ε, to represent the current rate of change in Y. (As you will see, the current rate of change in Y can vary depending on any error introduced in each iteration of the algorithm.) The initial value for ε is zero, and for each iteration of the algorithm we will add ΔY to it. This addition represents the change in Y that occurs each time we step along the X-axis. Since we are currently in the first iteration of the algorithm, we add ΔY to ε and so the value of ε is now 2.
+The problem with doing this is that we end up with floating point values, and a key feature of the Bresenham algorithm is that it is implemented using only integer operations. We can avoid this if we use the rate of change of the fast axis as the unit value in our calculations. Thus the distance between the two pixels is ΔX, and the intersection point is ΔY above the lower pixel:
+
+![](/images/2020-07-28-bresenhams-line-algorithm/13_bresenham-guide-2x.png "Using the rates of change to determine the intersection point")
+
+(Note that there is a floating point value in the above diagram — 0.5 — but I will shortly show how it is avoided in the calculations.)
+
+We will use epsilon, with the symbol ε, to represent the current rate of change in Y. This is because that rate of change will not necessarily always be ΔY — it normally varies depending on any error introduced with each iteration of the algorithm. The initial value for ε is zero, and at the start of each iteration of the algorithm we will add ΔY to it. This addition represents the change in Y that occurs each time we take one step along the X-axis. Since we are currently in the first iteration of the algorithm, we add ΔY to ε and so the new value of ε is 0 + 2 which is 2.
 
 We can now compare the value of ε to the value of the midpoint:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/14_bresenham-guide-2x.png "Comparing ε to the midpoint")
 
-To avoid the floating point value here (because of 0.5 × ΔX), we can multiply both values by two before comparing them, such that we are comparing 2ε (4) with ΔX (3):
+To avoid a floating point value here, we can multiply both values by two before comparing them, such that we are comparing 2ε (4) and ΔX (3):
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/15_bresenham-guide-2x.png "Avoiding floating point values when comparing ε to the midpoint")
 
@@ -89,19 +92,17 @@ Because the value of ε is greater than the midpoint value, we know that we need
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/16_bresenham-guide-2x.png "Filling the pixel at (1, 1)")
 
-Although we determined that the intersection point was closer to the pixel at (1, 1) than to the pixel at (1, 0), it did not fall directly on it. This means that by filling the pixel at (1, 1), the change in Y is ΔX rather than ΔY:
+Although we determined that the intersection point was closer to the pixel at (1, 1), that point did not fall directly on the pixel's point. This means that by filling the pixel at (1, 1), the change in Y is ΔX rather than ΔY:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/17_bresenham-guide-2x.png "Desired change in Y versus actual change in Y")
 
-The difference between the desired change (ΔY) and the actual change (ΔX) is the rasterisation error. We need to take this into account when calculating the next pixel to fill. If we did not do this then we would draw some very odd-looking lines:
-
-![](/images/2020-07-28-bresenhams-line-algorithm/18_bresenham-guide-2x.png "An odd line when the error term is not included")
-
-The value of ε includes this error. However, we need to adjust the value of ε before the next iteration of the algorithm. We found that we needed to increment the Y coordinate value, and so we filled the pixel at (1, 1) rather than (1, 0). We now need to adjust the value of ε so that it is relative to this new pixel. We can do this by subtracting ΔX from ε, which is 2 - 3 and so the new value of ε is -1:
+Each new iteration of the algorithm operates relative to the pixel filled in during the previous iteration. This requires us to first adjust the value of ε so that it is relative to the filled pixel. Since we incremented the Y-coordinate value, we can adjust ε by subtracting ΔX from it. This is 2 - 3 which equals -1 and so this is the new value of ε:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/19_bresenham-guide-2x.png "Adjusting ε after incrementing the Y coordinate value")
 
-We can now move on to the next iteration of the algorithm to determine which pixel should be filled next:
+Thus this new value of ε indicates that the true intersection point was below the filled pixel.
+
+We can now begin the next iteration of the algorithm:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/20_bresenham-guide-2x.png "The third pixel to be filled")
 
@@ -117,7 +118,7 @@ Again, to avoid a floating point value, we can multiply both values by two befor
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/23_bresenham-guide-2x.png "Avoiding floating point values when comparing ε to the midpoint")
 
-Since the intersection point is not above the midpoint, we do not increment Y for this next pixel and so it is pixel (2, 1) that is filled.
+Since the intersection point is not above the midpoint, this time we do not increment Y and so it is pixel (2, 1) that is filled.
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/24_bresenham-guide-2x.png "Filling the pixel at (2, 1)")
 
@@ -127,11 +128,13 @@ Now we can determine the final pixel to fill:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/25_bresenham-guide-2x.png "The final pixel to fill")
 
+(The pixel to fill is obviously (3, 2) but it is useful for illustrative purposes to continue the calculations.)
+
 Again we have to determine if Y should be incremented or not, and so we determine which pixel the line to rasterise is closest to:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/26_bresenham-guide-2x.png "Using rates of change to determine the intersection point")
 
-And as before, the line that we are checking is actually the line that extends from the pixel that we last filled to the point at which the line being rasterised passes between the two pixels that we are currently considering. This is shown as the blue dashed line in the following diagram:
+And as before, the line that we are checking is actually the line that extends from the pixel that we last filled to the point at which the line being rasterised passes between the two possible next pixels. This is shown as the blue dashed line in the following diagram:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/27_bresenham-guide-2x.png "The effective line being tested")
 
@@ -147,7 +150,7 @@ And with that the rasterisation of the example line is complete.
 
 ## An implementation in JavaScript
 
-Below is a JavaScript implementation of the algorithm. It is a variation on the implementation from the [node-bresenham](https://github.com/madbence/node-bresenham) package that was created by the GitHub user [madbence](https://github.com/madbence):
+Below is a JavaScript implementation of the algorithm. It is a variation on the implementation in the [node-bresenham](https://github.com/madbence/node-bresenham) package that was created by the GitHub user [madbence](https://github.com/madbence):
 
 ```js
 function bresenham(x0, y0, x1, y1) {
@@ -195,28 +198,28 @@ var adx = Math.abs(dx);
 var ady = Math.abs(dy);
 ```
 
-Then two sign constants are defined:
+Finally two sign constants are defined:
 
 ```js
 var sx = dx > 0 ? 1 : -1;
 var sy = dy > 0 ? 1 : -1;
 ```
 
-The value of `sx` ('sign X') indicates if ΔX is positive (`1`) or negative (`-1`). Similarly the value of `sy` ('sign Y') indicates if ΔY is positive (`1`) or negative (`-1`).
+The value of `sx` ('sign X') indicates if ΔX is positive (when `sx` is `1`) or negative (when `sx` is `-1`). Similarly the value of `sy` ('sign Y') indicates if ΔY is positive (when `sy` is `1`) or negative (when `sy` is `-1`).
 
-The epsilon variable is defined next, here called `eps`. As expected, it is initialised to zero:
+The epsilon variable, called `eps` is defined next. As expected, it is initialised to zero:
 
 ```js
 var eps = 0;
 ```
 
-Now the algorithm takes two different paths depending on whether the fast axis is the X-axis or the Y-axis. This is found by comparing the values of `adx` and `ady`, as shown in the following diagram:
+The algorithm now branches depending on whether the fast axis is the X-axis or the Y-axis. This is found by comparing the values of `adx` and `ady`, as shown in the following diagram:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/30_bresenham-guide-2x.png "The fast axis classification")
 
-It also shows that if the fast axis is the X-axis then the value of `sx` indicates if the X coordinate value should be incremented or decremented. If the fast axis is the Y-axis then it is the value of `sy` that is used to indicate this for the Y coordinate value.
+The diagram also shows that if the fast axis is the X-axis then the value of `sx` indicates if the X coordinate value should be incremented or decremented. If the fast axis is the Y-axis then it is the value of `sy` that is used to indicate this for the Y coordinate value.
 
-Let us consider the scenario when the X-axis is the fast axis. In that case the for-loop that executes is the following:
+Let us consider the scenario when the X-axis is the fast axis. The for-loop that executes is the following:
 
 ```js
 for (var x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
@@ -229,47 +232,49 @@ for (var x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
 }
 ```
 
-The variables `x` and `y` identify the next pixel to be filled. The variable `x` to the line's starting X value and is is incremented if ΔX is positive or decremented if ΔX is negative, until `x1` is reached. The variable `y` is initialised to the line's starting Y value. At the start of each loop iteration, `x` and `y` are pushed to the results array:
+The variables `x` and `y` identify the next pixel to be filled. The variable `x` to the line's starting X value and is is always incremented if ΔX is positive or always decremented if ΔX is negative, until `x1` is reached. The variable `y` is initialised to the line's starting Y value. At the start of each loop iteration, `x` and `y` are pushed to the result array:
 
 ```js
 arr.push({ x: x, y: y });
 ```
 
-The absolute value of ΔY is added to ε:
+Also, the absolute value of ΔY is added to ε:
 
 ```js
 eps += ady;
 ```
 
-Then the value of ε is tested to see if it is equal to or above the absolute midpoint value of 0.5 × ΔX. To avoid a possible floating point value, this is done by comparing 2ε to ΔX (the expression `eps << 1` has the effect of multiplying ε by 2):
+Then the value of ε is tested to see if it is equal to or above the absolute midpoint value of 0.5 × ΔX. To avoid a possible floating point value here, this is done by comparing 2ε to ΔX:
 
 ```js
 if (eps << 1 >= adx)
 ```
 
-If this condition tests as true then two actions occur. First the value of `y` is incremented or decremented (according to the direction of the line's endpoint):
+(The expression `eps << 1` has the effect of multiplying ε by 2.)
+
+If this condition tests as true then two actions occur. First the value of `y` is incremented or decremented (according to the directional vector of the line):
 
 ```js
 y += sy;
 ```
 
-Secondly the absolute ΔX is subtracted from ε:
+Secondly the absolute value of ΔX is subtracted from ε:
 
 ```js
 eps -= adx;
 ```
 
-This for-loop iteration is now complete. The loop continues until the end of the line is reached, at which point the results array is returned.
+This iteration of the for-loop is now complete. The loop continues until the end of the line is reached, at which point the result array is returned.
 
-You should recognise all of these steps from the worked example in the previous section. The main difference is that this implementation has to deal with all possible direction vectors for the line to rasterise, and so to minimise code repetition it uses `sx`, `sy`, and the absolute versions of ΔX and ΔY in the calculations.
+You should recognise all of these steps from the worked example in the previous section. The main difference is that this implementation has to deal with all possible directional vectors. As a result and to minimise code repetition, the calculations use `sx`, `sy`, and the absolute versions of ΔX and ΔY.
 
 ## Observing the results
 
-For many lines, the rasterisation result is good. For example, the following is the result of rasterising a line where ΔY equals ΔX:
+For many lines the rasterisation result is good. For example, the following is the result of rasterising a line where ΔX and ΔY are equal:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/good-1-1-2x.png "Rasterisation of a line from (0, 0) to (6, 6)")
 
-A line from (0, 0) to (5, 2) rasterises well, with an increment in Y every second increment in X:
+A line from (0, 0) to (5, 2) rasterises well, with an increment in Y for every second increment in X:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/good-2-2-2x.png "Rasterisation of a line from (0, 0) to (5, 2)")
 
@@ -281,34 +286,38 @@ The situation is similar for a line from (0, 0) to (11, 2), which could be raste
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/prefer-4-4-4-2x.png "Rasterisation of a line from (0, 0) to (11, 2)")
 
-And finally here is a line from (0, 0) to (14, 2), which I would prefer to be rasterised as an increment in Y for every fifth increment in X, but this is not the case:
+And finally here is a line from (0, 0) to (14, 2), which I would prefer to be rasterised as an increment in Y for every fifth increment in X:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/prefer-5-5-5-2x.png "Rasterisation of a line from (0, 0) to (14, 2)")
 
-As shown previously in this post, the Bresenham line algorithm rasterises a line from the center of the pixel at the start of the line to the center of the pixel at the end of the line. In order to change the rasterisation result, we would need to change the line that is rasterised for the given parameters. The following diagram shows how such a line would differ when the starting pixel is at (0, 0) and the ending pixel is at (8, 2):
+As shown in this post, the Bresenham line algorithm rasterises a line that extends from the centre of the pixel at the start of the line to the centre of the pixel at the end of the line. In order to change the rasterisation result, we would need to change this line somehow. If we want a line from (0, 0) to (8, 2) to indeed be rasterised as an increment in Y for every third increment in X, we would need to rasterise a slightly different line:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/actual-vs-theoretical-2x.png "Actual versus preferred rasterisation of a line from (0, 0) to (8, 2)")
 
 This new line has two differences compared to the existing line:
 
 1. It has a steeper gradient.
-2. It starts at a point somewhat below the center of the pixel at the start of the line.
+2. The start of the line is at a point below the centre of the starting pixel.
 
-Let us now get some values for these differences. The new line has ΔX and ΔY values that are each one greater than those of the existing line:
+Let us now calculate some values for these differences. The new line has ΔX and ΔY values that are each one greater than those of the existing line:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/different-gradient-2x.png "The ΔX and ΔY values for the new line")
 
-With the existing line, the ε (epsilon) value is initialised to zero, since the starting point for the line is in the centre of the starting pixel. The initial ε value for the new line is definitely not zero, since the starting point of the line is now below the center of the starting pixel:
+With the existing line, the ε (epsilon) value is initialised to zero because the starting point for the line is at the centre of the starting pixel. For the new line, the initial value of ε needs to be some negative value to position the starting point of the line below the centre of the starting pixel:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/starting-epsilon-2x.png "Unknown starting value of ε for the new line")
 
-It is straightforward to calculate the new value using the approach used for updating ε that has been shown previously in this post:
+We represent the change in X of each pixel increment as ΔX and the change in Y as ΔY. The change in X at the starting point is ΔX × 0.5 and the change in Y is ΔY × 0.5:
+
+![](/images/2020-07-28-bresenhams-line-algorithm/halfway-calculation-2x.png "Calculating the starting point of the line to rasterize")
+
+However, we need the change in Y to be relative to the centre of the pixel. This is the value we will initialise ε to. We can calculate this by subtracting ΔX × 0.5 from ΔY × 0.5:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/calculating-epsilon-2x.png "Calculating the starting value of ε for the new line")
 
-This can be written as (ΔX - ΔY) × 0.5.
+This can be rewritten as (ΔY - ΔX) × 0.5.
 
-Now that we have expressions for these differences, we can update the Bresenham line algorithm implementation from the previous section:
+Now that we have expressions for these differences, we can update the Bresenham line algorithm implementation from the previous section to the following:
 
 ```js
 function bresenhamVariation(x0, y0, x1, y1) {
@@ -351,7 +360,7 @@ var adx = (Math.abs(dx) + 1) << 1;
 var ady = (Math.abs(dy) + 1) << 1;
 ```
 
-The doubling is because the calculation of the initial value of ε requires multiplying by a half, and to avoid a potential floating point value here I double `adx` and `ady`.
+The doubling is because the calculation of the initial value of ε requires multiplying by one half, so to avoid a potential floating point value here I double `adx` and `ady`.
 
 The initial value of ε now depends on whether the fast axis is the X-axis or the Y-axis:
 
@@ -369,8 +378,18 @@ if (adx > ady) {
 }
 ```
 
-I have embedded the following simple interactive visualisation so that you can compare the line produced by the original Bresenham line algorithm with those produced by the altered algorithm:
+You will find a simple interactive visualisation below that you can use to compare lines produced by the original Bresenham line algorithm with those produced by the altered algorithm. Click on a square to draw a line from the center of the visualisation to that location. Use the dropdown to select the algorithm.
 
-<div class="responsive-iframe-wrap">
-    <iframe class="responsive-iframe" src="/iframes/bresenham.html" allow="encrypted-media" allowfullscreen></iframe>
+<div>
+  <iframe src="/iframes/bresenham.html" width="461" height="518"></iframe>
 </div>
+
+## Conclusion
+
+The Bresenham line algorithm may have been invented many years ago but it is still relevant today. In understanding how the algorithm is implemented, I have been able to create a variation of the algorithm that better suits my particular preferences for line rasterisation.
+
+---
+
+## Changelog
+
+- 2020-07-30 Initial version

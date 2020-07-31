@@ -2,12 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Bresenham Visualizer</title>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"
-      integrity="sha512-k8F8QynmFNURwbUJC8drKA+fo3YfNvjqKzStdydD6au+MzvxBoRnxH8E31RJXwDY9DrnEiPhh9wBoDSIxhkyHQ=="
-      crossorigin="anonymous"
-    ></script>
+    <title>Bresenham line algorithm visualiser</title>
     <script type="text/javascript">
       const imageRadius = 11;
       const imageWidth = imageRadius * 2 + 1;
@@ -100,29 +95,28 @@
       function drawGrid() {
         const canvas = document.getElementById("canvas");
         const context = canvas.getContext("2d");
-        // context.clearRect(0, 0, canvas.width, canvas.height);
         context.imageSmoothingEnabled = false;
         context.fillStyle = "black";
 
-        for (let i = 0; i < imageHeight; ++i) {
-          const x = Math.floor(i * (canvas.width / imageWidth));
+        for (let i = 0; i <= imageHeight; ++i) {
+          const x = Math.floor(i * ((canvas.width - 1) / imageWidth));
           context.fillRect(x, 0, 1, canvas.height - 1);
         }
 
-        for (let i = 0; i < imageHeight; ++i) {
-          const y = Math.floor(i * (canvas.height / imageHeight));
+        for (let i = 0; i <= imageHeight; ++i) {
+          const y = Math.floor(i * ((canvas.height - 1) / imageHeight));
           context.fillRect(0, y, canvas.width - 1, 1);
         }
       }
 
-      function handlePointerMove(event) {
+      function handlePointerDown(event) {
         const {
           offsetX,
           offsetY,
           currentTarget: { width, height },
         } = event;
-        // const useAltered = !!document.getElementById("use-altered").checked;
-        const useAltered = false;
+        const useAltered =
+          document.getElementById("algorithm").value === "variation";
 
         if (offsetX === currentOffsetY && offsetY === currentOffsetY) {
           return;
@@ -191,8 +185,8 @@
           imageHeight,
           0,
           0,
-          uiCanvas.width,
-          uiCanvas.height
+          uiCanvas.width - 1,
+          uiCanvas.height - 1
         );
         uiCanvasContext.globalCompositeOperation = "source-over";
         uiCanvasContext.imageSmoothingEnabled = true;
@@ -329,34 +323,30 @@
       function handleLoad() {
         const visualisationWrapper = document.querySelector(".canvas-wrap");
         visualisationWrapper.style.width = `${
-          visualisationScale * imageWidth
+          visualisationScale * imageWidth + 1
         }px`;
         visualisationWrapper.style.height = `${
-          visualisationScale * imageHeight
+          visualisationScale * imageHeight + 1
         }px`;
 
         const canvas = document.getElementById("canvas");
-        canvas.width = visualisationScale * imageWidth;
-        canvas.height = visualisationScale * imageHeight;
-        canvas.addEventListener("pointermove", handlePointerMove);
+        canvas.width = visualisationScale * imageWidth + 1;
+        canvas.height = visualisationScale * imageHeight + 1;
+        canvas.addEventListener("pointerdown", handlePointerDown);
 
         imageCanvas = document.createElement("canvas");
         imageCanvas.width = imageWidth;
         imageCanvas.height = imageHeight;
         drawGrid();
-
-        document.addEventListener("keydown", (event) => {
-          if (event.code === "KeyP") {
-            const canvas = document.getElementById("canvas");
-            canvas.toBlob(function (blob) {
-              saveAs(blob, `${Date.now()}.png`);
-            });
-          }
-        });
       }
     </script>
     <style type="text/css">
+      body {
+        margin: 0;
+      }
+
       .canvas-wrap {
+        margin-top: 16px;
         position: relative;
         background-color: #eee;
       }
@@ -364,27 +354,85 @@
       #canvas {
         position: absolute;
       }
+
+      /* Select element styling from https://css-tricks.com/styling-a-select-like-its-2019/ */
+      .select-css {
+        display: block;
+        font-size: 16px;
+        font-family: sans-serif;
+        font-weight: 700;
+        color: #444;
+        line-height: 1.3;
+        padding: 0.6em 1.4em 0.5em 0.8em;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        border: 1px solid #aaa;
+        box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
+        border-radius: 0.5em;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: #fff;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"),
+          linear-gradient(to bottom, #ffffff 0%, #e5e5e5 100%);
+        background-repeat: no-repeat, repeat;
+        /* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
+        background-position: right 0.7em top 50%, 0 0;
+        /* icon size, then gradient */
+        background-size: 0.65em auto, 100%;
+      }
+      /* Hide arrow icon in IE browsers */
+      .select-css::-ms-expand {
+        display: none;
+      }
+      /* Hover style */
+      .select-css:hover {
+        border-color: #888;
+      }
+      /* Focus style */
+      .select-css:focus {
+        border-color: #aaa;
+        /* It'd be nice to use -webkit-focus-ring-color here but it doesn't work on box-shadow */
+        box-shadow: 0 0 1px 3px rgba(59, 153, 252, 0.7);
+        box-shadow: 0 0 0 3px -moz-mac-focusring;
+        color: #222;
+        outline: none;
+      }
+
+      /* Set options to normal weight */
+      .select-css option {
+        font-weight: normal;
+      }
+
+      /* Support for rtl text, explicit support for Arabic and Hebrew */
+      *[dir="rtl"] .select-css,
+      :root:lang(ar) .select-css,
+      :root:lang(iw) .select-css {
+        background-position: left 0.7em top 50%, 0 0;
+        padding: 0.6em 0.8em 0.5em 1.4em;
+      }
+
+      /* Disabled styles */
+      .select-css:disabled,
+      .select-css[aria-disabled="true"] {
+        color: graytext;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22graytext%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"),
+          linear-gradient(to bottom, #ffffff 0%, #e5e5e5 100%);
+      }
+
+      .select-css:disabled:hover,
+      .select-css[aria-disabled="true"] {
+        border-color: #aaa;
+      }
     </style>
   </head>
   <body onload="handleLoad()">
-    <!-- <form id="form">
-      <input type="checkbox" id="use-altered" name="useAltered" />
-      <label for="use-altered">Use altered Bresenham algorithm</label>
-      <input
-        type="number"
-        id="initialEpsilon"
-        name="initialEpsilon"
-        min="-20"
-        max="20"
-        value="0"
-      />
-      <label for="initialEpsilon">Initial epsilon value</label>
-      <input type="number" id="x" name="x" min="-40" max="40" value="0" />
-      <label for="x">Destination X</label>
-      <input type="number" id="y" name="y" min="-40" max="40" value="0" />
-      <label for="y">Destination Y</label>
-      <button type="submit">Submit</button>
-    </form> -->
+    <select name="algorithm" id="algorithm" class="select-css">
+      <option value="original">Use original algorithm</option>
+      <option value="variation">Use variation algorithm</option>
+    </select>
     <div class="canvas-wrap">
       <canvas id="canvas"></canvas>
     </div>

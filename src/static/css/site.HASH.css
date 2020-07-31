@@ -233,7 +233,8 @@ figure {
   margin-bottom: var(--space-6);
 }
 
-pre {
+pre,
+iframe {
   margin-top: var(--space-5);
   margin-bottom: var(--space-5);
 }
@@ -1346,7 +1347,11 @@ body.index header.hero h1 strong {
 /*            IFRAME            */
 /********************************/
 
-.responsive-iframe-wrap {
+iframe {
+  border: 0;
+}
+
+/* .responsive-iframe-wrap {
   position: relative;
   overflow: hidden;
   padding-top: 100%;
@@ -1359,6 +1364,6 @@ body.index header.hero h1 strong {
   width: 100%;
   height: 100%;
   border: 0;
-}
+} */
 
 /********************************/
