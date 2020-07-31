@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@nodelib/fs.walk": "^1.2.4",
-    "autoprefixer": "^9.8.5",
+    "autoprefixer": "^9.8.6",
     "chokidar": "^3.4.1",
     "cssnano": "^4.1.10",
     "dotenv": "^8.2.0",

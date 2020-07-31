@@ -380,7 +380,7 @@ if (adx > ady) {
 
 You will find a simple interactive visualisation below that you can use to compare lines produced by the original Bresenham line algorithm with those produced by the altered algorithm. Click on a square to draw a line from the center of the visualisation to that location. Use the dropdown to select the algorithm.
 
-<div>
+<div style="overflow: scroll;">
   <iframe src="/iframes/bresenham.html" width="461" height="518"></iframe>
 </div>
 

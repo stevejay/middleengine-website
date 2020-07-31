@@ -4,119 +4,28 @@
     <meta charset="utf-8" />
     <title>Bresenham line algorithm visualiser</title>
     <script type="text/javascript">
-      const imageRadius = 11;
-      const imageWidth = imageRadius * 2 + 1;
-      const imageHeight = imageWidth;
-      const imageCenterX = imageRadius;
-      const imageCenterY = imageRadius;
-      const originX = 5;
-      const originY = 5;
-      const visualisationScale = 20;
-      let currentOffsetX = null;
-      let currentOffsetY = null;
-
-      const CONSTRAINED_LINE_STEPS = [
-        0,
-        6,
-        5,
-        4,
-        3,
-        2,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0,
-        1,
-        0,
-        1,
-        0,
-        1,
-        0,
-      ];
-
-      const CONSTRAINED_LINE_RADIAN_STEPS = [
-        0,
-        Math.atan2(1, 6),
-        Math.atan2(1, 5),
-        Math.atan2(1, 4),
-        Math.atan2(1, 3),
-        Math.atan2(1, 2),
-        Math.PI * 0.25, // 0.7853
-        Math.PI * 0.5 - Math.atan2(1, 2), // 1.24905
-        Math.PI * 0.5 - Math.atan2(1, 3), // 1.3734
-        Math.PI * 0.5 - Math.atan2(1, 4), // 1.4289
-        Math.PI * 0.5 - Math.atan2(1, 5), // 1.4289
-        Math.PI * 0.5 - Math.atan2(1, 6), // 1.4289
-        Math.PI * 0.5, // 1.57079
-        //   Math.PI * 0.5 + 0.24498,
-        //   Math.PI * 0.5 + 0.32175,
-        //   Math.PI * 0.5 + 0.46365,
-        Math.PI * 0.75,
-        //   Math.PI * 0.75 + 0.321751837,
-        //   Math.PI * 0.75 + 0.463651837,
-        //   Math.PI * 0.75 + 0.540416837,
-        Math.PI,
-        //   Math.PI + 0.24498,
-        //   Math.PI + 0.32175,
-        //   Math.PI + 0.46365,
-        Math.PI * 1.25,
-        //   Math.PI * 1.25 + 0.321751837,
-        //   Math.PI * 1.25 + 0.463651837,
-        //   Math.PI * 1.25 + 0.540416837,
-        Math.PI * 1.5,
-        //   Math.PI * 1.5 + 0.24498,
-        //   Math.PI * 1.5 + 0.32175,
-        //   Math.PI * 1.5 + 0.46365,
-        Math.PI * 1.75,
-        //   Math.PI * 1.75 + 0.321751837,
-        //   Math.PI * 1.75 + 0.463651837,
-        //   Math.PI * 1.75 + 0.540416837,
-        Math.PI * 2,
-      ];
-
-      function getIndexOfClosestNumberInArray(num, arr) {
-        let index = 0;
-        let curr = arr[0];
-        let diff = Math.abs(num - curr);
-        for (let val = 0; val < arr.length; val++) {
-          const newdiff = Math.abs(num - arr[val]);
-          if (newdiff < diff) {
-            diff = newdiff;
-            curr = arr[val];
-            index = val;
-          }
-        }
-        return index;
-      }
-
-      function drawGrid() {
-        const canvas = document.getElementById("canvas");
-        const context = canvas.getContext("2d");
-        context.imageSmoothingEnabled = false;
-        context.fillStyle = "black";
-
-        for (let i = 0; i <= imageHeight; ++i) {
-          const x = Math.floor(i * ((canvas.width - 1) / imageWidth));
-          context.fillRect(x, 0, 1, canvas.height - 1);
-        }
-
-        for (let i = 0; i <= imageHeight; ++i) {
-          const y = Math.floor(i * ((canvas.height - 1) / imageHeight));
-          context.fillRect(0, y, canvas.width - 1, 1);
-        }
-      }
+      var imageRadius = 11;
+      var imageWidth = imageRadius * 2 + 1;
+      var imageHeight = imageWidth;
+      var imageCenterX = imageRadius;
+      var imageCenterY = imageRadius;
+      var originX = 5;
+      var originY = 5;
+      var visualisationScale = 20;
+      var currentOffsetX = null;
+      var currentOffsetY = null;
 
       function handlePointerDown(event) {
-        const {
+        var {
           offsetX,
           offsetY,
           currentTarget: { width, height },
         } = event;
-        const useAltered =
-          document.getElementById("algorithm").value === "variation";
+
+        var algorithmVersion = document.getElementById("algorithm").value;
+        var drawAlteredLine = algorithmVersion === "variation";
+        var algorithmFunc =
+          algorithmVersion === "original" ? bresenham : bresenhamVariation;
 
         if (offsetX === currentOffsetY && offsetY === currentOffsetY) {
           return;
@@ -125,13 +34,13 @@
         currentOffsetX = offsetX;
         currentOffsetY = offsetY;
 
-        const imageOffsetX =
+        var imageOffsetX =
           Math.max(
             0,
             Math.min(imageWidth - 1, Math.floor(offsetX / (width / imageWidth)))
           ) - imageCenterX;
 
-        const imageOffsetY =
+        var imageOffsetY =
           Math.max(
             0,
             Math.min(
@@ -140,44 +49,27 @@
             )
           ) - imageCenterY;
 
-        const x0 = originX;
-        const y0 = originY;
-        let x1 = originX + imageOffsetX;
-        let y1 = originY + imageOffsetY;
+        var x0 = originX;
+        var y0 = originY;
+        var x1 = originX + imageOffsetX;
+        var y1 = originY + imageOffsetY;
+        var result = algorithmFunc(x0, y0, x1, y1);
 
-        let angleRadians = Math.atan2(y0 - y1, x1 - x0);
-        if (angleRadians < 0) {
-          angleRadians += Math.PI * 2;
-        }
-        const constrainedIndex = getIndexOfClosestNumberInArray(
-          angleRadians,
-          CONSTRAINED_LINE_RADIAN_STEPS
-        );
-
-        const step = CONSTRAINED_LINE_STEPS[constrainedIndex];
-
-        // y1 = step > 0 ? y0 - Math.trunc(Math.abs(x1 - x0) / step) : y0;
-        const overrideAdx = null; // step === 0 ? 10 : step - 1; //6;
-        const overrideAdy = null; // step === 0 ? -1 : 1; //1;
-
-        const func = useAltered ? bresenhamVariation : bresenham;
-        const result = func(x0, y0, x1, y1, overrideAdx, overrideAdy);
-
-        const context = imageCanvas.getContext("2d");
+        var context = imageCanvas.getContext("2d");
         context.clearRect(0, 0, imageWidth, imageHeight);
         context.fillStyle = "#bbb";
 
         result.forEach(({ x, y }) => {
-          const imageRelativeX = x + (imageCenterX - originX);
-          const imageRelativeY = y + (imageCenterY - originY);
+          var imageRelativeX = x + (imageCenterX - originX);
+          var imageRelativeY = y + (imageCenterY - originY);
           context.fillRect(imageRelativeX, imageRelativeY, 1, 1);
         });
 
-        const uiCanvas = document.getElementById("canvas");
-        const uiCanvasContext = uiCanvas.getContext("2d");
-        uiCanvasContext.globalCompositeOperation = "copy";
-        uiCanvasContext.imageSmoothingEnabled = false;
-        uiCanvasContext.drawImage(
+        var canvas = document.getElementById("canvas");
+        var canvasContext = canvas.getContext("2d");
+        canvasContext.globalCompositeOperation = "copy";
+        canvasContext.imageSmoothingEnabled = false;
+        canvasContext.drawImage(
           imageCanvas,
           0,
           0,
@@ -185,29 +77,25 @@
           imageHeight,
           0,
           0,
-          uiCanvas.width - 1,
-          uiCanvas.height - 1
+          canvas.width - 1,
+          canvas.height - 1
         );
-        uiCanvasContext.globalCompositeOperation = "source-over";
-        uiCanvasContext.imageSmoothingEnabled = true;
-
+        canvasContext.globalCompositeOperation = "source-over";
+        canvasContext.imageSmoothingEnabled = true;
         drawGrid();
-        const gridCanvas = document.getElementById("canvas");
-        const gridCanvasContext = gridCanvas.getContext("2d");
-        gridCanvasContext.imageSmoothingEnabled = true;
-        gridCanvasContext.strokeStyle = "red";
-        gridCanvasContext.beginPath();
-        if (useAltered) {
-          const dx = x1 - x0;
-          const dy = y1 - y0;
-          const sx = dx > 0 ? 1 : -1;
-          const sy = dy > 0 ? 1 : -1;
-          const adx = Math.abs(dx) + 1;
-          const ady = Math.abs(dy) + 1;
-          let adjustedX0, adjustedY0, adjustedX1, adjustedY1;
+        canvasContext.strokeStyle = "red";
+        canvasContext.beginPath();
+        if (drawAlteredLine) {
+          var dx = x1 - x0;
+          var dy = y1 - y0;
+          var sx = dx > 0 ? 1 : -1;
+          var sy = dy > 0 ? 1 : -1;
+          var adx = Math.abs(dx) + 1;
+          var ady = Math.abs(dy) + 1;
+          var adjustedX0, adjustedY0, adjustedX1, adjustedY1;
 
           if (adx > ady) {
-            const epsilon = ((ady - adx) / adx) * 0.5;
+            var epsilon = ((ady - adx) / adx) * 0.5;
             adjustedX0 = x0 + 0.5 - originX + imageCenterX;
             adjustedY0 =
               y0 + 0.5 + (sy > 0 ? epsilon : -epsilon) - originY + imageCenterY;
@@ -215,7 +103,7 @@
             adjustedY1 =
               y1 + 0.5 - (sy > 0 ? epsilon : -epsilon) - originY + imageCenterY;
           } else {
-            const epsilon = ((adx - ady) / ady) * 0.5;
+            var epsilon = ((adx - ady) / ady) * 0.5;
             adjustedX0 =
               x0 + 0.5 + (sx > 0 ? epsilon : -epsilon) - originX + imageCenterX;
             adjustedY0 = y0 + 0.5 - originY + imageCenterY;
@@ -224,33 +112,59 @@
             adjustedY1 = y1 + 0.5 - originY + imageCenterY;
           }
 
-          gridCanvasContext.moveTo(
-            adjustedX0 * (gridCanvas.width / imageWidth) + 0.5,
-            adjustedY0 * (gridCanvas.height / imageHeight) + 0.5
+          canvasContext.moveTo(
+            adjustedX0 * (canvas.width / imageWidth) + 0.5,
+            adjustedY0 * (canvas.height / imageHeight) + 0.5
           );
-          gridCanvasContext.lineTo(
-            adjustedX1 * (gridCanvas.width / imageWidth) + 0.5,
-            adjustedY1 * (gridCanvas.height / imageHeight) + 0.5
+          canvasContext.lineTo(
+            adjustedX1 * (canvas.width / imageWidth) + 0.5,
+            adjustedY1 * (canvas.height / imageHeight) + 0.5
           );
         } else {
-          gridCanvasContext.moveTo(
-            (x0 + 0.5 - originX + imageCenterX) *
-              (gridCanvas.width / imageWidth) +
+          canvasContext.moveTo(
+            (x0 + 0.5 - originX + imageCenterX) * (canvas.width / imageWidth) +
               0.5,
             (y0 + 0.5 - originY + imageCenterY) *
-              (gridCanvas.height / imageHeight) +
+              (canvas.height / imageHeight) +
               0.5
           );
-          gridCanvasContext.lineTo(
-            (x1 + 0.5 - originX + imageCenterX) *
-              (gridCanvas.width / imageWidth) +
+          canvasContext.lineTo(
+            (x1 + 0.5 - originX + imageCenterX) * (canvas.width / imageWidth) +
               0.5,
             (y1 + 0.5 - originY + imageCenterY) *
-              (gridCanvas.height / imageHeight) +
+              (canvas.height / imageHeight) +
               0.5
           );
         }
-        gridCanvasContext.stroke();
+        canvasContext.stroke();
+      }
+
+      function drawGrid() {
+        var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        context.imageSmoothingEnabled = false;
+        context.fillStyle = "black";
+        context.strokeStyle = "gray";
+
+        for (var i = 0; i <= imageHeight; ++i) {
+          var x = Math.floor(i * ((canvas.width - 1) / imageWidth));
+          context.fillRect(x, 0, 1, canvas.height - 1);
+        }
+
+        for (var i = 0; i <= imageHeight; ++i) {
+          var y = Math.floor(i * ((canvas.height - 1) / imageHeight));
+          context.fillRect(0, y, canvas.width - 1, 1);
+        }
+
+        context.beginPath();
+        context.arc(
+          (canvas.width - 1) * 0.5 + 0.5,
+          (canvas.height - 1) * 0.5 + 0.5,
+          6,
+          0,
+          2 * Math.PI
+        );
+        context.stroke();
       }
 
       function bresenham(x0, y0, x1, y1) {
@@ -264,7 +178,7 @@
         var arr = [];
         if (adx > ady) {
           // The X-axis is the fast axis.
-          for (let x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
+          for (var x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
             arr.push({ x, y });
             eps += ady;
             if (eps << 1 >= adx) {
@@ -274,7 +188,7 @@
           }
         } else {
           // The Y-axis is the fast axis.
-          for (let x = x0, y = y0; sy < 0 ? y >= y1 : y <= y1; y += sy) {
+          for (var x = x0, y = y0; sy < 0 ? y >= y1 : y <= y1; y += sy) {
             arr.push({ x, y });
             eps += adx;
             if (eps << 1 >= ady) {
@@ -297,7 +211,7 @@
         if (adx > ady) {
           // The X-axis is the fast axis.
           var eps = (ady - adx) >> 1;
-          for (let x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
+          for (var x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
             arr.push({ x, y });
             eps += ady;
             if (eps << 1 >= adx) {
@@ -307,8 +221,8 @@
           }
         } else {
           // The Y-axis is the fast axis.
-          let eps = (adx - ady) >> 1;
-          for (let x = x0, y = y0; sy < 0 ? y >= y1 : y <= y1; y += sy) {
+          var eps = (adx - ady) >> 1;
+          for (var x = x0, y = y0; sy < 0 ? y >= y1 : y <= y1; y += sy) {
             arr.push({ x, y });
             eps += adx;
             if (eps << 1 >= ady) {
@@ -321,17 +235,16 @@
       }
 
       function handleLoad() {
-        const visualisationWrapper = document.querySelector(".canvas-wrap");
-        visualisationWrapper.style.width = `${
-          visualisationScale * imageWidth + 1
-        }px`;
-        visualisationWrapper.style.height = `${
-          visualisationScale * imageHeight + 1
-        }px`;
+        var width = visualisationScale * imageWidth + 1;
+        var height = visualisationScale * imageHeight + 1;
 
-        const canvas = document.getElementById("canvas");
-        canvas.width = visualisationScale * imageWidth + 1;
-        canvas.height = visualisationScale * imageHeight + 1;
+        var canvasWrap = document.querySelector(".canvas-wrap");
+        canvasWrap.style.width = `${width}px`;
+        canvasWrap.style.height = `${height}px`;
+
+        var canvas = document.getElementById("canvas");
+        canvas.width = width;
+        canvas.height = height;
         canvas.addEventListener("pointerdown", handlePointerDown);
 
         imageCanvas = document.createElement("canvas");
