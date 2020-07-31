@@ -347,6 +347,7 @@ blockquote p {
 .byline address::after {
   content: "|";
   position: absolute;
+  top: 0;
   right: -2px;
   color: var(--color-neutral-400);
 }
