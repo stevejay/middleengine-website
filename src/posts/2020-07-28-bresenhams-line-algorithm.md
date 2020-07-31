@@ -28,7 +28,7 @@ The line rasterisation algorithm that is often used for the non- anti-aliased lo
 
 ## A worked example
 
-Explanations of the algorithm available on the Web at Wikipedia, YouTube and other sites usually focus on deriving the equation that underlies it. I have found it more useful to understand the algorithm by working through an example rasterisation. The line that we will rasterise is the following:
+Explanations of the algorithm available on the Web at [Wikipedia](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm), [YouTube](https://www.youtube.com/watch?v=RGB-wlatStc) and other sites usually focus on deriving the equation that underlies it. I have found it more useful to understand the algorithm by working through an example rasterisation. The line that we will rasterise is the following:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/04_bresenham-guide-2x.png "The line to be rasterised")
 
