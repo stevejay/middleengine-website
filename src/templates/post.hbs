@@ -21,6 +21,27 @@
             </header>
             <div class="article-body">
                 {{{content}}}
+                {{#if issueNumber}}
+                <section>
+                    <h2 id="comments"><a class="header-anchor" href="#changelog">#</a> Comments</h2>
+                    <div id="comments-content"></div>
+                    <script>
+                        Octomments({
+                            github: {
+                                owner: 'stevejay',
+                                repo: 'middleengine-website',
+                            },
+                            issueNumber: {{ issueNumber }},
+                            renderer: [OctommentsRenderer, '#comments-content'],
+                            debug: false,
+                            endpoints: {
+                            issue: 'https://middleengine-website-comments.vercel.app/octomments/issue',
+                            token: 'https://middleengine-website-comments.vercel.app/octomments/token',
+                        }
+                    }).init();
+                    </script>
+                </section>
+                {{/if}}
             </div>
         </article>
     </main>
