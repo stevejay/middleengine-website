@@ -32,7 +32,7 @@ Explanations of the algorithm available on the Web at [Wikipedia](https://en.wik
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/04_bresenham-guide-2x.png "The line to be rasterised")
 
-We can observe that, in rasterising this line, we will **always** be incrementing the X-axis coordinate but we will only **sometimes** be incrementing the Y-axis coordinate. This is because the change in X, which is 3, is greater than the change in Y, which is 2. The change in X is termed delta X, or ΔX, and the change in Y is termed delta Y, or ΔY. Here we use the Bresenham line algorithm to answer the question of exactly when the Y-axis coordinate value should be incremented.
+We can observe that, in rasterising this line, we will **always** be incrementing the X-axis coordinate but we will only **sometimes** be incrementing the Y-axis coordinate. This is because the change in X, which is 3, is greater than the change in Y, which is 2. The change in X is termed delta X, or ΔX, and the change in Y is termed delta Y, or ΔY. The reason we are using the Bresenham line algorithm is to answer the question of exactly when the Y-axis coordinate value should be incremented.
 
 Conventionally, the 'always' axis is called the fast axis and the 'sometimes' axis is called the slow axis:
 
@@ -48,7 +48,7 @@ Similarly, the following diagram shows how the slow axis classification also dep
 
 The directional vector of the example line is shown below, confirming that the fast axis is the X-axis and the slow axis is the Y-axis:
 
-![](/images/2020-07-28-bresenhams-line-algorithm/08_bresenham-guide-2x.png "The directional vector of the example line")
+![](/images/2020-07-28-bresenhams-line-algorithm/08_bresenham-guide-v2-2x.png "The directional vector of the example line")
 
 Having classified the axes, we can start the rasterisation process. The first step is easy: the pixel at the start of the line is always filled. For the example line, this is the pixel at (0, 0). The problem now is to determine the next pixel to be filled. We know that the next X-axis coordinate value is 1 because the X-axis is the fast axis. For the Y-axis, we either do or do not increment its coordinate value. This gives us a choice between two possible pixels to fill: the pixel at (1, 0) or the pixel at (1, 1):
 
@@ -76,9 +76,9 @@ The problem with doing this is that we will almost certainly end up with floatin
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/13_bresenham-guide-2x.png "Using the rates of change to determine the intersection point")
 
-(Note that there is a floating point value in the above diagram — 0.5 — but I will shortly show how to avoid it in our calculations.)
+(Note that there is a floating point value in the above diagram — 1.5 — but I will shortly show how to avoid it in our calculations.)
 
-We will use epsilon, with the symbol ε, to represent the current rate of change in Y. This is because that rate of change will not necessarily always be ΔY — it normally varies depending on any error introduced with each iteration of the algorithm. The initial value for ε is zero, and at the start of each iteration of the algorithm we will add ΔY to it. This addition represents the change in Y that occurs each time we take one step along the X-axis. Since we are currently in the first iteration of the algorithm, we add ΔY to ε and so the new value of ε is 0 + 2 which is 2.
+We will use epsilon, with symbol ε, to represent the current rate of change in Y. This is because the rate of change will not necessarily always be ΔY — it can vary depending on any error introduced with each iteration of the algorithm. The initial value for ε is zero, and at the start of each iteration we will add ΔY to it. This addition represents the change in Y that occurs each time we take one step along the X-axis. Since we are currently in the first iteration of the algorithm, we add ΔY to ε and so the new value of ε is 0 + 2 which is 2.
 
 We can now compare the value of ε to the value of the midpoint:
 
@@ -98,13 +98,13 @@ Although we determined that the intersection point was closer to the pixel at (1
 
 Each new iteration of the algorithm operates relative to the pixel filled in during the previous iteration. This requires us to first adjust the value of ε so that it is relative to the filled pixel. Since we incremented the Y-coordinate value, we can adjust ε by subtracting ΔX from it. This is 2 - 3 which equals -1 and so this is the new value of ε:
 
-![](/images/2020-07-28-bresenhams-line-algorithm/19_bresenham-guide-2x.png "Adjusting ε after incrementing the Y coordinate value")
+![](/images/2020-07-28-bresenhams-line-algorithm/19_bresenham-guide-v2-2x.png "Adjusting ε after incrementing the Y coordinate value")
 
 Thus this new value of ε indicates that the true intersection point was below the filled pixel.
 
 We can now begin the next iteration of the algorithm:
 
-![](/images/2020-07-28-bresenhams-line-algorithm/20_bresenham-guide-2x.png "The third pixel to be filled")
+![](/images/2020-07-28-bresenhams-line-algorithm/20_bresenham-guide-v2-2x.png "The third pixel to be filled")
 
 As before we have to determine if the Y coordinate value should be incremented or not. And as before we first add ΔY to ε. Since the value of ε after the last iteration was -1, the new value of ε is 1:
 
@@ -126,7 +126,7 @@ Because the value of ε is not greater than the midpoint value, the next pixel h
 
 Now we can determine the final pixel to fill:
 
-![](/images/2020-07-28-bresenhams-line-algorithm/25_bresenham-guide-2x.png "The final pixel to fill")
+![](/images/2020-07-28-bresenhams-line-algorithm/25_bresenham-guide-v2-2x.png "The final pixel to fill")
 
 (The pixel to fill is obviously (3, 2) but it is useful for illustrative purposes to continue the calculations.)
 
@@ -393,4 +393,4 @@ The Bresenham line algorithm may have been invented many years ago but it is sti
 ## Changelog
 
 - 2020-07-30 Initial version
-- 2020-08-03 Minor fixes
+- 2020-08-03 Minor fixes and image changes
