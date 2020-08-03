@@ -393,3 +393,4 @@ The Bresenham line algorithm may have been invented many years ago but it is sti
 ## Changelog
 
 - 2020-07-30 Initial version
+- 2020-08-03 Minor fixes
