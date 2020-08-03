@@ -10,7 +10,7 @@
     <div id="comments"></div>
     <script type="text/javascript">
       var params = new URL(document.location).searchParams;
-      var issueNumber = parseInt(params.get("issueNumber"));
+      var issueNumber = parseInt(params.get("issueNumber") || 42);
       Octomments({
         github: {
           owner: "stevejay",
