@@ -14,15 +14,15 @@ I have recently been working on a [pixel art](https://en.wikipedia.org/wiki/Pixe
 
 ## Line-drawing and rasterisation
 
-In a vector graphics editor, a line drawn by the user is represented mathematically and so always appears smooth regardless of the current magnification level. This is in contrast to a raster graphics editor, such as Adobe Photoshop, where the image is made up of discrete pixels that you can see if you enlarge it:
+In a vector graphics editor, a line drawn by the user is represented mathematically and so always appears smooth regardless of the current magnification level. This is in contrast to a raster graphics editor, such as Adobe Photoshop, where the image is made up of discrete pixels that you can see when you magnify it:
 
-![](/images/2020-07-28-bresenhams-line-algorithm/01_vector-vs-raster-2x.png "Vector graphics compared to raster graphics when magnified")
+![](/images/2020-07-28-bresenhams-line-algorithm/01_vector-vs-raster-v2-2x.png "Vector graphics compared to raster graphics when magnified")
 
-When a user draws a line in a raster graphics editor, it needs to be [rasterised](https://en.wikipedia.org/wiki/Rasterisation) to determine which pixels should be filled. Often the aim is to produce a smooth result and so [anti-aliasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing) is applied as part of the process. The user might also want to be able to draw lines that start and end on fractional coordinates. Pixel art is different — the jagged look of non- anti-aliased rasterisation is preferred, and lines are always drawn from whole pixel to whole pixel.
+When a user draws a line in a raster graphics editor, it needs to be [rasterised](https://en.wikipedia.org/wiki/Rasterisation) to determine which pixels should be filled. Often the aim is to produce a smooth result and so [anti-aliasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing) is applied as part of the process. The user might also want to be able to draw lines that start and end on fractional coordinates. Pixel art is different: the jagged look of non- anti-aliased rasterisation is preferred, and lines are always drawn from whole pixel to whole pixel.
 
-![](/images/2020-07-28-bresenhams-line-algorithm/02_aliased-vs-non-aliased-with-originals-2x.png "Comparing rasterisation performed with and without anti-aliasing")
+![](/images/2020-07-28-bresenhams-line-algorithm/02_aliased-vs-non-aliased-with-originals-v2-2x.png "Comparing rasterisation performed with and without anti-aliasing")
 
-The line rasterisation algorithm that is often used for the non- anti-aliased look is [Bresenham's line algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm). It was invented by Jack Elton Bresenham in 1962. The algorithm does not accept or output fractional coordinate values and so the result has the desired [jaggies](https://en.wikipedia.org/wiki/Jaggies). The algorithm also uses only integer operations, which was a particularly useful feature at a time when floating point arithmetic was computationally expensive to perform. The following animation shows the rasterisation result for a variety of lines when using this algorithm:
+The line rasterisation algorithm that is often used for the non- anti-aliased look is [Bresenham's line algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm). It was invented by Jack Elton Bresenham in 1962. The algorithm does not accept or output fractional coordinate values and so the result has the desired [jaggies](https://en.wikipedia.org/wiki/Jaggies). The algorithm also uses only integer operations, which was a useful feature at a time when floating point arithmetic was computationally expensive to perform. The following animation shows the rasterisation result for a variety of lines when using this algorithm:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/03_bresenham-12x12-example.gif "Examples of line rasterisation using Bresenham's line algorithm")
 
@@ -72,11 +72,11 @@ How do we express this mathematically? We could put exact figures into the calcu
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/12b_bresenham-guide-2x.png "Using exact figures")
 
-The problem with doing this is that we end up with floating point values, and a key feature of the Bresenham algorithm is that it is implemented using only integer operations. We can avoid this if we use the rate of change of the fast axis as the unit value in our calculations. Thus the distance between the two pixels is ΔX, and the intersection point is ΔY above the lower pixel:
+The problem with doing this is that we will almost certainly end up with floating point values, and a key feature of the Bresenham algorithm is that it is implemented using only integer operations. We can avoid this if we use the rate of change of the fast axis as the unit value in our calculations. Thus the distance between the two pixels is ΔX, and the intersection point is ΔY above the lower pixel:
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/13_bresenham-guide-2x.png "Using the rates of change to determine the intersection point")
 
-(Note that there is a floating point value in the above diagram — 0.5 — but I will shortly show how it is avoided in the calculations.)
+(Note that there is a floating point value in the above diagram — 0.5 — but I will shortly show how to avoid it in our calculations.)
 
 We will use epsilon, with the symbol ε, to represent the current rate of change in Y. This is because that rate of change will not necessarily always be ΔY — it normally varies depending on any error introduced with each iteration of the algorithm. The initial value for ε is zero, and at the start of each iteration of the algorithm we will add ΔY to it. This addition represents the change in Y that occurs each time we take one step along the X-axis. Since we are currently in the first iteration of the algorithm, we add ΔY to ε and so the new value of ε is 0 + 2 which is 2.
 
@@ -367,12 +367,12 @@ The initial value of ε now depends on whether the fast axis is the X-axis or th
 ```js
 if (adx > ady) {
   // The X-axis is the fast axis.
-  let eps = (ady - adx) >> 1;
+  var eps = (ady - adx) >> 1;
 
   // for-loop here
 } else {
   // The Y-axis is the fast axis.
-  let eps = (adx - ady) >> 1;
+  var eps = (adx - ady) >> 1;
 
   // for-loop here
 }
