@@ -24,22 +24,10 @@
                 {{#if issueNumber}}
                 <section>
                     <h2 id="comments"><a class="header-anchor" href="#changelog">#</a> Comments</h2>
-                    <div id="comments-content"></div>
-                    <script>
-                        Octomments({
-                            github: {
-                                owner: 'stevejay',
-                                repo: 'middleengine-website',
-                            },
-                            issueNumber: {{ issueNumber }},
-                            renderer: [OctommentsRenderer, '#comments-content'],
-                            debug: false,
-                            endpoints: {
-                            issue: 'https://middleengine-website-comments.vercel.app/octomments/issue',
-                            token: 'https://middleengine-website-comments.vercel.app/octomments/token',
-                        }
-                    }).init();
-                    </script>
+                    <div style="overflow: scroll;">
+                        <iframe src="/iframes/comments.html?issueNumber={{issueNumber}}" width="461"
+                            height="518"></iframe>
+                    </div>
                 </section>
                 {{/if}}
             </div>
