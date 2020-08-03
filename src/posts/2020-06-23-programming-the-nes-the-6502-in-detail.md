@@ -145,11 +145,11 @@ Your program code will consist mainly of instructions but sometimes data needs t
 .addr some_label      ; Embeds the address associated with the label.
 ```
 
-In this particular assembler dialect, `.byte`, `.word` and `.addr` are instructions for the assembler itself (termed control commands).
+In this particular assembler dialect, `.byte`, `.word` and `.addr` are instructions for the assembler itself. These assembler instructions are termed control commands.
 
 ## Binary number theory
 
-This section introduces a number of concepts regarding binary numbers and how to add and subtract them. This information will make subsequent sections about the operation of the 6502 much easier to understand.
+This section introduces a number of concepts regarding binary numbers, and how to add and subtract them. This information will make subsequent sections about the operation of the 6502 much easier to understand.
 
 ### Unsigned and signed binary values
 
@@ -195,7 +195,7 @@ When we add two decimal numbers, the digits of the numbers to add are added colu
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/addition-carry-decimal-v2-2x.png "Addition example in decimal")
 
-In the above example the addition in the units column is 5 plus 7 which equals 12, so the 1 is carried to the tens column.
+In the above example the addition in the units column is 5 plus 7 which equals 12, so the result for the units column is 2 and the 1 is carried to the tens column.
 
 This all still holds when adding binary numbers. The difference is that we carry the one to the left for each column where the total is 2 or greater (`%10` in binary). Here is the same addition performed using unsigned byte values:
 
@@ -209,7 +209,7 @@ There is a 9th bit, a carry bit, that is not included in the result. To capture 
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/addition-overflow-16bit-binary-v2-2x.png "Addition using 16-bit values")
 
-However, because the 6502 is an 8-bit CPU, we can only add byte values. The solution is to combine multiple additions, starting with the LSBs and finishing with the MSBs, and including any carry bits between bytes. For example, to add `$80FF` and `$0003` (33,023 + 3 in decimal) we first add the LSBs, `$FF` and `$03`. The result is `$02` plus a carry bit. Next we add the MSBs, `$80` and `$00`, making sure to also add `$01` for that carry bit. The result is `$81` with no carry bit, so the combined result is `$8102` or 33,026 in decimal. This is a complete result because no carry bit was created when adding the MSBs.
+However, because the 6502 is an 8-bit CPU, we can only add byte values. The solution is to combine multiple additions, starting with the LSBs and finishing with the MSBs, and including any carry bits in the calculations. For example, to add `$80FF` and `$0003` (33,023 + 3 in decimal) we first add the LSBs, `$FF` and `$03`. The result is `$02` plus a carry bit. Next we add the MSBs, `$80` and `$00`, making sure to also add `$01` for that carry bit. The result is `$81` with no carry bit, so the combined result is `$8102` or 33,026 in decimal. This is a complete result because no carry bit was created when adding the MSBs.
 
 Now let us try adding `$FFFE` and `$0003` (65,534 + 3 in decimal). First we add the LSBs, `$FE` and `$03`. The result is `$01` plus a carry bit. Next we add the MSBs, `$FF` and `$00`, making sure to also add `$01` for that carry bit. The result is `$00` plus a carry bit. The combined result is `$0001` (1 in decimal) but this is not the correct result (which would be 65,537 in decimal) because a carry bit remains. We would have to perform this calculation using 24-bit values to get the full result.
 
@@ -221,32 +221,30 @@ Adding signed binary values introduces the problem of overflow. As an example, l
 
 The result is `%10000000`, or 128 in decimal, which would be the correct answer if we were adding unsigned values but we are not. This result is actually -128 in two's complement representation. The problem is that bit #7 in a signed byte is reserved for the value's sign, so there is actually one less bit with which to represent a value's magnitude. A signed byte value can only represent values in the range -128 to +127, and the correct answer of +128 falls outside that range. The result has _overflowed_ the available magnitude bits.
 
-Previously when we added unsigned binary values, we could detect an invalid result because there would be a carry bit remaining after adding the MSBs. How can we detect overflow when adding signed bytes? We have to look to see if the sign bit of the result is correct given the values that we are adding together. In the example above we added two positive numbers, +127 and +2, so we would expect the result to be positive as well. In fact the result is negative because bit #7 of the result is set. Using this knowledge, the result would be identified as invalid.
+Previously when we added unsigned binary values, we could detect an invalid result because there would be a carry bit remaining after adding the MSBs. How can we detect overflow when adding signed bytes? We have to look to see if the sign bit of the result is correct given the values that we have added together. In the example above we added two positive numbers, +127 and +2, so we would expect the result to be positive as well. In fact the result is negative because bit #7 of the result is set. Using this knowledge, the result would be identified as invalid.
 
 More generally, when adding a negative value to a positive value or a positive value to a negative value, overflow cannot occur. But when the result of adding two positive values is negative or the result of adding two negative values is positive, overflow has occurred.
 
-It is important to note that a remaining carry bit does **not** indicate an invalid result as it does when adding unsigned values. You should in fact ignore any remaining carry bit.
+It is important to note that a remaining carry bit does **not** indicate an invalid result in the way that it does when adding unsigned values. You should in fact ignore any remaining carry bit.
 
-We have to use 16-bit signed values in the above calculation to get the correct result. As you might expect, we have to add signed multi-byte values one byte at a time, starting with the LSBs and finishing with the MSBs, and including any carry bits between bytes. When performing the final addition of the MSBs, we need to check for overflow to ensure that the result is valid. We also ignore any carry bit that remains from this final addition.
+We have to use 16-bit signed values in the above calculation to get the correct result. As you might expect, we have to add signed multi-byte values one byte at a time, starting with the LSBs and finishing with the MSBs, and including any carry bits in the calculations. When performing the final addition of the MSBs, we need to check for overflow to ensure that the result is valid. We also ignore any carry bit that remains from this final addition.
 
 To illustrate adding 16-bit signed values, let us add `$80FF` and `$FFFE` (-32,513 + -2 in decimal). We first add the LSBs, `$FF` and `$FE`. The result is `$FD` plus a carry bit. Next we add the MSBs, `$80` and `$FF`, making sure to also add `$01` for the carry bit. The result is `$80` with a carry bit. We can ignore the carry bit, so the combined result is `$80FD`, or -32,515 in decimal. Now we need to check if overflow occurred. We added two negative values so the result should be negative too. The result `$80FD` does indeed represent a negative value (bit #7 of the MSB is set), therefore overflow has not occurred and the result is valid.
 
 ### The implementation of addition in the 6502
 
-Mathematical operations are performed by the 6502's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU). The 6502 includes a Carry bit that is used by the ALU in two ways:
+Mathematical operations are performed using the 6502's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU). The 6502 also includes a Carry bit that is used by the ALU in two ways:
 
-1. It is used during addition to indicate that the ALU should add one to the addition calculation.
-2. It is updated by the ALU after the addition to indicate whether or not the result includes a carry bit. If the Carry bit it set then the result includes a carry bit. If the Carry bit is not set then it does not.
+1. It is used during addition to indicate that the ALU should add one to the current addition calculation.
+2. It is updated by the ALU after an addition to indicate whether or not the result includes a carry bit. If the Carry bit is set then the result includes a carry bit. If the Carry bit is not set then it does not.
 
-The calculation that the ALU performs is therefore the following:
+The addition operation is used to add two byte values. The calculation that the ALU performs is therefore the following:
 
+```markup
+Byte1 + Byte2 + Carry
 ```
-value1 + value2 + Carry
-```
 
-If an addition should not also include the addition of a carry bit then we need to first ensure that the Carry bit is not set. Conversely, if an addition should also include the addition of a carry bit then we need to first ensure that the Carry bit is set.
-
-When starting an addition operation, we need to first ensure that the Carry bit is not set. When adding multi-byte values, we first ensure that the Carry bit is not set but we also do not update its state as we proceed to add the byte pairs. This ensures that any carry bit generated as part of adding one pair of bytes will get carried over into the addition for the next pair of bytes.
+When starting an addition operation, we first ensure that the Carry bit is not set. When adding multi-byte values, we first ensure that the Carry bit is not set but we also do not update the state of the Carry bit as we proceed to add the byte pairs. This ensures that any carry bit generated as a result of adding one pair of bytes will get carried over into the addition of the next pair of bytes.
 
 ### Subtracting binary values
 
@@ -277,77 +275,85 @@ Finding the one's complement of a binary value means inverting all of its bits (
 
 Let us try calculating +35 - +7 again but this time in binary. Using the two's complement representation, this is `%00100011` - `%00000111`. The one's complement of the subtrahend is `%11111000`, or -8 in decimal. We add one to it, to give `%11111001`, or -7 in decimal. The subtraction now becomes an addition: `%00100011` + `%11111001`, or +35 + -7.
 
-There is a wrinkle to how this is implemented in the ALU. As shown earlier, the ALU implements addition as follows:
+There is a wrinkle to how this is implemented in the ALU. As shown earlier, the ALU implements addition like so:
 
-```
-value1 + value2 + Carry
-```
-
-Subtraction is implemented in the same way but with a single change of taking the one's complement of the subtrahend:
-
-```
-value1 + ~value2 + Carry
+```markup
+Byte1 + Byte2 + Carry
 ```
 
-What this means is that it is the Carry bit which performs the role of controlling whether or not the 'add one' stage of the negation process is performed. Normally we need to perform that stage and so we have to ensure that the Carry bit is set before a subtraction operation. For example, let us calculate `$02` - `$01`, which is +2 - +1 in decimal. This is transformed by the ALU into the following calculation:
+The ALU implements subtraction in the same way but with a single change — it takes the one's complement of the subtrahend:
 
+```markup
+Byte1 + ~Byte2 + Carry
 ```
-$02 + ~$01 + Carry
+
+What this means is that it is the Carry bit which performs the role of controlling whether or not the 'add one' stage of the negation process is performed. Normally we want to perform that stage of the negation process and so we have to ensure that the Carry bit is set before a subtraction operation. For example, let us calculate `$02` - `$01`, which is +2 - +1 in decimal. This is transformed by the ALU into the following calculation:
+
+```markup
+  Byte1 + ~Byte2 + Carry
+= $02 + ~$01 + Carry
 = $02 + $FE + Carry
-= \$00 + Carry
+= $00 + Carry
 ```
 
 The correct answer to the calculation is `$01` or 1 in decimal. We only get the correct answer if the Carry bit is set:
 
-```
-$02 + ~$01 + $01
+```markup
+  Byte1 + ~Byte2 + Carry
+= $02 + ~$01 + $01
 = $02 + $FE + $01
-= \$00 + $01
-= \$01.
+= $00 + $01
+= $01
 ```
 
 Thus, before performing a subtraction operation, we have to ensure that the Carry bit is set.
 
-As explained previously, the Carry bit is updated by the ALU after an addition operation to indicate whether or not the result includes a carry bit. For a subtraction operation, the Carry bit is updated by the ALU to indicate whether or not a bit had to be borrowed as part of the operation. If the Carry bit is set then no bit had to borrowed, but if the Carry bit is not set then a bit had to be borrowed. With the previous calculation of `$02` - `$01`, the Carry bit is set after the subtraction because the result of adding `$02` + `$FE` + `$01` is `$01` and a carry bit. The carry bit here indicates that a bit did not need to be borrowed, which is correct.
+As explained previously, the Carry bit is updated by the ALU after an addition operation to indicate whether or not the result includes a carry bit. For a subtraction operation, the Carry bit is updated by the ALU to indicate whether or not a bit had to be borrowed as part of the operation. It is important to note that the Carry bit is set inversely in this role:
+
+- If the Carry bit is set then no bit had to borrowed.
+- If the Carry bit is not set then a bit had to be borrowed.
+
+With the previous calculation of `$02` - `$01`, the Carry bit is set after the subtraction because the result of adding `$02` + `$FE` + `$01` is `$01` and a carry bit. The carry bit here indicates that a bit did not need to be borrowed, which is correct.
 
 Let us see a calculation where a bit does need to be borrowed. For this, let us calculate `$02` - `$03`, which is +2 - +3 in decimal. This is transformed by the ALU into the following calculation:
 
-```
-$02 + ~$03 + $01
-= $02 + $FC + $01
-= \$FE + $01
-= $FF
-```
-
-The result of adding `$02` + `$FC` + `$01` is \$FF with no carry bit, so the Carry bit is not set after this subtraction operation. If we were to perform this operation actually as a subtraction, rather than converting it into an addition, then we would need to borrow one and so that is why the Carry bit not being set here indicates that borrowing has occurred.
-
-To get a complete result, we would have to perform this subtraction using 16-bit values, specifically as `$0002` - `$0003`. As with addition, if we want to subtract multi-byte values then we have to perform the operation one byte at a time, starting with the LSBs and finishing with the MSBs. We first ensure that the Carry bit is set before starting the subtraction process. The subtraction of the LSBs (`$02` - `$03`) has already been shown:
-
-```
-$02 + ~$03 + Carry
+```markup
+  Byte1 + ~Byte2 + Carry
 = $02 + ~$03 + $01
 = $02 + $FC + $01
-= \$FE + $01
+= $FE + $01
 = $FF
 ```
 
-Now we add the MSBs. We do not update the value of the Carry bit during the subtraction operation, so the ALU performs the following calculation:
+The result of adding `$02` + `$FC` + `$01` is `$FF` with no carry bit, so the Carry bit is not set after this subtraction operation. If we were to actually perform this operation as a subtraction, rather than converting it into an addition, then we would need to borrow one and so that is why the Carry bit not being set indicates that a bit had to be borrowed.
 
+To get a complete result, we would have to perform this subtraction using 16-bit signed values, specifically as `$0002` - `$0003`. As with addition, if we want to subtract multi-byte values then we have to perform the operation one byte at a time, starting with the LSBs and finishing with the MSBs. We first ensure that the Carry bit is set before starting the subtraction process. The subtraction of the LSBs (`$02` - `$03`) has already been shown:
+
+```markup
+  $02 + ~$03 + Carry
+= $02 + ~$03 + $01
+= $02 + $FC + $01
+= $FE + $01
+= $FF
 ```
-$00 + ~$00 + Carry
+
+Now we can add the MSBs. We do not update the value of the Carry bit during the subtraction operation, so the ALU performs the following calculation:
+
+```markup
+  $00 + ~$00 + Carry
 = $00 + ~$00 + $00
 = $00 + $FF + $00
 = $FF + $00
-= \$FF
+= $FF
 ```
 
-Thus the final answer is `$FFFF` with no carry bit, which is -1 in decimal when using the two's complement representation for binary values. By not adding one in the MSB calculation, since the Carry bit was not set, we account for the fact that one had to be borrowed from that byte pair.
+Thus the final answer is `$FFFF` with no carry bit, which is -1 in decimal when using the two's complement representation for binary values. By not adding one in the MSB calculation, achieved by the Carry bit not being set, we account for the fact that one had to be borrowed from that byte pair calculation.
 
-Let us see how this works for some more multi-byte signed values. First let us calculate +255 - -1, which is `$00FF` - `$FFFF` in hex. We initially subtract the LSBs, `$FF` - `$FF`. This gets rewritten using addition as `$FF` + ~`$FF` + Carry, with Carry being `$01` because that is its initial value. This simplifies to `$FF` + `$00` + `$01`, which equals `$00` with a carry bit. Now we subtract the MSBs: `$00` - `$FF`. This gets rewritten using addition as `$00` + ~`$FF` + Carry, with Carry being `$01` because there was a carry bit from adding the LSBs. This simplifies to `$00` + `$00` + `$01`, which equals `$01` with no carry bit. Therefore the combined result is `$0100`, or +256 in decimal.
+Let us see how this works for some more multi-byte signed values. First let us calculate +255 - -1, which is `$00FF` - `$FFFF` in hex. We initially subtract the LSBs, `$FF` - `$FF`. This gets rewritten using addition as `$FF` + ~`$FF` + Carry, with Carry being `$01` because that is its required initial value. This simplifies to `$FF` + `$00` + `$01`, which equals `$00` with a carry bit. Now we subtract the MSBs: `$00` - `$FF`. This gets rewritten using addition as `$00` + ~`$FF` + Carry, with Carry being `$01` because there was a carry bit generated from adding the LSBs. This simplifies to `$00` + `$00` + `$01`, which equals `$01` with no carry bit. Therefore the combined result is `$0100`, or +256 in decimal.
 
-Now let us calculate +256 - +1, which is `$0100` - `$0001` in hex. Initially we subtract the LSBs, `$00` - `$01`. This gets rewritten using addition as `$00` + ~`$01` + Carry, with Carry being `$01` because that is its initial value. This simplifies to `$00` + `$FE` + `$01`, which equals `$FF` with no carry bit. Now we subtract the MSBs, `$01` - `$00`. This gets rewritten using addition as `$01` + ~`$00` + Carry, with Carry being `$00` as there was no carry bit from adding the LSBs. This simplifies to `$01` + `$FF` + `$00`, which equals `$00` with a carry bit. We know to ignore that final carry bit because we are adding signed values, therefore the combined result is `$00FF`, or +255 in decimal.
+Now let us calculate +256 - +1, which is `$0100` - `$0001` in hex. Initially we subtract the LSBs, `$00` - `$01`. This gets rewritten using addition as `$00` + ~`$01` + Carry, with Carry being `$01` because that is its required initial value. This simplifies to `$00` + `$FE` + `$01`, which equals `$FF` with no carry bit. Now we subtract the MSBs, `$01` - `$00`. This gets rewritten using addition as `$01` + ~`$00` + Carry, with Carry being `$00` as there was no carry bit generated from adding the LSBs. This simplifies to `$01` + `$FF` + `$00`, which equals `$00` with a carry bit. We know to ignore that final carry bit because we are adding signed values. The combined result is `$00FF`, or +255 in decimal.
 
-In both cases, we need to ensure that overflow has not occurred when adding the MSBs. The rule for overflow when subtracting is different to the rule for overflow when adding. When subtracting one number from another, overflow occurs when their signs differ and the sign of the result is the same as the sign of the number you are subtracting by. In the case of the first example, +255 - -1, the signs do differ but the result (+256) is positive while the number being subtracted by (-1) is negative; overflow has not occurred. In the case of the second example, +256 - +1, the signs are the same and so overflow cannot occur.
+In both cases, we need to ensure that overflow has not occurred when adding the MSBs. The rule for overflow when subtracting is different to the rule for overflow when adding: when subtracting one number from another, overflow occurs when their signs differ and the sign of the result is the same as the sign of the number you are subtracting by. In the case of the first example, +255 - -1, the signs do differ but the result (+256) is positive while the number being subtracted by (-1) is negative; overflow has not occurred. In the case of the second example, +256 - +1, the signs are the same and so overflow cannot occur.
 
 ### Increasing bit counts
 
@@ -357,13 +363,13 @@ This is easy to do for unsigned values: you simply add as many significant zero 
 
 However, the approach is not as obvious for signed values. The solution is called [sign extension](https://en.wikipedia.org/wiki/Sign_extension). You still add as many significant bits as necessary, but now all of these added bits have the same value as the sign bit of the value that is being extended. For example, the value -128 as an 8-bit signed value is `%10000000`. The sign bit (bit #7) has the value 1 so the equivalent 16-bit signed value is formed by adding an MSB with all of its bits set to 1. This gives the value `%1111111110000000`, which still represents -128 in decimal.
 
-### Best practise
+### Best practise for addition and subtraction
 
-There are a few important caveats to bear in mind when adding or subtracting binary values:
+As touched on in the previous sections, there are a few important caveats to bear in mind when adding or subtracting binary values:
 
 1. Avoid mixing signed and unsigned values. At the very least it is difficult to know when overflow has occurred and how any carry bits should be handled.
 2. The two values to add or subtract should have the same bit count. You would normally sign-extend the shorter value if this is not the case.
-3. Ignore any carry bit remaining after adding adding or subtracting signed values.
+3. Ignore any carry bit that remains after adding adding or subtracting signed values. However you do need to check for overflow.
 
 ## Processor registers
 
@@ -378,35 +384,39 @@ The six registers, along with their commonly used abbreviations, are:
 - Index Register X (X).
 - Index Register Y (Y).
 
-The **Program Counter** (PC) stores the address of the next instruction to be executed. Normally that address gets updated automatically by the CPU as it sequentially executes your program, but certain instructions update the value of the Program Counter to an address somewhere else in the program code. Because the Program Counter stores an address and the 6502 uses 16-bit addresses, this register is two bytes in size.
+The **Program Counter** (PC) stores the address of the next instruction to be executed. Normally that address gets updated automatically by the CPU as it sequentially executes your program, but certain instructions update the value of the Program Counter to an address somewhere else in the program code.
 
-The rest of the registers each hold a single data value and, since the 6502 has an 8-bit data bus, all are one byte in size.
+Because the Program Counter stores an address and the 6502 uses 16-bit addresses, this register is two bytes in size. The rest of the registers each hold a single data value and, since the 6502 has an 8-bit data bus, all are one byte in size.
 
-The **Accumulator** (A) is the main register that instructions operate on. Many instructions use it in their inputs or write their results to it. It is also useful as a temporary storage area when moving data from one memory location to another.
+The **Accumulator** (A) is the main register that instructions operate on. Many instructions use it in their inputs or write the result to it. It is also useful as a temporary storage area when moving data from one memory location to another.
 
 **Index Register X** (X) and **Index Register Y** (Y), or more simply the X register and the Y register, are both primarily used to specify a particular byte in the address space for an instruction to operate on, when the address of that byte is the sum of some base address plus the current value of the X or Y register. For example, if an instruction uses a base address of `$0C01` with the X register, and the current value in the X register is `$02`, then the address accessed by the instruction will be `$0C03` (`$0C01` plus `$02`). Indexing in this way is useful when you want to iterate through a sequence of bytes in memory. Like the Accumulator, these index registers can also be used as temporary storage areas.
 
 The **Stack Pointer** (S) is used to point to the next free byte in the 6502's call stack. The call stack is covered in detail later in this post.
 
-Finally there is the **Processor Status** (P) register. This register actually operates as eight flag bits, where each bit indicates if some particular processor status is currently true or not. A bit is set if it is a 1, and clear or not set if it is a 0. Only seven out of the eight flag bits are used; bit #5 is unused.
+Finally there is the **Processor Status** (P) register. This register actually operates as eight flag bits, where each bit indicates if some particular processor status is currently true or not. A bit is set if it is a one, and clear or not set if it is a zero. Only seven out of the eight flag bits are used; bit #5 is unused.
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/processor-status-register-2x.png "The Processor Status register flags")
 
-The **[Carry](https://en.wikipedia.org/wiki/Carry_flag)** (C) flag is used by the ALU as a carry or borrow bit for addition and subtraction, and as a ninth bit for the bit shifting operations. When performing addition, if this flag is set then a carry bit gets added to the calculation, and if it tests as set after the addition then the result includes a carry bit. When performing subtraction this flag indicates a borrow bit, but as its complement: when the Carry flag is set then there is no borrow bit, but when it is not set then there is a borrow bit. So if this flag is not set on performing the subtraction then it indicates that a bit has been borrowed from the calculation, and if it tests as not set after the subtraction then a bit was borrowed in the calculation.
+The **[Carry](https://en.wikipedia.org/wiki/Carry_flag)** (C) flag is used by the ALU as a carry or borrow bit for addition and subtraction, and as a ninth bit for the bit shifting operations.
 
-The **Negative** (N) flag is useful when values are being interpreted as signed values using two's complement representation. As described earlier in this post, in that representation the most significant bit (the sign bit) indicates if the value is negative &mdash; when that bit is set &mdash; or positive &mdash; when that bit is not set. To assist with checking whether a signed value is positive or negative, some instructions update the state of this Negative flag to the same state as bit #7 of the instruction result. If we know that the result represents the MSB of a signed value, then the state of this flag tells us if the value is positive or negative.
+When the ALU is to be used for an addition operation, the Carry flag needs to be set if the addition should include a carry bit, or cleared if it should not. This flag then gets updated by the ALU as part of the addition operation. It gets set if the result of the addition includes a carry bit, or it gets cleared if the result does not include a carry bit.
 
-The [**Overflow**](https://en.wikipedia.org/wiki/Overflow_flag) (V) flag is set by the ALU when the sign bit of the result of an addition or subtraction does not have the expected state, specifically when the values being added or subtracted are interpreted as signed 8-bit values using two's complement representation. If the Overflow flag is set then overflow has occurred and the result is not valid. If this flag is not set then overflow has not occurred. Note that it is only useful to check for overflow after adding or subtracting the MSBs of two signed values.
+When the ALU is to be used for a subtraction operation, the Carry flag needs to be set if the subtraction should not include a borrow bit, or cleared if it should. This flag then gets updated by the ALU as part of the subtraction operation. It gets set if the subtraction did not require a bit to be borrowed, or it gets cleared if the subtraction did require a bit to be borrowed.
 
-The Overflow and Negative flags are useful if you want to check the state of bit #6 or bit #7 of some byte. For example, this can be done for any byte in memory using a BIT instruction (discussed later in this post). This makes these bits cheap to test for, and so any flag bytes in your program should generally use bit #6 or bit #7 for flags that are checked frequently.
+The **Negative** (N) flag is useful when values are being interpreted as signed values using two's complement representation. As described earlier in this post, in that representation the most significant bit (the sign bit) indicates if the value is negative, when that bit is set, or positive, when that bit is not set. To assist with checking whether a signed value is positive or negative, some instructions update the state of this Negative flag to the same state as bit #7 of the instruction result. So if we know that the result represents the MSB of a signed value, the state of this flag tells us if the result is positive or negative.
+
+The [**Overflow**](https://en.wikipedia.org/wiki/Overflow_flag) (V) flag is set by the ALU when the sign bit of the result of an addition or subtraction does not have the expected state, specifically when the values being added or subtracted are interpreted as signed 8-bit values using the two's complement representation. If the Overflow flag is set then overflow has occurred and the result is not valid. If this flag is not set then overflow has not occurred. Note that it is only useful to check for overflow after adding or subtracting the MSBs of two signed values.
+
+The Overflow and Negative flags are useful if you want to check the state of bit #6 or bit #7 of some byte. For example, this can be done for any byte in memory using a BIT instruction (as discussed later in this post). These flags makes these bit numbers cheap to test for, and so any flag bytes in your program should generally use bit #6 or bit #7 for the flags that are checked most frequently.
 
 The **Zero** (Z) flag is set by some instructions if the result of the instruction is zero (i.e., `$00`). For example, subtracting `$04` from `$04` equals `$00`, which would result in the Zero flag being set.
 
-The **Interrupt Disable** (I) flag indicates if maskable interrupts are disabled &mdash; the bit is set &mdash; or enabled &mdash; the bit is not set. Interrupts are covered later in this post.
+The **Interrupt Disable** (I) flag indicates if maskable interrupts are disabled, when this flag is set, or enabled, when the flag is not set. Interrupts are covered later in this post.
 
 The **Break** (B) flag is updated by the CPU as appropriate and is useful in an interrupt handler if you need to determine if the interrupt was triggered by a BRK instruction or whether it was triggered by a normal maskable interrupt. Interrupts are covered later in this post.
 
-The **Decimal Mode** (D) flag is used to control if the CPU is in binary coded decimal mode or not. The flag can be set and cleared but, because the CPU used in the NES does not implement this mode, there is no effect on the CPU's operation.
+The **Decimal Mode** (D) flag is used to control if the CPU is in binary coded decimal mode or not. The flag can be set and cleared, but because the CPU used in the NES does not implement this mode, these changes have no effect on the CPU's operation.
 
 ## Addressing modes
 
@@ -426,7 +436,7 @@ As stated earlier in this post, a program instruction represents a particular op
 - Absolute Indirect
 - Relative
 
-Each operation supports one or more of these addressing modes.
+Each of the 6502's operations support one or more of these addressing modes.
 
 In the **Implied** addressing mode, it is the operation itself that implies the byte to operate on. For example, the CLC (Clear Carry Flag) clears the Carry flag of the Processor Status register. The byte to operate on &mdash; the Processor Status register &mdash; is implied; you cannot specify a different byte of data.
 
@@ -2358,4 +2368,4 @@ If you have not done any low-level programming before then writing games for the
 ## Changelog
 
 - 2020-06-23 Draft version
-- 2020-08-02 A substantial rework of the explanations for the addition and subtraction of binary values
+- 2020-08-02 A substantial rework of the explanations of addition and subtraction.
