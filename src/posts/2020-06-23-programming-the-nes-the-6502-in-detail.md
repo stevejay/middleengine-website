@@ -12,7 +12,7 @@ author:
 
 In the previous post I presented an overview of the NES and its subsystems. A key component is the CPU, which is a version of the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) CPU. In order to write games for the NES, it is necessary to have a good understanding of the functioning of the 6502 and how to program it using assembly. This post covers basic assembly, binary number theory, the processor registers, the addressing modes, the call stack, interrupts, and the opcodes.
 
-The primary reference for this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is quite a dense read, but it does include a lot of useful advice and many worked examples. Since the CPU in the NES does not support the 6502's binary coded decimal mode, any information in the manual regarding it can be ignored.
+The primary reference for this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is quite a dense read but it does include a lot of useful advice and many worked examples. Since the CPU in the NES does not support the 6502's binary coded decimal mode, any information in the manual regarding it can be ignored.
 
 If you have not done so already, I recommend that you read the [first post in this series](/blog/posts/2020/06/22/programming-the-nes-the-nes-in-overview) before this one.
 
@@ -34,15 +34,15 @@ The bits of a byte are numbered from 0 to 7, with bit #0 being the least signifi
 
 #### Hexadecimal literals
 
-[Hexadecimal](https://en.wikipedia.org/wiki/Hexadecimal) (or hex) literal values are prefixed by a dollar sign, for example `$0F`.
+[Hexadecimal](https://en.wikipedia.org/wiki/Hexadecimal), or hex, literal values are prefixed by a dollar sign, for example `$0F`.
 
 Each digit in a hexadecimal literal represents a [nibble](https://en.wikipedia.org/wiki/Nibble). A byte consists of two nibbles, so a single byte is written as two hexadecimal digits and a two-byte value is written as four hexadecimal digits. Thus `$3F` represents a byte value and `$C008` represents a two-byte value.
 
-The first byte of a two-byte value is the [most significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_byte) (MSB) and the second byte is the [least significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte) (LSB). Given the hex value `$C008`, the MSB is `$C0` and the LSB is `$08`.
+The first byte of a two-byte value is the [most significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_byte) (MSB) and the second byte is the [least significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte) (LSB). So given the hex value `$C008`, the MSB is `$C0` and the LSB is `$08`.
 
 #### Decimal literals
 
-Literal values without a dollar sign or percent sign prefix are regular decimal values.
+Literal values without a dollar or percent sign prefix are regular decimal values.
 
 ### Comments
 
@@ -56,9 +56,9 @@ LDA #$04 ; This comment comes after an instruction
 
 ### Opcodes
 
-A program instruction represents a particular operation on a particular byte of data. The operation is identified by the [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) used in the instruction. The opcode is a byte value in the range 0 to 255 inclusive. The 6502 officially supports 151 opcodes and they can be grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). Each opcode in a group performs the same basic operation (such as adding two numbers together) but it will use a different addressing mode to specify the byte of data to operate on. (Addressing modes are covered later in this post.)
+A program instruction represents a particular operation to be performed, and it may or may not include an operand. The operation is identified by the [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) used in the instruction. The opcode is a byte value in the range 0 to 255 inclusive. The 6502 officially supports 151 opcodes and they can be grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). Each opcode in a group performs the same basic operation (such as adding two numbers together) but it will use a different addressing mode to specify the data to operate on. (Addressing modes are covered later in this post.)
 
-For each instruction in your program, the assembler needs to determine which of the 151 opcodes to output as the generated machine code. The basic operation is indicated by which three-letter mnemonic is used in the instruction. The mnemonic is not case sensitive.
+For each instruction in your program, the assembler needs to determine which of the 151 opcodes to output as the generated machine code. The basic operation is indicated by the particular three-letter mnemonic that is used in the instruction. The mnemonic is not case sensitive.
 
 ```asm6502
 SEI       ; The mnemonic is SEI.
@@ -75,7 +75,7 @@ ADC $04, X   ; The opcode is $61.
 ADC ($04), Y ; The opcode is $71.
 ```
 
-The particular syntax used with the operand indicates to the assembler which addressing mode is being used and so which one of the `ADC`{lang=asm6502}-related opcodes to output.
+The particular syntax used with the operand indicates to the assembler exactly which addressing mode is being used and so which one of the `ADC`{lang=asm6502}-related opcodes to output.
 
 The assembler outputs the opcode first and the operand second, if there is one. The operand is one or two bytes in size so every machine instruction is either one, two, or three bytes in size.
 
@@ -400,11 +400,13 @@ Finally there is the **Processor Status** (P) register. This register actually o
 
 The **[Carry](https://en.wikipedia.org/wiki/Carry_flag)** (C) flag is used by the ALU as a carry or borrow bit for addition and subtraction, and as a ninth bit for the bit shifting operations.
 
-When the ALU is to be used for an addition operation, the Carry flag needs to be set if the addition should include a carry bit, or cleared if it should not. This flag then gets updated by the ALU as part of the addition operation. It gets set if the result of the addition includes a carry bit, or it gets cleared if the result does not include a carry bit.
+When the ALU is to be used for an addition operation, the Carry flag needs to be set if the addition should include a carry bit or cleared if it should not. This flag then gets updated by the ALU as part of the addition operation: it gets set if the result of the addition includes a carry bit, or it gets cleared if the result does not include a carry bit.
 
-When the ALU is to be used for a subtraction operation, the Carry flag needs to be set if the subtraction should not include a borrow bit, or cleared if it should. This flag then gets updated by the ALU as part of the subtraction operation. It gets set if the subtraction did not require a bit to be borrowed, or it gets cleared if the subtraction did require a bit to be borrowed.
+When the ALU is to be used for a subtraction operation, the Carry flag needs to be set if the subtraction should not include a borrow bit or cleared if it should include it. This flag then gets updated by the ALU as part of the subtraction operation: it gets set if the subtraction did not require a bit to be borrowed, or it gets cleared if the subtraction did require a bit to be borrowed.
 
-The **Negative** (N) flag is useful when values are being interpreted as signed values using two's complement representation. As described earlier in this post, in that representation the most significant bit (the sign bit) indicates if the value is negative, when that bit is set, or positive, when that bit is not set. To assist with checking whether a signed value is positive or negative, some instructions update the state of this Negative flag to the same state as bit #7 of the instruction result. So if we know that the result represents the MSB of a signed value, the state of this flag tells us if the result is positive or negative.
+The **Negative** (N) flag is useful when values are being interpreted as signed values using the two's complement representation. As described earlier in this post, in that representation the most significant bit (the sign bit) indicates if the value is negative, when that bit is set, or positive, when that bit is not set. To assist with checking whether a signed value is positive or negative, some instructions update the state of this Negative flag to the same state as bit #7 of the instruction result. So if we know that the result represents the MSB of a signed value, the state of this flag tells us if the result is positive or negative.
+
+(Note that the borrowing is conceptual since, as explained earlier, subtraction is implemented as a form of addition.)
 
 The [**Overflow**](https://en.wikipedia.org/wiki/Overflow_flag) (V) flag is set by the ALU when the sign bit of the result of an addition or subtraction does not have the expected state, specifically when the values being added or subtracted are interpreted as signed 8-bit values using the two's complement representation. If the Overflow flag is set then overflow has occurred and the result is not valid. If this flag is not set then overflow has not occurred. Note that it is only useful to check for overflow after adding or subtracting the MSBs of two signed values.
 
@@ -543,7 +545,7 @@ To use the emulator:
 2. Click the Assemble button. You can check for any assembler errors in the message box at the bottom of the page.
 3. Click the Run button to run the program.
 
-The state of the registers after the program runs is shown in the righthand column. To see the state of main memory, tick the Monitor option located just below the text area.
+The state of the registers after the program runs is shown in the righthand column. To see the state of the system RAM, tick the Monitor option located just below the text area.
 
 ### Operations for setting and clearing the Processor Status register flags
 
@@ -649,7 +651,7 @@ Clears the Decimal Mode flag of the Processor Status register.
 
 ### Operations for transferring bytes of data
 
-Many of the instructions in your programs will be for shuffling data around from main memory to the registers, between registers, and from the registers back to main memory. This is because very few operations directly mutate data in memory. You need to instead load a value into a register, operate on it, and then store the result somewhere.
+Many of the instructions in your programs will be for shuffling data around from the system RAM to the registers, between registers, and from the registers back to the system RAM. This is because very few operations directly mutate data in memory. You need to instead load a value into a register, operate on it, and then store the result somewhere.
 
 The following diagram shows the supported transfers:
 
@@ -927,14 +929,14 @@ Copies the value in the Stack Pointer to the X register.
 The following assembly demonstrates how these data transfer operations can be used to store a given 16-bit value in memory and then copy it to a another memory location:
 
 ```asm6502
-; Store the 16-bit value $0123 into main memory, in little endian format.
+; Store the 16-bit value $0123 into system RAM, in little endian format.
 
 LDA #$23  ; Load LSB as an immediate value into the Accumulator.
 STA $00   ; Store the Accumulator in memory at address $0000.
 LDA #$01  ; Load MSB as an immediate value into the Accumulator.
 STA $01   ; Store the Accumulator in memory at address $0001.
 
-; Copy that value to another location in memory.
+; Copy that value to another location in system RAM.
 
 LDA $00   ; Load LSB from address $0000 into the Accumulator.
 STA $02   ; Store the Accumulator in memory at address $0002.
@@ -1586,9 +1588,9 @@ When using these comparison operators, it is the state of the Carry and Zero fla
 
 #### The BIT operation
 
-The byte comparison operations (CMP, CPX and CPY) are useful for comparing whole bytes, but sometimes you only want to test particular bits of a byte in main memory. The answer is to use the BIT operation.
+The byte comparison operations (CMP, CPX and CPY) are useful for comparing whole bytes, but sometimes you only want to test particular bits of a byte in the CPU's address space. The answer is to use the BIT operation.
 
-A BIT operation performs a bitwise AND operation between the value in the Accumulator and the specified byte in memory. The value in the Accumulator is normally a bitmask for the test. The result of the operation is either zero (none of the bits tested were set in both bytes) or non-zero (one or more of the bits tested were set in both bytes). The Zero flag of the Processor Status register is used to communicate this result. The Negative and Overflow flags also get updated, but they are updated solely to the state of bits #7 and #6 respectively of the byte in main memory; they are not affected by the value in the Accumulator.
+A BIT operation performs a bitwise AND operation between the value in the Accumulator and the specified byte in memory. The value in the Accumulator is normally a bitmask for the test. The result of the operation is either zero (none of the bits tested were set in both bytes) or non-zero (one or more of the bits tested were set in both bytes). The Zero flag of the Processor Status register is used to communicate this result. The Negative and Overflow flags also get updated, but they are updated solely to the state of bits #7 and #6 respectively of the byte in the address space; they are not affected by the value in the Accumulator.
 
 The result of the AND operation is not stored anywhere; the value in the Accumulator is not updated. This is unlike the AND bitwise operation, which does store the operation's result in the Accumulator and so does update it.
 
@@ -1596,7 +1598,7 @@ The result of the AND operation is not stored anywhere; the value in the Accumul
 
 ##### BIT (Test Bits in Memory with Accumulator)
 
-Performs a bitwise AND operation between the value in the Accumulator and the specified byte in main memory. The value in the Accumulator is not updated.
+Performs a bitwise AND operation between the value in the Accumulator and the specified byte in the CPU's address space. The value in the Accumulator is not updated.
 
 ###### Processor Status register changes
 
