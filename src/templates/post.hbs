@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-{{> head description=summary }}
+{{> head description=summary issueNumber=issueNumber }}
 
 <body class="blog">
     {{> header }}
@@ -24,16 +24,38 @@
                 {{#if issueNumber}}
                 <section>
                     <h2 id="comments"><a class="header-anchor" href="#changelog">#</a> Comments</h2>
-                    <div style="overflow: scroll;">
-                        <iframe src="/iframes/comments.html" width="461"
-                            height="518"></iframe>
-                    </div>
+                    <div id="comments-list"></div>
                 </section>
                 {{/if}}
             </div>
         </article>
     </main>
     {{> footer }}
+    {{#if issueNumber}}
+    <script>
+        var issueNumberMetaTag = document.querySelector(
+            'meta[itemprop="issueNumber"]'
+        );
+        var issueNumber = parseInt(
+            issueNumberMetaTag.getAttribute("content") || null
+        );
+        Octomments({
+            github: {
+                owner: "stevejay",
+                repo: "middleengine-website",
+            },
+            issueNumber,
+            renderer: [OctommentsRenderer, "#comments-list"],
+            debug: false,
+            endpoints: {
+                issue:
+                    "https://middleengine-website-comments.vercel.app/octomments/issue",
+                token:
+                    "https://middleengine-website-comments.vercel.app/octomments/token",
+            },
+        }).init();
+    </script>
+    {{/if}}
 </body>
 
 </html>
