@@ -10,7 +10,7 @@ author:
 
 ## Introduction
 
-This is the first in a series of posts about programming the [Nintendo Entertainment System](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) (NES) games console. Released more than 35 years ago, the NES represents a way of programming that I have no prior experience of. I have always programmed in high-level languages that largely hide the underlying CPU architecture from the developer. While NES programs can be written in C, they are normally 'hand crafted' in [assembly language](https://en.wikipedia.org/wiki/Assembly_language) to get maximum performance out of the limited hardware. And writing in assembly means thinking about concepts like opcodes, addressing modes, registers, and the call stack. This is truly bare metal programming!
+This is the first in a series of posts about programming the [Nintendo Entertainment System](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) (NES) games console. Released more than 35 years ago, the NES represents a way of programming that I have no prior experience of. I have always programmed in high-level languages that largely hide the underlying CPU architecture from the developer. While NES programs can be written in C, they are normally 'hand crafted' in [assembly language](https://en.wikipedia.org/wiki/Assembly_language) to get maximum performance out of the limited hardware. And writing in assembly requires thinking about concepts like opcodes, addressing modes, registers, and the call stack. This is truly bare metal programming!
 
 ## The console
 
@@ -24,13 +24,13 @@ There was a version of the NES for the [PAL](https://en.wikipedia.org/wiki/PAL) 
 
 At the heart of the NES is a [central processing unit](https://en.wikipedia.org/wiki/Central_processing_unit) (CPU) made by Ricoh. It is based on the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502), with the omission of a patented [binary coded decimal](https://en.wikipedia.org/wiki/Binary-coded_decimal) mode. The version of that CPU used in the NTSC NES was the [Ricoh 2A03](https://en.wikipedia.org/wiki/Ricoh_2A03) (a.k.a. RP2A03), and the version used in the PAL NES was the [Ricoh 2A07](https://en.wikipedia.org/wiki/Ricoh_2A03#Regional_variations) (a.k.a. RP2A07).
 
-A CPU works by executing machine instructions, each starting with an [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) that identifies the particular operation that the CPU should perform. There are 151 official opcodes. Many of them include information &mdash; an operand &mdash; that is used to identify the data to be operated on.
+A CPU works by executing machine instructions, each starting with an [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) that identifies the particular operation that the CPU should perform. There are 151 official opcodes. Many of them include information &mdash; an operand &mdash; that identifies the data to be operated on.
 
 The speed at which a CPU executes instructions is determined by its clock rate, which is measured in clock cycles per second. The clock rate of the NES's CPU depends on the version of the console, being 1.66 MHz for the PAL version and 1.79 MHz for the NTSC version. Most instructions take from 2 to 7 clock cycles to execute.
 
-Code written in the form of machine instructions is called [machine code](https://en.wikipedia.org/wiki/Machine_code). Games for the NES are usually written in assembly, a low-level programming language that closely resembles machine code but is much easier to write. An [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) is used to convert it into machine code.
+Code written in the form of machine instructions is called [machine code](https://en.wikipedia.org/wiki/Machine_code). Games for the NES are usually written in assembly, a low-level programming language that closely resembles machine code but is easier to write. An [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) is used to convert it into machine code.
 
-The CPU is an 8-bit CPU, meaning it has an 8-bit data bus. The data bus is the communication mechanism by which data is transferred, for example between memory and the CPU, and the width of the bus is the size in bits of the individual values that it transfers. An 8-bit data bus can only transfer 8 bits &mdash; one byte &mdash; at a time, so each machine instruction can only operate on 8-bit data values. If you need to manipulate values that cannot fit inside one byte then you need to write assembly that uses multiple instructions to achieve the desired result.
+The CPU is an 8-bit CPU, meaning it has an 8-bit data bus. The data bus is the communication mechanism by which data is transferred, for example between internal RAM and the CPU, and the width of the bus is the size in bits of the individual values that it transfers. An 8-bit data bus can only transfer 8 bits &mdash; one byte &mdash; at a time, so each machine instruction can only operate on 8-bit data values. If you need to manipulate values that cannot fit inside one byte then you need to write assembly that uses multiple instructions to achieve the desired result.
 
 The NES has only 2 KiB of internal (system) RAM, although this can be expanded via the game cartridge.
 
@@ -42,9 +42,11 @@ The CPU includes six [processor registers](https://en.wikipedia.org/wiki/Process
 
 ## Graphics support
 
-Video output from the NES is handled by the [Picture Processing Unit](https://en.wikipedia.org/wiki/Picture_Processing_Unit) (PPU). It has a resolution of 256 pixels by 240 pixels, a palette of 54 colours, support for up to 64 simultaneous sprites (also called objects), and support for scrolling backgrounds. The PPU has a 16 KiB address space, from `$0000` to `$3FFF`. The PPU also includes a block of 256 bytes of memory termed the [Object Attribute Memory](https://wiki.nesdev.com/w/index.php/PPU_OAM) (OAM). This memory is separate from the PPU's 16 KiB address space and is read by the PPU when rendering sprites to determine their appearance and position. Whenever we want to change the image displayed on the screen, we have to update the PPU's state. This is usually done using special addresses in the CPU address space. By writing to these addresses we can update the state of the PPU and the OAM.
+Video output from the NES is handled by the [Picture Processing Unit](https://en.wikipedia.org/wiki/Picture_Processing_Unit) (PPU). It has a resolution of 256 pixels by 240 pixels, a palette of 54 colours, support for up to 64 simultaneous sprites (also called objects), and support for scrolling backgrounds.
 
 ![](/images/2020-06-22-programming-the-nes-the-nes-in-overview/castlevania.png "A screenshot from the NES game Castlevania")
+
+The PPU has a 16 KiB address space, from `$0000` to `$3FFF`. The PPU also includes a block of 256 bytes of memory termed the [Object Attribute Memory](https://wiki.nesdev.com/w/index.php/PPU_OAM) (OAM). This memory is separate from the PPU's 16 KiB address space and is read by the PPU when rendering sprites to determine their appearance and position. Whenever we want to change the image displayed on the screen, we have to update the PPU's state. This is usually done using special addresses in the CPU address space. By writing to these addresses we can update the state of the PPU and the OAM.
 
 The NES was created at a time when the display technology in common use was the [cathode-ray tube](https://en.wikipedia.org/wiki/Cathode-ray_tube) (CRT). This works by projecting one or more electron beams onto a fluorescent screen, scanning the beam from side to side and from top to bottom to build up an image. When the beam reaches the bottom, there is a period of time needed for the beam to return back to the top of the screen so that it can begin scanning the next frame. This time is termed the [vertical blanking interval](https://en.wikipedia.org/wiki/Vertical_blanking_interval) or vblank. During vblank the PPU is not actively rendering a frame and so it is safe to update the state of the PPU. The NTSC NES renders at 60 frames per second, while the PAL NES renders at 50 frames per second.
 
@@ -80,3 +82,4 @@ The NES has many limitations compared to today's game consoles and personal comp
 - 2020-06-23: Minor formatting changes
 - 2020-06-27: Minor formatting changes
 - 2020-06-28: Minor formatting changes
+- 2020-08-03: Minor wording changes
