@@ -59,6 +59,7 @@ You can access the Web site via the URL `http://localhost/`.
 
 ## Services used
 
+- [Excalidraw](https://excalidraw.com/) for the hand-drawn images.
 - [Favicon Converter](https://favicon.io/favicon-converter/) for favicon generation.
 - [DrLinkCheck](https://www.drlinkcheck.com/) for checking for broken links.
 - [SVGOMG](https://jakearchibald.github.io/svgomg/) for SVG optimisation.
@@ -70,13 +71,12 @@ You can access the Web site via the URL `http://localhost/`.
 
 ## File versioning
 
-Image files are versioned by appending a `vN` style suffix to the image file name, and manually incrementing the number `N` when the image is updated.
+Image files are versioned manually. I simply add a `vN`-type suffix to the image file name when necessary, and manually increment the number `N` when the image is updated.
 
-JavaScript and CSS files are versioned automatically by the build script if they are in the `src/static` directory and have the value `.HASH` just before the file extension, e.g., `src/static/css/site.HASH.css`. A hash value is generated from the file content and replaces the `HASH` part of the file name.
+JavaScript and CSS files are versioned automatically by the build script if they are in the `src/static` directory and have include the path part `.HASH` just before the file extension, e.g., `src/static/css/site.HASH.css`. A hash value is generated from the file content and it replaces the `HASH` part of the file name.
 
-The result of this versioning is that all of these files can have a very long cache control TTL value.
+The result is that all of these files (images, JavaScript and CSS) can have very long cache control TTL values.
 
 ## TODO
 
 - Callicode - Building Docker Containers for Go Applications
-- Better subtraction explanation, referring to [this emulator info](https://stackoverflow.com/questions/29193303/6502-emulation-proper-way-to-implement-adc-and-sbc). Also [this info](https://en.wikipedia.org/wiki/Carry_flag#Vs._borrow_flag) on Wikipedia on 'subtract with carry'.

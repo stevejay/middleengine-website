@@ -42,7 +42,7 @@ As I say, I settled on storybook-chrome-screenshot and reg-suit, largely because
 
 1. I write stories.
 1. I add the storybook-chrome-screenshot decorator, indicating the widths I want it to take screenshots at.
-1. I create a bucket in S3 and add the reg-suit integration to the Github repository.
+1. I create a bucket in S3 and add the reg-suit integration to the GitHub repository.
 1. I set up [CircleCI](https://circleci.com/) so that when I create a pull request, a job runs the storybook-chrome-screenshot CLI tool.
 1. It builds and runs Storybook in a headless browser, saving all the screenshots to a directory on the CI server.
 1. The job then runs the reg-suit tool, which checks for the commit that is the parent for the branch, downloads its associated screenshots from the s3 bucket, and then diffs them with the local ones.
