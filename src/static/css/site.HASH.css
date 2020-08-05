@@ -1353,3 +1353,13 @@ body.index header.hero h1 strong {
 }
 
 /********************************/
+/*           Comments           */
+/********************************/
+
+.comments-info {
+  font-size: var(--font-size-1);
+  color: var(--color-neutral-600);
+  margin-left: calc(60px + 1em);
+}
+
+/********************************/

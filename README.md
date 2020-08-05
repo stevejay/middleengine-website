@@ -59,6 +59,7 @@ You can access the Web site via the URL `http://localhost/`.
 
 ## Services used
 
+- [Octomments](https://github.com/krasimir/octomments) to allow GitHub Issues to be used for blog post comments.
 - [Excalidraw](https://excalidraw.com/) for the hand-drawn images.
 - [Favicon Converter](https://favicon.io/favicon-converter/) for favicon generation.
 - [DrLinkCheck](https://www.drlinkcheck.com/) for checking for broken links.
