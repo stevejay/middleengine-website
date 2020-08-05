@@ -6,6 +6,7 @@ date: 2018-12-21
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 58
 ---
 
 When you are tasked with adding a new feature to a React Web app, how do you go about creating the correct visuals and behaviours? I thought today that I would describe one approach that I have found to be very effective.

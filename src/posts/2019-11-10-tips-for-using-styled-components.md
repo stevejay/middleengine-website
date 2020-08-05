@@ -6,6 +6,7 @@ date: 2019-11-10
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 52
 ---
 
 The library [Styled Components](https://styled-components.com/) is one of a number of CSS-in-JS solutions for styling Web apps. I have previously been a big fan of [CSS Modules](https://github.com/css-modules/css-modules) but, having used Styled Components on a recent project, I am now a convert. I have found some rough edges along the way so I thought I would post about how I have improved my Styled Components usage, including usage with TypeScript.

@@ -6,6 +6,7 @@ date: 2018-05-09
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 64
 ---
 
 An analogy I have for when a software developer starts working on a ticket is that the developer starts playing a game of [Snakes and Ladders](https://en.wikipedia.org/wiki/Snakes_and_Ladders). The developer might get lucky and hit ladders all the way; no blockers or complications are found and the ticket is easily completed within the anticipated time frame. The worst result is that it is snakes all the way; major issues are found and the work balloons in scope and complexity.

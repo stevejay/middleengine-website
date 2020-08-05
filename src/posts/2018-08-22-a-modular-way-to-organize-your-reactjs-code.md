@@ -6,6 +6,7 @@ date: 2018-08-22
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 61
 ---
 
 I have decided that it is time for that special rite of passage every blogging React developer undertakes: describing how I organize my application source code.
