@@ -1,15 +1,14 @@
-const issueNumberMetaTag = document.querySelector(
-  'meta[itemprop="issueNumber"]'
-);
-const issueNumber = parseInt(
-  issueNumberMetaTag.getAttribute("content") || null
-);
+document.getElementById("comments-list").innerHTML = "";
 Octomments({
   github: {
     owner: "stevejay",
     repo: "middleengine-website",
   },
-  issueNumber,
+  issueNumber: parseInt(
+    document
+      .querySelector('meta[itemprop="issueNumber"]')
+      .getAttribute("content") || null
+  ),
   renderer: [OctommentsRenderer, "#comments-list"],
   debug: false,
   endpoints: {
