@@ -1372,7 +1372,7 @@ body.index header.hero h1 strong {
 /********************************/
 
 .comments-info {
-  font-size: var(--font-size-1);
+  font-size: 0.75rem;
   color: var(--color-neutral-600);
   margin-left: calc(60px + 1em);
 }
