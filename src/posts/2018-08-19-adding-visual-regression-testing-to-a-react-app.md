@@ -6,6 +6,7 @@ date: 2018-08-19
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 63
 ---
 
 A while ago I began adopting a [lean testing](https://blog.usejournal.com/lean-testing-or-why-unit-tests-are-worse-than-you-think-b6500139a009) approach to quality control of React single page applications. I now implement the following practises:

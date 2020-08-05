@@ -6,6 +6,7 @@ date: 2015-07-22
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 68
 ---
 
 The rise and rise of cloud computing services has made it easy for developers to experiment with various enterprise deployment techniques. One of those techniques is [blue-green deployment][1], which involves provisioning two production environments and then toggling between them when deploying a new version of the system. The new code is first deployed to the staging environment, validated, and then that environment is made live, with the previously live environment becoming the new staging environment. Advantages include zero downtime when deploying and the ability to easily roll back a release. This post details how I implemented blue-green deployment in [Amazon Web Services][2] (AWS).

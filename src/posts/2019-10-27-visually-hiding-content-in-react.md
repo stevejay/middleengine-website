@@ -6,6 +6,7 @@ date: 2019-10-27
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 53
 ---
 
 I am interested in accessibility (a11y) and what patterns and practises I can adopt to improve the Web sites I work on. For example, I learned about the [roving tabindex](https://www.stefanjudis.com/today-i-learned/roving-tabindex/) pattern and I created a [React implementation](https://www.npmjs.com/package/react-roving-tabindex) in response. Another a11y pattern I have read about is including visually hidden content on a Web page to help a11y users understand and navigate the page. This is the pattern I am going to discuss today.

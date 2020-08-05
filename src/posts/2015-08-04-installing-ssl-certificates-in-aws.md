@@ -6,6 +6,7 @@ date: 2015-08-04
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 67
 ---
 
 I recently had to install an SSL certificate on a couple of load balancers in [Amazon Web Services][1] (AWS). The certificate was a [RapidSSL wildcard certificate][2]. To create the certificate, I needed to first generate a Certificate Signing Request. The request result was the content of a _pem_ file (the private key that needs to be kept secret), and the request itself. Once I had entered that request on the purchase site and had been authorized to create certificates for my domain, I was send a file package with three files in it:

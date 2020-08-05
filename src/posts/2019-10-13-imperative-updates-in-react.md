@@ -6,6 +6,7 @@ date: 2019-10-12
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 54
 ---
 
 React uses a declarative approach to rendering user interfaces (UIs). As a React developer, you create components to describe how the browser UI should look given the possible application states, and you create event handling logic for how the application state should change in response to user interactions. The changed state is passed down to child components and React updates the UI according to that new description. Exactly what browser DOM updates need to be made (what HTML elements need to be added or removed, what element attribute changes need to be made, etc.) is all determined by React. As the developer, you only need to consider what the UI should look like for a given application state. This is the power of the declarative approach to user interface development.

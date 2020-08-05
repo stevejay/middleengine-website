@@ -6,6 +6,7 @@ date: 2017-03-22
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 66
 ---
 
 I am currently doing some Web scraping and I wanted to take the approach of using AWS Lambda to run my Node.js scraper code.

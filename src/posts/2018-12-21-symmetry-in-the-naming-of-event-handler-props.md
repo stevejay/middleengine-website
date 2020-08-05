@@ -6,6 +6,7 @@ date: 2018-12-21
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 57
 ---
 
 In React, there is a common pattern used when naming event handler props and methods that uses the prefixes `on` and `handle`. Today I thought I would detail how it works.

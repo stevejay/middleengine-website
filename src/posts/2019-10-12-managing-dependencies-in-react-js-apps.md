@@ -6,6 +6,7 @@ date: 2019-10-12
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
+issueNumber: 55
 ---
 
 Managing dependencies in a simple React application tends to be straightforward. You are probably the only developer working it, it does not contain many source files, and those files are probably organized [by file type](https://reactjs.org/docs/faq-structure.html#grouping-by-file-type). Dependencies between files are usually easy to keep track of and do not cause issues. However, with a more complex React application, it is probably being written and maintained by multiple developers, there are many source files, and those files are probably [grouped into modules](https://engineering.kapost.com/2016/01/organizing-large-react-applications/). Without some way to police the dependencies between modules, those dependencies can quickly become a mess, since in JavaScript we are free to import any file from any other file, regardless of whether that creates circular dependencies or whether a file is intended to be used by other modules or not.
