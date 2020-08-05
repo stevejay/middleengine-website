@@ -133,6 +133,7 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
   const filePath = `${urlPath}.html`;
 
   if (markdownIt.meta.draft) {
+    // && buildPostName !== "test") {
     console.log(`Draft blog post URL: ${urlPath}`);
   }
 
