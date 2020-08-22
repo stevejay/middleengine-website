@@ -17,7 +17,7 @@ The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is
 
 ## CPU and GPU canvases
 
-In rendering content to a given `<canvas>` element or `OffscreenCanvas`, browsers can choose to do so using either the CPU or the [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit). In this post I refer to the former as a CPU canvas and the latter as a GPU canvas. Generally a GPU canvas is preferred because rendering is hardware accelerated, but both approaches have advantages and disadvantages. Because of this, the browser might include complex heuristics for deciding which approach to use, potentially even [changing approach after the initial decision](https://www.reddit.com/r/javascript/comments/ac9hdb/calling_getimagedata_potentially_puts_you_canvas/) in response to how it sees the canvas is being used. [This file](https://chromium.googlesource.com/chromium/src/+/41d279a5476937a3981a8413be722d42da0de0d2/third_party/WebKit/Source/platform/graphics/ExpensiveCanvasHeuristicParameters.h) is an example of the heuristics used in an older version of the [Blink](<https://en.wikipedia.org/wiki/Blink_(browser_engine)>) browser engine.
+When rendering content to a given `<canvas>` element or `OffscreenCanvas`, browsers can choose to use either the CPU or the [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit). In this post I refer to the former as a CPU canvas and the latter as a GPU canvas. Generally a GPU canvas is preferred because rendering is hardware accelerated, but both approaches have advantages and disadvantages. Because of this, the browser might include complex heuristics for deciding which approach to use, potentially even [changing approach after the initial decision](https://www.reddit.com/r/javascript/comments/ac9hdb/calling_getimagedata_potentially_puts_you_canvas/) in response to how it sees the canvas is being used. [This file](https://chromium.googlesource.com/chromium/src/+/41d279a5476937a3981a8413be722d42da0de0d2/third_party/WebKit/Source/platform/graphics/ExpensiveCanvasHeuristicParameters.h) is an example of the heuristics used in an older version of the [Blink](<https://en.wikipedia.org/wiki/Blink_(browser_engine)>) browser engine.
 
 One potential and simple heuristic is the size of the canvas: a very small or very large canvas might be better as a CPU canvas. There is some discussion about how canvas size is important [here in the Blink developers group](https://groups.google.com/a/chromium.org/g/blink-dev/c/NPSQdiXSK4w/m/jgzIaJPJxh8J). The browser might also choose to create any new canvases as CPU canvases regardless of their size if there are already many GPU canvases.
 
@@ -137,6 +137,31 @@ There is no page freezing when this test suite is run, but the results are consi
 
 My suspicion is that the destination canvas gets turned into a CPU canvas because of the calls to `getImageData`, and so these results are without hardware acceleration. It is noticeable just how much slower these results are compared to those from the previous test suite. This demonstrates just how much of a performance hit it can be if the browser runs a canvas as a CPU canvas rather than as a GPU canvas.
 
+### Limited results for the `drawImage` method performance tests
+
+I created two test suites for performance testing the `drawImage` method, both using `createImageBitmap` for flushing:
+
+- [Scaling up performance](https://jsbench.me/ooke36wtsw/1), which is the test suite from the previous section.
+- [Scaling down performance](https://jsbench.me/cake67gtlb/1).
+
+I performed these tests from Chrome v84 on macOS v10.15 using a mid-2014 i5 MacBook Pro. The following is an example test run result for scaling up performance (duplicated from the previous section):
+
+| Test                                                                     | Result                 |
+| ------------------------------------------------------------------------ | ---------------------- |
+| Scaling from a 300x300 canvas area to a 300x300 canvas area (no scaling) | 1435.57 ops/s ± 17.99% |
+| Scaling from a 300x300 canvas area to a 900x900 canvas area              | 848.19 ops/s ± 8.88%   |
+| Scaling from a 300x300 canvas area to a 3000x3000 canvas area            | 480.4 ops/s ± 31.48%   |
+
+The following is an example test run result for scaling down performance:
+
+| Test                                                                         | Result                |
+| ---------------------------------------------------------------------------- | --------------------- |
+| Scaling from a 3000x3000 canvas area to a 300x300 canvas area                | 1018.38 ops/s ± 22.7% |
+| Scaling from a 3000x3000 canvas area to a 900x900 canvas area                | 502.38 ops/s ± 21.1%  |
+| Scaling from a 3000x3000 canvas area to a 3000x3000 canvas area (no scaling) | 317.33 ops/s ± 5.64%  |
+
+The most significant factor in performance is the size of the destination image: the smaller the destination image, the better the performance. Even when scaling from a large image to a small image, the performance was over 1000 operation per seconds. That said, the size of the source image does also affect performance, with smaller source images producing better results than larger source images.
+
 ## Layered canvas issues
 
 A recommended optimisation when using a `<canvas>` element to render a complex scene is to [use multiple canvases layered together](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas) rather than a single canvas. Imagine that you are creating an image editor that supports multiple layers, but the user can only draw to the currently selected layer. One approach is to use a single `<canvas>` element to display all of the layers, but this will be inefficient: you have to redraw all of the layers whenever the user draws to the current layer, even though the layers above and the layers below have not changed. A better approach is to use three `<canvas>` elements, one for the layers below, one for the current layer, and one for the layers above. Now you only need to redraw the current layer's `<canvas>` element when the user draws to it, although in some situations you still need to redraw all of the canvases, such as when zooming into or out of the image.
@@ -145,17 +170,17 @@ I was interested in using the new and experimental [`HTMLCanvasElement.transferC
 
 I can demonstrate this with a test that uses two canvases of the same size layered together. On one I draw a grey square. On the other I fill the entire canvas with that gray colour but I erase the area covered by that grey square:
 
-![](/images/2020-08-22-observations-when-using-the-html-canvas-element-for-web-browsers/canvas-rendering-test-image-2x.png "Canvas test with two layered canvases")
+![](/images/2020-08-22-observations-when-using-the-canvas-web-api/canvas-rendering-test-image-2x.png "Canvas test with two layered canvases")
 
 There is a slider that controls the size of the grey square, simulating zooming in and out of the image. The color behind the canvases is [rebeccapurple](https://medium.com/@valgaze/the-hidden-purple-memorial-in-your-web-browser-7d84813bb416). When the slider is moved, both canvases get updated to show the new size for the square. If the two canvases always get updated on the same frame then the purple background will never be visible. However, if the canvases get updated on different frames then there will be a moment when one canvas will have been updated with the new square size while the other canvas will still be displaying the old square. Depending on the exact zoom change, the purple background may become momentarily visible.
 
 I tried this test in Chrome v84 on macOS v10.15 (Catalina), once when the canvas updates are performed on the main thread and once when they are performed on the Web Worker. When they are performed on the main thread then I _never_ see the purple background but I regularly do when they are performed on the Web Worker:
 
-![](/images/2020-08-22-observations-when-using-the-html-canvas-element-for-web-browsers/tearing-1-2x.gif "Tearing when using a Web Worker for canvas updates")
+![](/images/2020-08-22-observations-when-using-the-canvas-web-api/tearing-1-2x.gif "Tearing when using a Web Worker for canvas updates")
 
 Also using the Web Worker, I sometimes see nasty flashes:
 
-![](/images/2020-08-22-observations-when-using-the-html-canvas-element-for-web-browsers/tearing-2-2x.gif "Flashes when using a Web Worker for canvas updates")
+![](/images/2020-08-22-observations-when-using-the-canvas-web-api/tearing-2-2x.gif "Flashes when using a Web Worker for canvas updates")
 
 This test HTML file is available [here](/iframes/canvas-tearing.html) if you wish to run it yourself. It will only work in a browser that supports [`HTMLCanvasElement.transferControlToOffscreen`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/transferControlToOffscreen). It should be stressed that this feature is experimental and hopefully the issues I have seen will be rectified in due course.
 
