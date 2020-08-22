@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Canvas tearing example</title>
+    <script id="worker" type="javascript/worker">
+      let zoomLevel = 10;
+      let raf = null;
+      let canvases = null;
+
+      var onmessage = function ({ data: { type, payload } }) {
+        switch (type) {
+          case "ZOOM":
+            {
+              zoomLevel = payload.zoomLevel;
+            }
+            break;
+          case "TRANSFER_CANVASES":
+            {
+              canvases = payload.canvases;
+            }
+            break;
+        }
+
+        if (!raf) {
+          raf = requestAnimationFrame(() => {
+            raf = null;
+            const centerX = 200;
+            const centerY = 200;
+            const dimension = zoomLevel * 3;
+
+            let canvas = canvases[0];
+            let context = canvas.getContext("2d");
+            context.fillStyle = "gray";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.globalCompositeOperation = "destination-out";
+            context.fillRect(
+              centerX - dimension,
+              centerY - dimension,
+              dimension << 1,
+              dimension << 1
+            );
+            context.globalCompositeOperation = "source-over";
+
+            canvas = canvases[1];
+            context = canvas.getContext("2d");
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = "gray";
+            context.fillRect(
+              centerX - dimension,
+              centerY - dimension,
+              dimension << 1,
+              dimension << 1
+            );
+          });
+        }
+      };
+    </script>
+    <script type="text/javascript">
+      let raf = null;
+      let zoomLevel = 10;
+      let worker = null;
+      let direction = "up";
+
+      function handleLoad() {
+        const blob = new Blob([document.querySelector("#worker").textContent], {
+          type: "text/javascript",
+        });
+        worker = new Worker(window.URL.createObjectURL(blob));
+
+        const canvasOne = document.getElementById("canvas-one");
+        const canvasTwo = document.getElementById("canvas-two");
+        const offscreenCanvases = [
+          canvasOne.transferControlToOffscreen(),
+          canvasTwo.transferControlToOffscreen(),
+        ];
+        worker.postMessage(
+          {
+            type: "TRANSFER_CANVASES",
+            payload: {
+              canvases: offscreenCanvases,
+            },
+          },
+          offscreenCanvases
+        );
+
+        const sliderOne = document.getElementById("slider-one");
+        sliderOne.addEventListener("input", (event) => {
+          worker.postMessage({
+            type: "ZOOM",
+            payload: { zoomLevel: parseInt(event.target.value, 10) },
+          });
+        });
+
+        const sliderTwo = document.getElementById("slider-two");
+        sliderTwo.addEventListener("input", (event) => {
+          zoomLevel = parseInt(event.target.value, 10);
+          if (!raf) {
+            raf = requestAnimationFrame(rafCallback);
+          }
+        });
+
+        raf = requestAnimationFrame(rafCallback);
+      }
+
+      function rafCallback() {
+        raf = null;
+        const centerX = 250;
+        const centerY = 250;
+        const dimension = zoomLevel * 3;
+
+        let canvas = document.getElementById("canvas-three");
+        let context = canvas.getContext("2d");
+        context.fillStyle = "gray";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.globalCompositeOperation = "destination-out";
+        context.fillRect(
+          centerX - dimension,
+          centerY - dimension,
+          dimension << 1,
+          dimension << 1
+        );
+        context.globalCompositeOperation = "source-over";
+
+        canvas = document.getElementById("canvas-four");
+        context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "gray";
+        context.fillRect(
+          centerX - dimension,
+          centerY - dimension,
+          dimension << 1,
+          dimension << 1
+        );
+      }
+    </script>
+    <style type="text/css">
+      body {
+        margin: 0;
+      }
+
+      main {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .canvas-wrap {
+        position: relative;
+        background-color: rebeccapurple;
+        width: 400px;
+        height: 400px;
+      }
+
+      .canvas-wrap > * {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .canvas-wrap > canvas {
+        image-rendering: pixelated;
+      }
+
+      input {
+        height: 30px;
+        width: 400px;
+      }
+
+      h2 {
+        font-family: sans-serif;
+        font-size: 1rem;
+        text-transform: uppercase;
+        margin: 0.25rem 0 0 0.25rem;
+      }
+    </style>
+  </head>
+  <body onload="handleLoad()">
+    <main>
+      <div class="canvas-wrap">
+        <canvas id="canvas-one" width="400px" height="400px"></canvas>
+        <canvas id="canvas-two" width="400px" height="400px"></canvas>
+        <h2>Web Worker</h2>
+      </div>
+      <input
+        id="slider-one"
+        type="range"
+        min="1"
+        max="64"
+        value="10"
+        step="1"
+      />
+      <div class="canvas-wrap">
+        <canvas id="canvas-three" width="400px" height="400px"></canvas>
+        <canvas id="canvas-four" width="400px" height="400px"></canvas>
+        <h2>Main thread</h2>
+      </div>
+      <input
+        id="slider-two"
+        type="range"
+        min="1"
+        max="64"
+        value="10"
+        step="1"
+      />
+    </main>
+  </body>
+</html>

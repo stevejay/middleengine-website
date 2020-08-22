@@ -431,6 +431,7 @@ void (async () => {
         }
       } catch (err) {
         console.error(`Build error: ${err.message}`);
+        buildInProgress = false;
       }
     }, WATCH_DEBOUNCE_MS);
 

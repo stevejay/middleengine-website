@@ -21,9 +21,9 @@ As stated in the introduction, blue-green deployment requires two production env
 
 I used [packer.io][8] to create the AMIs. I first created a generic AMI with [nginx][22] and [Node.js][23] installed on it. (The scripts for this are in the _webserver_ directory.) Then I used this as the base AMI for generating another AMI, this one with the Web site and Web API code installed on it, with the new launch configuration referencing that AMI. I also used [ServerSpec][13] to automatically test each generated AMI. (The scripts for creating the second AMI are in the _deployment/webserver_ directory.)
 
-I used [Elastic Load Balancing][9] (ELB) to route traffic to the instances in an environment. There are two load balancers, one for each of the two production environments (live and staging). I used [alias records][10] in [Route 53][11] to route traffic to a particular load balancer. So, for a request to the Web service or the Web site, it gets routed by Route 53 to the appropriate load balancer, which in turn forwards the request to one of the instances in the autoscaling group it balances the load for. I also made use of [SSL termination][14] in the load balancers to simplify the setup of the instances, since they then only need to handle HTTP traffic.
+I used [Elastic Load Balancing][9] (ELB) to route traffic to the instances in an environment. There are two load balancers, one for each of the two production environments (live and staging). I used [alias records][10] in [Route 53][11] to route traffic to a particular load balancer. So, for a request to the Web service or the Web site, it gets routed by Route 53 to the appropriate load balancer, which in turn forwards the request to one of the instances in the autoscaling group it balances the load for. I also made use of [SSL termination][14] in the load balancers to simplify the set-up of the instances, since they then only need to handle HTTP traffic.
 
-## Security setup
+## Security set-up
 
 I created a private [Virtual Private Cloud][12] (VPC) for the site, rather than using the default VPC:
 
@@ -80,7 +80,7 @@ While I set this up so that the public hosted zone points to the first load bala
 
 ## Deploying to the Staging environment
 
-The setup is now complete, so lets start deploying some code the blue-green way! I decided that I needed three distinct steps to the deployment process:
+The set-up is now complete, so lets start deploying some code the blue-green way! I decided that I needed three distinct steps to the deployment process:
 
 1. Deploying the new code to the staging environment (deploy to staging).
 2. Altering the alias records in Route 53 to switch the live and staging environments (switch live and staging).

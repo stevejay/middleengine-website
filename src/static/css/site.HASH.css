@@ -12,6 +12,7 @@
 
   --color-secondary: #549809;
   --color-secondary-500: #78bd2d;
+  --color-secondary-100: #effae6;
 
   --color-white: #ffffff;
   --color-neutral-50: #fafafa;
@@ -121,6 +122,7 @@ h6 {
   font-weight: var(--font-weight-heading-bold);
   font-style: italic;
   line-height: 1.2;
+  overflow-wrap: break-word;
 }
 
 h1 {
@@ -271,6 +273,14 @@ ol > li {
 hr {
   margin-top: var(--space-6);
   margin-bottom: var(--space-6);
+}
+
+/********************************/
+/*          Paragraph           */
+/********************************/
+
+p {
+  overflow-wrap: break-word;
 }
 
 /********************************/
@@ -808,6 +818,18 @@ main > article > .article-body > :last-child {
   main > article > .article-body {
     padding: var(--space-6) var(--space-5) var(--space-7);
   }
+}
+
+/********************************/
+/*            Note              */
+/********************************/
+
+.note {
+  font-size: var(--font-size-1);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-secondary-100);
+  border: var(--width-hair) solid var(--color-secondary);
+  border-radius: var(--radius-2);
 }
 
 /********************************/
