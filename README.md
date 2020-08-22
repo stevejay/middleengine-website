@@ -82,3 +82,4 @@ The result is that all of these files (images, JavaScript and CSS) can have very
 
 - Callicode - Building Docker Containers for Go Applications.
 - Lazy load the comments.
+- Recover from build error when file not found (e.g. image file)
