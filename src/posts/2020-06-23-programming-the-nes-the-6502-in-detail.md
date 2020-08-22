@@ -2109,7 +2109,7 @@ Since only one page of memory is allocated to the stack, there is a limit to how
 
 The MOS MCS6500 microcomputer family programming manual has the following guidance regarding when to use subroutines:
 
-> [T]he use of subroutines should be limited to those cases where the user expects to duplicate code of significant length several times in the program. In these cases, and only in these cases, is subroutine call warranted rather than the normal mode of knowing the addresses and specifying them in an instruction. In all cases where timing [is] of significant interest, subroutines should also be avoided. Subroutines add significantly to the set-up and execution time of problem solution.
+> [T]he use of subroutines should be limited to those cases where the user expects to duplicate code of significant length several times in the program. In these cases, and only in these cases, is subroutine call warranted rather than the normal mode of knowing the addresses and specifying them in an instruction. In all cases where timing [is] of significant interest, subroutines should also be avoided. Subroutines add significantly to the setup and execution time of problem solution.
 > — [Section 8.8, MOS MCS6500 microcomputer family programming manual](http://users.telenet.be/kim1-6502/6502/proman.html#88)
 
 When entering a subroutine, it is sometimes not only the current value of the Program Counter that needs to be stored on the stack. Consider a scenario where you have a particular value in the Accumulator and you then call a subroutine. The subroutine might load a different value into the Accumulator, overwriting that original value. When the subroutine returns, you would not be able to just pick up from where you were before.
