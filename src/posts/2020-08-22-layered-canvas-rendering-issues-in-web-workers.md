@@ -12,7 +12,9 @@ issueNumber: 77
 
 ## Introduction
 
-A recommended optimisation when using a [`<canvas>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) HTML element to render a complex scene is to [use multiple canvases layered together](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas), rather than just a single canvas. This post details two rendering issues that I have found in Chrome when rendering to layered canvases from Web Workers.
+A recommended optimisation when using a [`<canvas>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) HTML element to render a complex scene is to [use multiple canvases layered together](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas), rather than just a single canvas. This post details two rendering issues that I found in Chrome when using the [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) to render to layered canvases from within a Web Worker.
+
+**Note:** The `<canvas>` element also supports displaying 3D graphics using the [WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API), but in this post I have only looked at using the 2D Canvas API for rendering.{class=note}
 
 ## Web Workers and layered canvases
 
@@ -24,7 +26,7 @@ The image editor uses the layered canvases optimisation. Imagine that you are cr
 
 I soon saw a problem with the image editor conversion: when all of the layered canvases need to be redrawn at the same time, for example when zooming in or out, all of the updates do not necessarily occur on the same frame. This is despite that fact that I issue all of the updates within the same `requestAnimationFrame` callback. The result can be tearing, where one canvas layer has been updated with the new image data but the other canvas layers have not and so they still display the old image data. Importantly, this tearing does not happen _at all_ if rendering is performed on the main thread.
 
-For the purposes of this post, I have created a simple demonstration widget that consists of two equal-sized canvases, one on top of the other. I draw a grey square in the centre of the upper canvas. I fill the lower canvas with that same grey color but I erase the area that is covered by the square on the upper canvas:
+For the purposes of this post, I have created a simple demonstration widget that consists of two equal-sized canvases, one on top of the other. Using the Canvas API, I draw a grey square in the centre of the upper canvas. I then fill the lower canvas with that same grey color but I erase the area that is covered by the square on the upper canvas:
 
 ![](/images/2020-08-22-layered-canvas-rendering-issues-in-web-workers/canvas-rendering-test-image-2x.png "Canvas test with two layered canvases")
 
@@ -42,7 +44,7 @@ If you want to try this test for yourself then the HTML file I used is available
 
 ## Conclusion
 
-Rendering to a canvas from a Web Worker has issues with timing and glitching in Chrome that may impact the common rendering optimisation of using layered canvases for complex scenes. This is something to be aware of if you are looking to move rendering off of your Web app's main thread and onto a Web Worker. That said, I must stress that this is an experimental feature and hopefully the issues I have seen will be rectified in due course.
+Rendering to a canvas using the Canvas API from a Web Worker has issues with timing and glitching in Chrome that may impact the common rendering optimisation of using layered canvases for complex scenes. This is something to be aware of if you are looking to move rendering off of your Web app's main thread and onto a Web Worker. That said, I must stress that this is an experimental feature and hopefully the issues I have seen will be rectified in due course.
 
 ---
 

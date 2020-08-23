@@ -12,9 +12,9 @@ issueNumber: 76
 
 ## Introduction
 
-The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is a rich and performant API for drawing and manipulating two-dimensional (2D) graphics in a Web browser. Drawing can be performed using the [`<canvas>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) HTML element or an [`OffscreenCanvas`](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas). When rendering content to a canvas, the browser can choose to use either the CPU or the [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit). This post examines how this decision is made and what effect this can have on rendering performance.
+The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is a rich and performant API for drawing and manipulating 2D graphics in a Web browser. Drawing can be performed using the [`<canvas>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) HTML element or an [`OffscreenCanvas`](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas). When rendering content to a canvas, the browser can choose to use either the CPU or the [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit). This post examines how this decision is made and what effect this can have on rendering performance.
 
-**Note:** The `<canvas>` element also supports displaying three-dimensional (3D) graphics using the [WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API), but in this post I focus solely on its use in 2D graphics.{class=note}
+**Note:** The `<canvas>` element also supports displaying 3D graphics using the [WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API), but in this post I focus solely on its use in 2D graphics.{class=note}
 
 ## Browser heuristics
 
