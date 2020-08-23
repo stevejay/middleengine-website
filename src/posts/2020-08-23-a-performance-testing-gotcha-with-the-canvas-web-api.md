@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Observations when using the Canvas Web API"
-summary: Various behaviours that I have observed when using the Canvas API to render 2D graphics in Web browsers.
-date: 2020-08-22
+title: "A performance testing gotcha with the Canvas Web API"
+summary: A description of a gotcha that you might come across when trying to test the performance of methods of the Canvas API.
+date: 2020-08-23
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
@@ -11,25 +11,11 @@ draft: true
 
 ## Introduction
 
-The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is a rich and performant API for drawing and manipulating two-dimensional (2D) graphics in a Web browser. Drawing can be performed using the [`<canvas>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) HTML element or an [`OffscreenCanvas`](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas). Having recently used the Canvas API, I have observed certain interesting behaviours and I thought it would be useful to detail them in a blog post.
+The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is a rich and performant API for drawing and manipulating two-dimensional (2D) graphics in a Web browser. This blog post details a gotcha that I found when performance testing its methods, in particular when trying to test the [`drawImage`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage) method.
 
-**Note:** The `<canvas>` element also supports displaying three-dimensional (3D) graphics using the [WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API), but in this post I focus solely on its use in 2D graphics.{class=note}
+## The initial attempt
 
-## CPU and GPU canvases
-
-When rendering content to a given `<canvas>` element or `OffscreenCanvas`, browsers can choose to use either the CPU or the [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit). I use the term _CPU canvas_ for a canvas that the browser is using the CPU to render to, and the term _GPU canvas_ when the browser is instead using the GPU. Generally a GPU canvas is preferred because rendering is hardware accelerated, but both approaches have advantages and disadvantages. Because of this, the browser might include complex heuristics for deciding which approach to use, potentially even [changing approach after the initial decision](https://www.reddit.com/r/javascript/comments/ac9hdb/calling_getimagedata_potentially_puts_you_canvas/) in response to how it sees the canvas is being used. [This file](https://chromium.googlesource.com/chromium/src/+/41d279a5476937a3981a8413be722d42da0de0d2/third_party/WebKit/Source/platform/graphics/ExpensiveCanvasHeuristicParameters.h) is an example of the heuristics used in an older version of the [Blink](<https://en.wikipedia.org/wiki/Blink_(browser_engine)>) browser engine.
-
-One potential and simple heuristic is the size of the canvas: a very small or very large canvas might be better as a CPU canvas. There is some discussion about how canvas size is important [here in the Blink developers group](https://groups.google.com/a/chromium.org/g/blink-dev/c/NPSQdiXSK4w/m/jgzIaJPJxh8J). The browser might also choose to create any new canvases as CPU canvases regardless of their size if there are already many GPU canvases.
-
-A very important heuristic is whether or not [`CanvasRenderingContext2D.getImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData) and [`CanvasRenderingContext2D.putImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData) are used with the canvas. Generally these two methods are used to read the values of particular pixels to process them in some way, such as applying a desaturation filter to an image, and they are handled by the CPU not the GPU. If the canvas is a GPU canvas then these methods require a GPU to CPU transfer of the pixel data (sometimes termed a GPU readback) which is [well known for being a slow operation](https://superuser.com/questions/1478985/why-is-there-a-bottleneck-sending-data-from-a-gpu-to-a-cpu-but-less-so-from-cp). It might in fact be better for this canvas to be a CPU canvas to avoid the overhead of GPU readbacks. Indeed, browsers are starting to support a new [`willReadFrequently`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext) 2D canvas context attribute that allows you to request a CPU canvas when you know that your use case will benefit from one.
-
-The use of heuristics points to a fundamental limitation of the Canvas API: you are beholden to the browser as to whether a given canvas is a CPU canvas or a GPU canvas. Although the `willReadFrequently` attribute will ensure that you can get a CPU canvas when you need one, you are otherwise relying on heuristics and they can change between browser versions. It is possible for one version of a browser to determine that a given canvas should be a GPU canvas rather than a CPU canvas and for another version to make the opposite determination. This lack of control over GPU acceleration is [one reason that Figma gave](https://www.figma.com/blog/building-a-professional-design-tool-on-the-web/) for opting to use WebGL rather than the 2D Canvas API.
-
-If you have a canvas that uses `getImageData` and/or `putImageData` only sparingly then I suggest removing those usages to help prevent triggering a CPU canvas now or in the future. Instead, use a temporary canvas for those operations. When using `getImageData`, first use [`drawImage`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage) to copy the pixels of interest to the temporary canvas and then only use `getImageData` on that temporary canvas. When using `putImageData`, use it to write to the temporary canvas and then use `drawImage` to copy from that temporary canvas to the destination canvas. You should also consider if WebGL would be a better choice for canvas rendering in your app.
-
-## Performance testing the `drawImage` method
-
-The [`drawImage`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage) method of the Canvas API is a synchronous method that allows you to draw an image to a `<canvas>` element or an `OffscreenCanvas`. It accepts several types of image source, including another `<canvas>` element, and it allows you to crop and/or scale the image at the same time. I was interested to understand the performance cost of scaling for various combinations of source and target image sizes, and so I created [this performance test suite](https://jsbench.me/1dke2mcybs/2) on the [JSBench.me](https://jsbench.me/) Web site.
+The [`drawImage`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage) method of the Canvas API is a synchronous method that allows you to draw an image to a `<canvas>` element or an `OffscreenCanvas`. It accepts several types of image source and it allows you to crop and/or scale the image at the same time. I was interested to understand the performance cost of scaling for various combinations of source and target image sizes, and so I created [this performance test suite](https://jsbench.me/1dke2mcybs/2) on the [JSBench.me](https://jsbench.me/) Web site.
 
 The test is quite simple. In the set-up I create a small source `<canvas>` element and a large destination `<canvas>` element. Then in each test I just invoke `drawImage` with some particular set of parameters:
 
@@ -47,9 +33,11 @@ $destContext.drawImage(
 );
 ```
 
-However, when I ran the test in Chrome v84 on macOS v10.15 (Catalina), the browser and indeed the OS first froze and then a few moments later my laptop crashed. I tried creating [a new test](https://jsbench.me/nmke2uordl/1) with a smaller destination canvas, which prevented a crash but still froze the Web page for the duration. On checking the test result, I decided that it seemed too good to be true: the browser was apparently able to manage over 300,000 `drawImage` operations per second.
+However, when I ran the test in Chrome v84 on macOS v10.15 (Catalina), the browser and indeed the OS froze and then a few moments later my laptop crashed. I tried creating [a new test](https://jsbench.me/nmke2uordl/1) with a smaller destination canvas, which prevented a crash but still froze the Web page for the duration. On checking the test result, I decided that it seemed too good to be true: the browser was apparently able to manage over 300,000 `drawImage` operations per second.
 
 My understanding for this behaviour is that the `drawImage` call does not necessarily execute the specified drawing action immediately, but rather that action normally gets deferred as part of a batching mechanism used to reduce the number of GPU render calls. (These calls are expensive so it is worthwhile for the browser to perform this optimisation.) This means that the `drawImage` call itself executes very quickly, giving the appearance of a fast function that the JSBench.me code opts to invoke many times, presumably to improve the accuracy of the benchmark. Thus there will be many pending `drawImage` actions which, when flushed, take time and computing resources to execute, potentially enough to crash the computer.
+
+## Finding a fix
 
 I reasoned that the answer was to somehow cause the batched action to be flushed within the test body. The WebKit performance tests in the Chromium source code include tests for `drawImage` [like this one](https://github.com/chromium/chromium/blob/2ca8c5037021c9d2ecc00b787d58a31ed8fc8bcb/third_party/blink/perf_tests/canvas/draw-dynamic-canvas-2d-to-hw-accelerated-canvas-2d.html) and those use a completion action to trigger flushing:
 
@@ -135,9 +123,9 @@ There is no page freezing when this test suite is run, but the results are consi
 | Scaling from a 300x300 canvas area to a 900x900 canvas area              | 8.29 ops/s ± 5.9%   |
 | Scaling from a 300x300 canvas area to a 3000x3000 canvas area            | 8.36 ops/s ± 2.74%  |
 
-My suspicion is that the destination canvas gets turned into a CPU canvas because of the calls to `getImageData`, and so these results are without hardware acceleration. It is noticeable just how much slower these results are compared to those from the previous test suite. This demonstrates just how much of a performance hit it can be if the browser runs a canvas as a CPU canvas rather than as a GPU canvas.
+My suspicion is that the destination canvas gets turned into a CPU canvas because of the calls to `getImageData`, and so these results are without hardware acceleration. It is noticeable just how much slower these results are compared to those from the previous test suite. This demonstrates just how much of a performance hit it can be if the browser runs a canvas as a CPU canvas rather than as a GPU canvas. See this post for more discussion on this topic.
 
-### Limited results for the `drawImage` method performance tests
+### Some results for the `drawImage` method performance tests
 
 I created two test suites for performance testing the `drawImage` method, both using `createImageBitmap` for flushing:
 
@@ -161,6 +149,10 @@ The following is an example test run result for scaling down performance:
 | Scaling from a 3000x3000 canvas area to a 3000x3000 canvas area (no scaling) | 317.33 ops/s ± 5.64%  |
 
 The most significant factor in performance is the size of the destination image: the smaller the destination image, the better the performance. Even when scaling from a large image to a small image, the performance was over 1000 operation per seconds. That said, the size of the source image does also affect performance, with smaller source images producing better results than larger source images.
+
+## Conclusion
+
+Performance testing in general can be difficult to do well and consistently, and in the case of the Canvas API some information is required about how browsers work internally in order to avoid problems. In this case finding a way to flush the pending draw actions solved the problems encountered.
 
 ## Layered canvas issues
 

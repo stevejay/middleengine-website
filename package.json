@@ -20,7 +20,7 @@
     "get-port": "^5.1.1",
     "handlebars": "^4.7.6",
     "handlebars-intl": "^1.1.2",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.20",
     "markdown-it": "^11.0.0",
     "markdown-it-anchor": "^5.3.0",
     "markdown-it-attribution": "^0.1.1",
