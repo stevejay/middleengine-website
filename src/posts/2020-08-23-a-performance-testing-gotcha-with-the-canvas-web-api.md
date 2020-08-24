@@ -125,4 +125,4 @@ Performance testing in general can be difficult to do well and consistently, and
 
 ## Changelog
 
-- 2020-08-23 Initial version
+- 2020-08-24 Initial version

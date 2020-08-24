@@ -6,7 +6,6 @@ date: 2020-08-21
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-draft: true
 issueNumber: 76
 ---
 
@@ -74,4 +73,4 @@ The Canvas API is in theory a performant and easy-to-use API for drawing and man
 
 ## Changelog
 
-- 2020-08-21 Initial version
+- 2020-08-24 Initial version

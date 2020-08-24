@@ -6,7 +6,6 @@ date: 2020-08-22
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-draft: true
 issueNumber: 77
 ---
 
@@ -50,4 +49,4 @@ Rendering to a canvas using the Canvas API from a Web Worker has issues with tim
 
 ## Changelog
 
-- 2020-08-22 Initial version
+- 2020-08-24 Initial version
