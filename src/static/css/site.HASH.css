@@ -824,12 +824,29 @@ main > article > .article-body > :last-child {
 /*            Note              */
 /********************************/
 
-.note {
+.note,
+.warning-note,
+.success-note {
   font-size: var(--font-size-1);
   padding: var(--space-2) var(--space-3);
-  background-color: var(--color-secondary-100);
-  border: var(--width-hair) solid var(--color-secondary);
+  border-width: var(--width-hair);
+  border-style: solid;
   border-radius: var(--radius-2);
+}
+
+.note {
+  background-color: #fefcea;
+  border-color: var(--color-primary-500);
+}
+
+.warning-note {
+  background-color: #f8d7da;
+  border-color: #d86975;
+}
+
+.success-note {
+  background-color: var(--color-secondary-100);
+  border-color: var(--color-secondary);
 }
 
 /********************************/
