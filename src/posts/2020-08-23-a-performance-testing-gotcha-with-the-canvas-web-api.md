@@ -50,8 +50,8 @@ $destContext.drawImage($destCanvas, 0, 0, 1, 1, 0, 0, 1, 1);
 
 I still found issues with the page freezing in Chrome on macOS but more importantly I saw significant variance in execution time of greater than ±100% for the first test. In theory an alternative way to force a flush is to read from the destination canvas immediately after writing to it. There are two ways that I know of to read pixel data from a canvas:
 
-- [`CanvasRenderingContext2D.getImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData)
-- [`createImageBitmap`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap)
+- [`CanvasRenderingContext2D.getImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData).
+- [`createImageBitmap`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap) (not supported in Safari).
 
 Using `createImageBitmap` works well and the resulting performance test suite can be found [here](https://jsbench.me/ooke36wtsw/1). The following is an example test from that test suite:
 
@@ -89,6 +89,8 @@ Again I only read the image data for a single pixel. There is no page freezing w
 
 My suspicion is that the destination canvas gets turned into a CPU canvas because of the calls to `getImageData`, and so these results are without hardware acceleration. It is noticeable how much slower these results are compared to those from the previous test suite. This demonstrates how much of a performance hit it can be if the browser runs a canvas as a CPU canvas rather than as a GPU canvas. For more on this topic, please see [my post here](/blog/posts/2020/08/21/cpu-versus-gpu-with-the-canvas-web-api).
 
+Note that the method you use for flushing might need to vary depending on the browser or even the browser version. You would have to experiment with the approaches given in this post.
+
 ## Some results for the `drawImage` method performance tests
 
 I created two test suites for performance testing the `drawImage` method, both using `createImageBitmap` for flushing:
@@ -96,23 +98,25 @@ I created two test suites for performance testing the `drawImage` method, both u
 - [Scaling up performance](https://jsbench.me/ooke36wtsw/1) (the test suite from the previous section).
 - [Scaling down performance](https://jsbench.me/cake67gtlb/1).
 
-I performed these tests from Chrome v84 on macOS v10.15 using a mid-2014 i5 MacBook Pro. The following is an example test run result for scaling up performance (duplicated from the previous section):
+I performed these tests in Chrome v84 and Edge v84 on macOS v10.15 using a mid-2014 i5 MacBook Pro. The following is an example test run result for scaling up performance (duplicated from the previous section):
 
 | Test                                                                     | Result                 |
 | ------------------------------------------------------------------------ | ---------------------- |
-| Scaling from a 300x300 canvas area to a 300x300 canvas area (no scaling) | 1435.57 ops/s ± 17.99% |
-| Scaling from a 300x300 canvas area to a 900x900 canvas area              | 848.19 ops/s ± 8.88%   |
-| Scaling from a 300x300 canvas area to a 3000x3000 canvas area            | 480.4 ops/s ± 31.48%   |
+| Scaling from a 300x300 canvas area to a 300x300 canvas area (no scaling) | 1192.83 ops/s ± 17.05% |
+| Scaling from a 300x300 canvas area to a 900x900 canvas area              | 794.14 ops/s ± 8.5%    |
+| Scaling from a 300x300 canvas area to a 3000x3000 canvas area            | 458.93 ops/s ± 22.79%  |
 
 The following is an example test run result for scaling down performance:
 
 | Test                                                                         | Result                |
 | ---------------------------------------------------------------------------- | --------------------- |
-| Scaling from a 3000x3000 canvas area to a 300x300 canvas area                | 1018.38 ops/s ± 22.7% |
-| Scaling from a 3000x3000 canvas area to a 900x900 canvas area                | 502.38 ops/s ± 21.1%  |
-| Scaling from a 3000x3000 canvas area to a 3000x3000 canvas area (no scaling) | 317.33 ops/s ± 5.64%  |
+| Scaling from a 3000x3000 canvas area to a 300x300 canvas area                | 889.19 ops/s ± 42.13% |
+| Scaling from a 3000x3000 canvas area to a 900x900 canvas area                | 56.26 ops/s ± 165.22% |
+| Scaling from a 3000x3000 canvas area to a 3000x3000 canvas area (no scaling) | 64.05 ops/s ± 43.89%  |
 
-The most significant factor in performance appears to be the size of the destination image area: the smaller the destination image area, the better the performance. Even when scaling from a large image area to a small image area, the performance was over 1000 operation per seconds. That said, the size of the source image area does also affect performance, with smaller source image areas producing better results than larger source image areas.
+I got comparable results running the tests in Chrome v84 and Edge v84 on Windows 10. In my testing, I noticed that the results could vary quite a lot between runs, but the basic magnitude of the timings would be consistent.
+
+Scaling up was performant regardless of the destination canvas area, whereas scaling down was only performant for the smallest destination canvas area. This suggests that the lower the total number of pixels involved, source and destination combined, then the more performant scaling will be. This observation of course makes sense intuitively.
 
 ## Conclusion
 
