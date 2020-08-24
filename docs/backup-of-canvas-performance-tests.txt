@@ -1,0 +1,180 @@
+drawImage using a GPU canvas
+
+var canvas = document.createElement("canvas");
+canvas.width = 1920;
+canvas.height = 1080;
+var context = canvas.getContext("2d");
+
+context.drawImage(canvas, 0, 0, 960, 540, 0, 0, 1920, 1080);
+// Force the drawImage call to be evaluated within this benchmark code:
+createImageBitmap(canvas, 0, 0, 1, 1).then(() => deferred.resolve());
+
+
+
+drawImage using a CPU canvas
+
+var canvas = document.createElement("canvas");
+canvas.width = 1920;
+canvas.height = 1080;
+var context = canvas.getContext("2d");
+context.getImageData(0, 0, 1, 1);
+
+context.drawImage(canvas, 0, 0, 960, 540, 0, 0, 1920, 1080);
+// Force the drawImage call to be evaluated within this benchmark code:
+createImageBitmap(canvas, 0, 0, 1, 1).then(() => deferred.resolve());
+
+
+
+drawImage scaling up performance (drawImage for flushing)
+
+$sourceCanvas = document.createElement("canvas");
+$sourceCanvas.width = 300;
+$sourceCanvas.height = 300;
+$sourceContext = $sourceCanvas.getContext("2d");
+
+$destCanvas = document.createElement("canvas");
+$destCanvas.width = 3000;
+$destCanvas.height = 3000;
+$destContext = $destCanvas.getContext("2d");
+
+Scaling from a 300x300 canvas area to a 300x300 canvas area (no scaling):
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 300, 300);
+// Force the drawImage call to be evaluated within this benchmark code:
+$destContext.drawImage($destCanvas, 0, 0, 1, 1, 0, 0, 1, 1);
+
+Scaling from a 300x300 canvas area to a 900x900 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 900, 900);
+// Force the drawImage call to be evaluated within this benchmark code:
+$destContext.drawImage($destCanvas, 0, 0, 1, 1, 0, 0, 1, 1);
+
+Scaling from a 300x300 canvas area to a 3000x3000 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 3000, 3000);
+// Force the drawImage call to be evaluated within this benchmark code:
+$destContext.drawImage($destCanvas, 0, 0, 1, 1, 0, 0, 1, 1);
+
+
+
+
+drawImage scaling up performance
+
+$sourceCanvas = document.createElement("canvas");
+$sourceCanvas.width = 300;
+$sourceCanvas.height = 300;
+$sourceContext = $sourceCanvas.getContext("2d");
+
+$destCanvas = document.createElement("canvas");
+$destCanvas.width = 3000;
+$destCanvas.height = 3000;
+$destContext = $destCanvas.getContext("2d");
+
+Scaling from a 300x300 canvas area to a 300x300 canvas area (no scaling)
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 300, 300);
+// Force the drawImage call to be evaluated within this benchmark code:
+createImageBitmap($destCanvas, 0, 0, 1, 1).then(() => deferred.resolve());
+
+Scaling from a 300x300 canvas area to a 900x900 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 900, 900);
+// Force the drawImage call to be evaluated within this benchmark code:
+createImageBitmap($destCanvas, 0, 0, 1, 1).then(() => deferred.resolve());
+
+Scaling from a 300x300 canvas area to a 3000x3000 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 3000, 3000);
+// Force the drawImage call to be evaluated within this benchmark code:
+createImageBitmap($destCanvas, 0, 0, 1, 1).then(() => deferred.resolve());
+
+
+
+
+drawImage test (run at your own risk)
+
+$sourceCanvas = document.createElement("canvas");
+$sourceCanvas.width = 300;
+$sourceCanvas.height = 300;
+$sourceContext = $sourceCanvas.getContext("2d");
+
+$destCanvas = document.createElement("canvas");
+$destCanvas.width = 1000;
+$destCanvas.height = 1000;
+$destContext = $destCanvas.getContext("2d");
+
+Scaling from a 300x300 canvas area to a 900x900 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 900, 900);
+
+
+
+
+drawImage test (small destination canvas)
+
+$sourceCanvas = document.createElement("canvas");
+$sourceCanvas.width = 100;
+$sourceCanvas.height = 100;
+$sourceContext = $sourceCanvas.getContext("2d");
+
+$destCanvas = document.createElement("canvas");
+$destCanvas.width = 200;
+$destCanvas.height = 200;
+$destContext = $destCanvas.getContext("2d");
+
+Scaling up from a 100x100 canvas area to a 200x200 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 100, 100, 0, 0, 200, 200);
+
+
+
+
+
+drawImage scaling up performance (getImageData for flushing)
+
+$sourceCanvas = document.createElement("canvas");
+$sourceCanvas.width = 300;
+$sourceCanvas.height = 300;
+$sourceContext = $sourceCanvas.getContext("2d");
+
+$destCanvas = document.createElement("canvas");
+$destCanvas.width = 3000;
+$destCanvas.height = 3000;
+$destContext = $destCanvas.getContext("2d");
+
+Scaling from a 300x300 canvas area to a 300x300 canvas area (no scaling)
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 300, 300);
+// Force the drawImage call to be evaluated within this benchmark code:
+$destContext.getImageData(0, 0, 1, 1);
+
+Scaling from a 300x300 canvas area to a 900x900 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 900, 900);
+// Force the drawImage call to be evaluated within this benchmark code:
+$destContext.getImageData(0, 0, 1, 1);
+
+Scaling from a 300x300 canvas area to a 3000x3000 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 3000, 3000);
+// Force the drawImage call to be evaluated within this benchmark code:
+$destContext.getImageData(0, 0, 1, 1);
+
+
+
+
+drawImage scaling down performance
+
+$sourceCanvas = document.createElement("canvas");
+$sourceCanvas.width = 3000;
+$sourceCanvas.height = 3000;
+$sourceContext = $sourceCanvas.getContext("2d");
+
+$destCanvas = document.createElement("canvas");
+$destCanvas.width = 3000;
+$destCanvas.height = 3000;
+$destContext = $destCanvas.getContext("2d");
+
+Scaling from a 3000x3000 canvas area to a 300x300 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 3000, 3000, 0, 0, 300, 300);
+// Force the drawImage call to be evaluated within this benchmark code:
+createImageBitmap($destCanvas, 0, 0, 1, 1).then(() => deferred.resolve());
+
+Scaling from a 3000x3000 canvas area to a 900x900 canvas area
+$destContext.drawImage($sourceCanvas, 0, 0, 3000, 3000, 0, 0, 900, 900);
+// Force the drawImage call to be evaluated within this benchmark code:
+createImageBitmap($destCanvas, 0, 0, 1, 1).then(() => deferred.resolve());
+
+Scaling from a 3000x3000 canvas area to a 3000x3000 canvas area (no scaling)
+$destContext.drawImage($sourceCanvas, 0, 0, 3000, 3000, 0, 0, 3000, 3000);
+// Force the drawImage call to be evaluated within this benchmark code:
+createImageBitmap($destCanvas, 0, 0, 1, 1).then(() => deferred.resolve());
