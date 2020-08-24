@@ -39,7 +39,7 @@ Also using the Web Worker, I sometimes saw nasty rendering glitches where nearly
 
 ![](/images/2020-08-22-layered-canvas-rendering-issues-in-web-workers/tearing-2-2x.gif "Flashes when using a Web Worker for canvas updates")
 
-If you want to try this test for yourself then the HTML file I used is available [here](/iframes/canvas-tearing.html). It contains two demonstration widgets. The first one uses a Web Worker to update the canvases and the second one uses the main thread. The file will only work in a browser that supports `transferControlToOffscreen`.
+If you want to try this test for yourself then the HTML file I used is available <a href="/iframes/canvas-tearing.html" target="_blank">here</a>. It contains two demonstration widgets. The first one uses a Web Worker to update the canvases and the second one uses the main thread. The file will only work in a browser that supports `transferControlToOffscreen`.
 
 ## Conclusion
 
