@@ -16,7 +16,7 @@ The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is
 
 ## The initial attempt
 
-The [`drawImage`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage) method of the Canvas API is a synchronous method that allows you to draw an image to a `<canvas>` element or an `OffscreenCanvas`. It accepts several types of image source and it allows you to crop and/or scale the image at the same time. I was interested in the performance cost of scaling for various combinations of source and target image sizes, and so I created [this performance test suite](https://jsbench.me/1dke2mcybs/2) on the [JSBench.me](https://jsbench.me/) Web site.
+The [`drawImage`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage) method of the Canvas API is a synchronous method that allows you to draw an image to a [`<canvas>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) HTML element or an [`OffscreenCanvas`](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas). It accepts several types of image source and it allows you to crop and/or scale the image at the same time. I was interested in the performance cost of scaling for various combinations of source and target image sizes, and so I created [this performance test suite](https://jsbench.me/1dke2mcybs/2) on the [JSBench.me](https://jsbench.me/) Web site.
 
 The test is quite simple. In the set-up I create a small source `<canvas>` element and a large destination `<canvas>` element. Then in each test I just invoke `drawImage` with some particular set of parameters:
 
@@ -112,7 +112,7 @@ The following is an example test run result for scaling down performance:
 | Scaling from a 3000x3000 canvas area to a 900x900 canvas area                | 502.38 ops/s ± 21.1%  |
 | Scaling from a 3000x3000 canvas area to a 3000x3000 canvas area (no scaling) | 317.33 ops/s ± 5.64%  |
 
-The most significant factor in performance appears to be the size of the destination image area: the smaller the destination image area, the better the performance. Even when scaling from a large image area to a small image area, the performance was over 1000 operation per seconds. That said, the size of the source image area does also affect performance, with smaller source image areas producing better results than larger source image area.
+The most significant factor in performance appears to be the size of the destination image area: the smaller the destination image area, the better the performance. Even when scaling from a large image area to a small image area, the performance was over 1000 operation per seconds. That said, the size of the source image area does also affect performance, with smaller source image areas producing better results than larger source image areas.
 
 ## Conclusion
 
