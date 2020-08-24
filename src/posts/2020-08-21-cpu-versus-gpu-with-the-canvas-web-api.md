@@ -6,19 +6,16 @@ date: 2020-08-21
 author:
   name: Steve Johns
   url: https://www.linkedin.com/in/stephen-johns-47a7568/
-draft: true
 issueNumber: 76
 ---
 
 ## Introduction
 
-The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is a rich and performant API for drawing and manipulating two-dimensional (2D) graphics in a Web browser. Drawing can be performed using the [`<canvas>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) HTML element or an [`OffscreenCanvas`](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas). When rendering content to a canvas, the browser can choose to use either the CPU or the [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit). This post examines how this decision is made and what effect this can have on rendering performance.
-
-**Note:** The `<canvas>` element also supports displaying three-dimensional (3D) graphics using the [WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API), but in this post I focus solely on its use in 2D graphics.{class=note}
+The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is a rich and performant API for drawing and manipulating 2D graphics in a Web browser. Drawing can be performed using the [`<canvas>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) HTML element or an [`OffscreenCanvas`](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas). When rendering content to a canvas, the browser can choose to use either the CPU or the [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit). This post examines how this decision is made and what effect this can have on rendering performance.
 
 ## Browser heuristics
 
-When you create a `<canvas>` element or an `OffscreenCanvas`, the browser has to decide whether to store the data for the canvas in main memory and use functions running on the CPU to render to it, or whether to create the canvas on the GPU and render to it by invoking GPU draw instructions. I use the term _CPU canvas_ for a canvas that the browser is using the CPU to render to, and the term _GPU canvas_ when the browser is instead using the GPU. Generally a GPU canvas is preferred as rendering will be hardware accelerated, but both approaches have advantages and disadvantages. Because of this, the browser might include complex heuristics for deciding which approach to use, potentially even [changing approach after the initial decision](https://www.reddit.com/r/javascript/comments/ac9hdb/calling_getimagedata_potentially_puts_you_canvas/) in response to how it sees the canvas is being used. [This file](https://chromium.googlesource.com/chromium/src/+/41d279a5476937a3981a8413be722d42da0de0d2/third_party/WebKit/Source/platform/graphics/ExpensiveCanvasHeuristicParameters.h) is an example of the heuristics used in an older version of the [Blink](<https://en.wikipedia.org/wiki/Blink_(browser_engine)>) browser engine in Chrome.
+When you create a `<canvas>` element or an `OffscreenCanvas`, the browser has to decide whether to store the data for the canvas in main memory and so use functions running on the CPU to render to it, or whether to create the canvas on the GPU and render to it by invoking GPU draw instructions. I use the term _CPU canvas_ for a canvas that the browser is using the CPU for rendering, and the term _GPU canvas_ when the browser is instead using the GPU. Generally a GPU canvas is preferred as rendering will be hardware accelerated and so faster, but both approaches have advantages and disadvantages. Because of this, the browser might include complex heuristics for deciding which approach to use, potentially even [changing approach after the initial decision](https://www.reddit.com/r/javascript/comments/ac9hdb/calling_getimagedata_potentially_puts_you_canvas/) in response to how it sees the canvas is being used. [This file](https://chromium.googlesource.com/chromium/src/+/41d279a5476937a3981a8413be722d42da0de0d2/third_party/WebKit/Source/platform/graphics/ExpensiveCanvasHeuristicParameters.h) is an example of the heuristics used in an older version of the [Blink](<https://en.wikipedia.org/wiki/Blink_(browser_engine)>) browser engine in Chrome.
 
 ### Size can matter
 
@@ -26,7 +23,7 @@ One potential and simple heuristic is the size of the canvas: a very small or ve
 
 ### Usages of `getImageData` and `putImageData`
 
-A very important heuristic is whether or not [`CanvasRenderingContext2D.getImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData) and [`CanvasRenderingContext2D.putImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData) are used with the canvas. Generally these two methods are used to read the values of particular pixels to process them in some way, such as applying a desaturation filter to an image, and they are handled by the CPU not the GPU. If the canvas is a GPU canvas then these methods require a GPU to CPU transfer of the pixel data (sometimes termed a GPU readback) which is [well known for being a slow operation](https://superuser.com/questions/1478985/why-is-there-a-bottleneck-sending-data-from-a-gpu-to-a-cpu-but-less-so-from-cp). Given this, if you use `getImageData` or `putImageData` on a canvas then the browser might decide to make that canvas a CPU canvas in order to avoid GPU readbacks.
+A very important heuristic is whether or not [`CanvasRenderingContext2D.getImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData) and [`CanvasRenderingContext2D.putImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData) are used with the canvas. Generally these two methods are used to read the values of particular pixels to process them in some way, such as applying a desaturation filter to an image, and they are handled by the CPU not the GPU. If the canvas is a GPU canvas then these methods require a GPU to CPU transfer of the pixel data (sometimes termed a GPU readback) which is [well known for being a slow operation](https://superuser.com/questions/1478985/why-is-there-a-bottleneck-sending-data-from-a-gpu-to-a-cpu-but-less-so-from-cp). Given this, if you use `getImageData` or `putImageData` on a canvas then the browser might decide to make that canvas a CPU canvas in order to avoid the overhead of GPU readbacks.
 
 Browsers are also starting to support a new [`willReadFrequently`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext) 2D canvas context attribute that allows you to request a CPU canvas when you know that your use case will benefit from one, rather than you having to rely on getting one via browser heuristics.
 
@@ -51,7 +48,7 @@ canvas.height = 1080;
 var context = canvas.getContext("2d");
 ```
 
-... but the set-up function for the CPU canvas test then includes one final line designed to trigger usage of a CPU canvas in Chrome v84:
+... but the set-up function for the CPU canvas test then includes one final line designed to trigger use of a CPU canvas in Chrome v84:
 
 ```js
 context.getImageData(0, 0, 1, 1);
@@ -76,4 +73,4 @@ The Canvas API is in theory a performant and easy-to-use API for drawing and man
 
 ## Changelog
 
-- 2020-08-21 Initial version
+- 2020-08-24 Initial version
