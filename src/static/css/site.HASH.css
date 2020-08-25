@@ -27,6 +27,9 @@
   --color-neutral-850: #2e2e2e;
   --color-neutral-900: #212121;
   --color-black: #000000;
+  --color-yellow-100: #fefcea;
+  --color-red-100: #f8d7da;
+  --color-red-300: #d86975;
 
   --font-family-body: "Open Sans", sans-serif;
   --font-weight-body-regular: 400;
@@ -824,12 +827,29 @@ main > article > .article-body > :last-child {
 /*            Note              */
 /********************************/
 
-.note {
+.note,
+.warning-note,
+.success-note {
   font-size: var(--font-size-1);
   padding: var(--space-2) var(--space-3);
-  background-color: var(--color-secondary-100);
-  border: var(--width-hair) solid var(--color-secondary);
+  border-width: var(--width-hair);
+  border-style: solid;
   border-radius: var(--radius-2);
+}
+
+.note {
+  background-color: var(--color-yellow-100);
+  border-color: var(--color-primary-500);
+}
+
+.warning-note {
+  background-color: var(--color-red-100);
+  border-color: var(--color-red-300);
+}
+
+.success-note {
+  background-color: var(--color-secondary-100);
+  border-color: var(--color-secondary);
 }
 
 /********************************/

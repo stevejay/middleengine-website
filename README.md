@@ -69,6 +69,8 @@ You can access the Web site via the URL `http://localhost/`.
 - [Pexels](https://www.pexels.com/) for images.
 - [GIF maker](https://gifmaker.me/).
 - [GIF cropper](https://ezgif.com/crop).
+- [Hemingway App](http://www.hemingwayapp.com/)
+- [Writing for Gov.UK](https://www.gov.uk/guidance/content-design/writing-for-gov-uk).
 
 ## File versioning
 
