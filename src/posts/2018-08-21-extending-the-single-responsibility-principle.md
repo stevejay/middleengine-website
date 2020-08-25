@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Extending the single responsibility principle
-summary: How identifying the key responsibilities in the code you write can lead to higher quality code.
+summary: How to identify the key responsibilities in your code and write higher quality code.
 date: 2018-08-21
 author:
   name: Steve Johns

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "A performance testing gotcha with the Canvas Web API"
-summary: A gotcha that you might come across when trying to test the performance of methods of the Canvas API.
+summary: A gotcha that you might come across when trying to test the performance of the Canvas API.
 date: 2020-08-23
 author:
   name: Steve Johns

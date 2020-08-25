@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "A layered canvas rendering issue in Web Workers"
-summary: Using layered canvases is a common optimisation when rendering complex scenes in Web apps. I demonstrate a rendering issue that I have found in Chrome when rendering to layered canvases from Web Workers.
+summary: An issue that I found in Chrome when rendering to layered canvases from Web Workers.
 date: 2020-08-22
 author:
   name: Steve Johns

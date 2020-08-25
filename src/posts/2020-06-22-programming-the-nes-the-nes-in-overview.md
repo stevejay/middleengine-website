@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Programming the NES: The NES in overview"
-summary: The first in a series of posts about programming the Nintendo Entertainment System games console, starting with a history of the system and an overview of its internals.
+summary: The first in a series of posts about programming the Nintendo Entertainment System. I start with a history of the system and an overview of its internals.
 date: 2020-06-22
 author:
   name: Steve Johns

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Tips for using Styled Components
-summary: Enhance your use of the Styled Components CSS-in-JS library with some useful tips and tricks.
+summary: Tips and tricks to enhance your use of the Styled Components CSS-in-JS library.
 date: 2019-11-10
 author:
   name: Steve Johns

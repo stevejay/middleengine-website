@@ -1,7 +1,7 @@
 ---
 layout: post
 title: What makes a good developer?
-summary: A discussion about what makes a good developer good.
+summary: A discussion about what makes a developer a good developer.
 date: 2018-05-08
 author:
   name: Steve Johns

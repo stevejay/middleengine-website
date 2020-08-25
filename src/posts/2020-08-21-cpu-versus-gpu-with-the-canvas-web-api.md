@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "CPU versus GPU with the Canvas Web API"
-summary: How the browser can use either the CPU or the GPU to render to a canvas when using the Canvas Web API, and how it affects the performance of your Web app.
+summary: How the browser can use the CPU or the GPU to render to a canvas when using the Canvas Web API, and how this affects the performance of your Web app.
 date: 2020-08-21
 author:
   name: Steve Johns

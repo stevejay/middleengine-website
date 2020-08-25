@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Imperative updates in React
-summary: Solutions for performing imperative updates in React, such as setting focus or scroll position.
+summary: Solutions for performing imperative updates in React.
 date: 2019-10-12
 author:
   name: Steve Johns

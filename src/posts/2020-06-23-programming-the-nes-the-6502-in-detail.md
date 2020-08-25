@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Programming the NES: The 6502 in detail"
-summary: The second in a series of posts about programming the Nintendo Entertainment System games console, detailing the CPU that is at its heart.
+summary: The second in a series of posts about programming the Nintendo Entertainment System. I take a detailed look at programming the CPU that powers it.
 date: 2020-06-23
 author:
   name: Steve Johns
