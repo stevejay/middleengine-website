@@ -27,6 +27,9 @@
   --color-neutral-850: #2e2e2e;
   --color-neutral-900: #212121;
   --color-black: #000000;
+  --color-yellow-100: #fefcea;
+  --color-red-100: #f8d7da;
+  --color-red-300: #d86975;
 
   --font-family-body: "Open Sans", sans-serif;
   --font-weight-body-regular: 400;
@@ -835,13 +838,13 @@ main > article > .article-body > :last-child {
 }
 
 .note {
-  background-color: #fefcea;
+  background-color: var(--color-yellow-100);
   border-color: var(--color-primary-500);
 }
 
 .warning-note {
-  background-color: #f8d7da;
-  border-color: #d86975;
+  background-color: var(--color-red-100);
+  border-color: var(--color-red-300);
 }
 
 .success-note {
