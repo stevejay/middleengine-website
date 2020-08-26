@@ -11,9 +11,9 @@ issueNumber: 47
 
 ## Introduction
 
-In the previous post from this series, I presented an overview of the NES and its subsystems. A key component is the CPU, which is a version of the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) CPU. In order to write games for the NES, it is necessary to have a good understanding of how the 6502 functions and how to program it using assembly. This post covers basic assembly, binary number theory, the processor registers, the addressing modes, the call stack, interrupts, and the opcodes.
+In the previous post from this series, I presented an overview of the NES and its subsystems. A key component is the CPU, which is a version of the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) CPU. To write games for the NES, it is necessary to understand how it functions and how to program it using assembly. This post covers the basics that you will need.
 
-The primary reference for this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is quite a dense read but it does include a lot of useful advice and many worked examples. Since the CPU in the NES does not support the 6502's binary coded decimal mode, any information in the manual regarding it can be ignored.
+The main reference used in this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is a dense read but it does include a lot of useful advice and many worked examples. You can ignore any information about the 6502's binary coded decimal mode as it is not supported by the NES's CPU.
 
 If you have not done so already, I recommend that you read the [first post in this series](/blog/posts/2020/06/22/programming-the-nes-the-nes-in-overview) before this one.
 
@@ -29,7 +29,7 @@ This section is a very basic introduction to assembly language syntax. The exact
 
 A bit is set if it has the value 1 and is clear or not set if it has the value 0. If the binary value has 8 bits then it represents one byte. Occasionally you will see two-byte values written in binary, for example `%0000000011111111`.
 
-The bits of a byte are numbered from 0 to 7, with bit #0 being the least significant (rightmost) bit and bit #7 the most significant (leftmost) bit:
+The bits of a byte are numbered from 0 to 7. Bit #0 is the least significant (rightmost) bit and bit #7 is the most significant (leftmost) bit:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/bit-numbers-2x.png "Bit numbering")
 
@@ -39,7 +39,7 @@ The bits of a byte are numbered from 0 to 7, with bit #0 being the least signifi
 
 Each digit in a hexadecimal literal represents a [nibble](https://en.wikipedia.org/wiki/Nibble). A byte consists of two nibbles, so a single byte is written as two hexadecimal digits and a two-byte value is written as four hexadecimal digits. Thus `$3F` represents a byte value and `$C008` represents a two-byte value.
 
-The first byte of a two-byte value is the [most significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_byte) (MSB) and the second byte is the [least significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte) (LSB). So given the hex value `$C008`, the MSB is `$C0` and the LSB is `$08`.
+The first byte of a two-byte value is the [most significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_byte) (MSB). The second byte is the [least significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte) (LSB). So given the hex value `$C008`, the MSB is `$C0` and the LSB is `$08`.
 
 #### Decimal literals
 
