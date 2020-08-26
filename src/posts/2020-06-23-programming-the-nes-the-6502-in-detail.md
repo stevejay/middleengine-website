@@ -37,13 +37,13 @@ The bits of a byte are numbered from 0 to 7. Bit #0 is the least significant (ri
 
 [Hexadecimal](https://en.wikipedia.org/wiki/Hexadecimal), or hex, literal values are prefixed by a dollar sign, for example `$0F`.
 
-Each digit in a hexadecimal literal represents a [nibble](https://en.wikipedia.org/wiki/Nibble). A byte consists of two nibbles, so a single byte is written as two hexadecimal digits and a two-byte value is written as four hexadecimal digits. Thus `$3F` represents a byte value and `$C008` represents a two-byte value.
+Each digit in a hexadecimal literal represents a [nibble](https://en.wikipedia.org/wiki/Nibble). A byte consists of two nibbles, so a single byte is written as two hexadecimal digits. A two-byte value is written as four hexadecimal digits. Thus `$3F` represents a byte value and `$C008` represents a two-byte value.
 
 The first byte of a two-byte value is the [most significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_byte) (MSB). The second byte is the [least significant byte](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte) (LSB). So given the hex value `$C008`, the MSB is `$C0` and the LSB is `$08`.
 
 #### Decimal literals
 
-Literal values without a dollar sign or percent sign prefix are regular decimal values.
+A literal value is a regular decimal value if it has no dollar sign or percent sign prefix.
 
 ### Comments
 
@@ -57,9 +57,9 @@ LDA #$04 ; This comment comes after an instruction
 
 ### Opcodes
 
-A program instruction represents a particular operation to be performed, and it may or may not include an operand. The operation is identified by the [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) used in the instruction. The opcode is a byte value in the range 0 to 255 inclusive. The 6502 officially supports 151 opcodes and they can be grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). Each opcode in a group performs the same basic operation (such as adding two numbers together) but it will use a different addressing mode to specify the data to operate on. (Addressing modes are covered later in this post.)
+A program instruction represents a particular operation to be performed. It may or may not include an operand. The [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) used in the instruction identifies the operation. The opcode is a byte value in the range 0 to 255 inclusive. The 6502 officially supports 151 opcodes and they are grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). Each opcode in a group performs the same basic operation, such as adding two numbers together. They differ by the addressing mode used to specify the data to operate on. (I cover addressing modes later in this post.)
 
-For each instruction in your program, the assembler needs to determine which of the 151 opcodes to output as the generated machine code. The basic operation is indicated by the particular three-letter mnemonic that is used in the instruction. The mnemonic is not case sensitive.
+For each instruction in your program, the assembler needs to determine the opcode to output. You state the basic operation by the particular three-letter mnemonic that you use. The mnemonic is not case sensitive.
 
 ```asm6502
 SEI       ; The mnemonic is SEI.
@@ -68,7 +68,7 @@ LDA $0211 ; This instruction has the mnemonic LDA
           ; and it is followed by an operand.
 ```
 
-The addressing mode is indicated either by the lack of an operand or, if there is an operand, by the syntax used to define it. Using this combination of mnemonic and addressing mode, the assembler can identify which one of the 151 opcodes it should output. For example, in all three of the following instructions the operation is 'Add memory to Accumulator with Carry' (which has the mnemonic `ADC`{lang=asm6502}) and the operand value is `$04`, but the syntax used to define that operand differs:
+You state the addressing mode by either omitting an operand or by the syntax you use to define it. The assembler uses this combination of mnemonic and addressing mode to identify which of the 151 opcodes to output. As an example, let us consider the operation 'Add memory to Accumulator with Carry' which has the mnemonic `ADC`{lang=asm6502}. All the following instructions use that mnemonic and an operand value of `$04`, but the syntax used to define the operand differs:
 
 ```asm6502
 ADC #$04     ; The opcode is $69.
@@ -76,24 +76,24 @@ ADC $04, X   ; The opcode is $61.
 ADC ($04), Y ; The opcode is $71.
 ```
 
-The particular syntax used with the operand indicates to the assembler which addressing mode is being used and so which one of the `ADC`{lang=asm6502}-related opcodes to output.
+The particular syntax you use for the operand tells the assembler which addressing mode is being used. This allows it to choose which one of the `ADC`{lang=asm6502}-related opcodes to output.
 
 The assembler outputs the opcode first and the operand second, if there is one. The operand is one or two bytes in size so every machine instruction is either one, two, or three bytes in size.
 
-The 6502 is little endian so any addresses in the program get encoded LSB first and MSB second. For example, if an operation has the address `$1234` as its operand then the assembler will encode that address as `$3412` (`$12` being the MSB and `$34` being the LSB).
+The 6502 is little endian so any addresses in the program get encoded LSB first and MSB second. For example, if an operation has an operand of the address `$1234` then the assembler will encode that address as `$3412` (`$12` being the MSB and `$34` being the LSB).
 
 ### Labels
 
-A label is used to associate a name with a particular location in the program code. Any use of a label as an operand gets replaced at assembly time either by the address of the location that it is associated with or by the relative offset to it. (The exact replacement value depends on the addressing mode used.) This makes the code more readable and avoids the use of hardcoded program addresses.
+You can use a label to associate a name with a particular location in the program code. The assembler replaces any uses of a label with either the program address that it is associated with or the relative offset to it. (The exact replacement value depends on the addressing mode used.) Using labels makes the code more readable and avoids the use of hardcoded program addresses.
 
-Each label is declared using a colon, with the assigned identifier being case sensitive. The following code declares the label `this_is_a_label`:
+You declare each label as a case-insensitive identifier followed by a colon. The following code declares the label `this_is_a_label`:
 
 ```asm6502
 this_is_a_label:
   LDA #$00
 ```
 
-This label can now be used as an operand. The following instruction results in program control jumping to wherever in the program the given label is declared:
+You can now use this label as an operand. The following instruction jumps the program to wherever you declared the given label:
 
 ```asm6502
 JMP this_is_a_label
@@ -105,30 +105,30 @@ You can also declare a label on the same line as an instruction:
 some_label: LDA #$00
 ```
 
-Some assemblers support other types of label. A [cheap local label](https://cc65.github.io/doc/ca65.html#ss6.6) allows you to reuse common labels. For example, you can reuse the label 'loop' so that you do not need to create a unique label every time you loop over a series of instructions:
+Some assemblers support other types of label. A [cheap local label](https://cc65.github.io/doc/ca65.html#ss6.6) allows you to reuse common labels. For example, you can reuse the label 'loop'. This means that you do not need to create a unique label every time you loop over a series of instructions:
 
 ```asm6502
 @loop:      ; A cheap local label
   JMP @loop ; Example usage of the cheap local label
 ```
 
-[Unnamed labels](https://cc65.github.io/doc/ca65.html#ss6.6) fulfil a similar role but they make the program code harder to understand and so I suggest avoiding them:
+[Unnamed labels](https://cc65.github.io/doc/ca65.html#ss6.6) fulfil a similar role but they make the program code harder to understand:
 
 ```asm6502
 :           ; An unnamed label
-  JMP :-    ; Example usage of the unnamed label
+  JMP :-    ; This jumps backwards to the last unnamed label
 ```
 
 ### Constants
 
-Programming in assembly can involve a lot of magic values, for example the addresses of particular bytes in the CPU address space that control attached devices. Assemblers usually support declaring numeric constants, allowing you to reference such values by name and so improve the readability of your code:
+Programming in assembly can involve a lot of magic values. These include the addresses of the bytes in the CPU address space that control the PPU. Assemblers usually support declaring numeric constants. These allow you to reference such values by name and so improve the readability of your code:
 
 ```asm6502
 PPUCTRL            = $2000     ; An address constant.
 BACKGROUND_ENABLED = %00001000 ; A bitmask constant.
 ```
 
-The constants can be used as instruction operands:
+You can use constants as instruction operands:
 
 ```asm6502
 STA PPUCTRL
@@ -138,7 +138,7 @@ It is common to use uppercase for the names of constants.
 
 ### Embedded bytes
 
-Your program code will consist mainly of instructions but sometimes data needs to be embedded into it. For example, you might need to embed colour palette data. An assembler will normally include a means for doing so. The following assembly embeds some data into the program code:
+Your program code will mostly consist of instructions but sometimes you will need to embed some data. For example, you might need to embed colour palette data. An assembler will include a means for doing so. The following assembly embeds some data into the program code:
 
 ```asm6502
 .byte $02,$30,$20,$20 ; Embeds these four one-byte values.
@@ -146,11 +146,11 @@ Your program code will consist mainly of instructions but sometimes data needs t
 .addr some_label      ; Embeds the address associated with the label.
 ```
 
-In this particular assembler dialect, `.byte`, `.word` and `.addr` are instructions for the assembler itself. These assembler instructions are termed control commands.
+In this assembler dialect, `.byte`, `.word` and `.addr` are instructions for the assembler. These assembler instructions are termed control commands.
 
 ## Binary number theory
 
-This section introduces a number of concepts regarding binary numbers, and how to add and subtract them. This information will make subsequent sections about the operation of the 6502 much easier to understand.
+This section introduces concepts about binary numbers. This information will make later sections easier to understand.
 
 ### Unsigned and signed binary values
 
@@ -161,7 +161,7 @@ A byte consists of 8 bits, from bit #0, the least significant bit, to bit #7, th
 %11111111 ; Largest 8-bit unsigned value (255 in decimal).
 ```
 
-An alternative interpretation is that they represent a signed value, with bit #7 indicating if the value is negative &mdash; when bit #7 is set &mdash; or positive &mdash; when bit #7 is not set. The magnitude of this positive or negative value is given by bits #0 to #6. The particular representation of signed binary values used in the 6502 is called [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement). The following values illustrate this representation:
+An alternative interpretation is that they represent a signed value. In that case, bit #7 indicates if the value is negative &mdash; when it is set &mdash; or positive &mdash; when it is not set. Bits #0 to #6 give the size of this positive or negative value. The representation of signed binary values used in the 6502 is called [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement). The following values illustrate this representation:
 
 ```asm6502
 %00000000 ; Positive 8-bit signed value with smallest magnitude (0 in decimal).
@@ -173,7 +173,7 @@ An alternative interpretation is that they represent a signed value, with bit #7
 
 ### Multi-byte binary values
 
-By increasing the number of bits used, larger unsigned and signed values can be represented. For example, 16-bit (two byte) values can represent an unsigned value in the range 0 to 65,535:
+Larger unsigned and signed values can be represented by increasing the number of bits. For example, 16-bit (two byte) values can represent an unsigned value in the range 0 to 65,535:
 
 ```asm6502
 %0000000000000000 ; Smallest 16-bit unsigned value (0 in decimal).
@@ -192,11 +192,11 @@ For signed multi-byte values, regardless of the total bit count, it is always bi
 
 ### Adding unsigned binary values
 
-When we add two decimal numbers, the digits of the numbers to add are added column by column from right to left. For each column where the total is 10 or greater, we have to carry the one to the next column to the left and use the remainder as the current column's result:
+When we add two decimal numbers, we add the digits column by column from right to left. For each column where the total is 10 or greater, we have to carry the one to the next column to the left. We then use the remainder as the current column's result:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/addition-carry-decimal-v2-2x.png "Addition example in decimal")
 
-In the above example the addition in the units column is 5 plus 7 which equals 12, so the result for the units column is 2 and the 1 is carried to the tens column.
+In the above example the addition in the units column is 5 plus 7 which equals 12. The result for the units column is 2 and we carry the 1 to the tens column.
 
 This all still holds when adding binary numbers. The difference is that we carry the one to the left for each column where the total is 2 or greater (`%10` in binary). Here is the same addition performed using unsigned byte values:
 
@@ -206,13 +206,13 @@ When adding binary numbers, it is not always the case that the result can fit in
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/addition-overflow-binary-v2-2x.png "Overflow when adding binary numbers")
 
-There is a 9th bit, a carry bit, that is not included in the result. To capture the full result we have to use 16-bit values in the calculation, carrying that 9th bit from the LSB to bit #0 of the MSB:
+There is a 9th bit, a carry bit, that is not included in the result. To capture the full result we have to use 16-bit values in the calculation. We carry that 9th bit from the LSB to bit #0 of the MSB:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/addition-overflow-16bit-binary-v2-2x.png "Addition using 16-bit values")
 
-However, because the 6502 is an 8-bit CPU, we can only add byte values. The solution is to combine multiple additions, starting with the LSBs and finishing with the MSBs, and including any carry bits in the calculations. For example, to add `$80FF` and `$0003` (33,023 + 3 in decimal) we first add the LSBs, `$FF` and `$03`. The result is `$02` plus a carry bit. Next we add the MSBs, `$80` and `$00`, making sure to also add `$01` for that carry bit. The result is `$81` with no carry bit, so the combined result is `$8102` or 33,026 in decimal. This is a complete result because no carry bit was created when adding the MSBs.
+But because the 6502 is an 8-bit CPU, we can only add byte values. The solution is to combine multiple additions. We start with the LSBs and finish with the MSBs, including any carry bits in the calculations. For example, to add `$80FF` and `$0003` (33,023 + 3 in decimal) we first add the LSBs, `$FF` and `$03`. The result is `$02` plus a carry bit. Next we add the MSBs, `$80` and `$00`, making sure to also add `$01` for that carry bit. The result is `$81` with no carry bit, so the combined result is `$8102` or 33,026 in decimal. This is a complete result because no carry bit was created when adding the MSBs.
 
-Now let us try adding `$FFFE` and `$0003` (65,534 + 3 in decimal). First we add the LSBs, `$FE` and `$03`. The result is `$01` plus a carry bit. Next we add the MSBs, `$FF` and `$00`, making sure to also add `$01` for that carry bit. The result is `$00` plus a carry bit. The combined result is `$0001` (1 in decimal) but this is not the correct result (which would be 65,537 in decimal) because a carry bit remains. We would have to perform this calculation using 24-bit values to get the full result.
+Now let us try adding `$FFFE` and `$0003` (65,534 + 3 in decimal). First we add the LSBs, `$FE` and `$03`. The result is `$01` plus a carry bit. Next we add the MSBs, `$FF` and `$00`, making sure to also add `$01` for that carry bit. The result is `$00` plus a carry bit. The combined result is `$0001` (1 in decimal) but this is not the correct result (which would be 65,537 in decimal). A carry bit remains. We would have to perform this calculation using 24-bit values to get the full result.
 
 ### Adding signed binary values
 
@@ -220,40 +220,42 @@ Adding signed binary values introduces the problem of overflow. As an example, l
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/addition-signed-overflow-binary-v2-2x.png "Overflow when adding signed binary values")
 
-The result is `%10000000`, or 128 in decimal, which would be the correct answer if we were adding unsigned values but we are not. This result is actually -128 in two's complement representation. The problem is that bit #7 in a signed byte is reserved for the value's sign, so there is actually one less bit with which to represent a value's magnitude. A signed byte value can only represent values in the range -128 to +127, and the correct answer of +128 falls outside that range. The result has _overflowed_ the available magnitude bits.
+The result is `%10000000`, or 128 in decimal. This would be the correct answer if we were adding unsigned values, but we are not. This result is actually -128 in two's complement representation. The problem is that bit #7 in a signed byte is reserved for the value's sign. There is actually one less bit with which to represent a value's magnitude. A signed byte value can only represent values in the range -128 to +127. The correct answer of +128 falls outside that range. The result has _overflowed_ the available magnitude bits.
 
-Previously when we added unsigned binary values, we could detect an invalid result because there would be a carry bit remaining after adding the MSBs. How can we detect overflow when adding signed bytes? We have to look to see if the sign bit of the result is correct given the values that we have added together. In the example above we added two positive numbers, +127 and +2, so we would expect the result to be positive as well. In fact the result is negative because bit #7 of the result is set. Using this knowledge, the result would be identified as invalid.
+When adding unsigned binary values, we could detect an invalid result: there would be a carry bit remaining after adding the MSBs. How can we detect overflow when adding signed bytes? We have to look to see if the sign bit of the result is correct given the values that we have added together. In the example above we added two positive numbers, +127 and +2, so we would expect the result to be positive as well. In fact the result is negative because bit #7 of the result is set. Using this knowledge, we can identify the result as invalid.
 
 More generally, when adding a negative value to a positive value or a positive value to a negative value, overflow cannot occur. But when the result of adding two positive values is negative or the result of adding two negative values is positive, overflow has occurred.
 
 It is important to note that a remaining carry bit does **not** indicate an invalid result in the way that it does when adding unsigned values. You should in fact ignore any remaining carry bit.
 
-We have to use 16-bit signed values in the above calculation to get the correct result. As you might expect, we have to add signed multi-byte values one byte pair at a time, starting with the LSBs and finishing with the MSBs, and including any carry bits in the calculations. When performing the final addition of the MSBs, we need to check for overflow to ensure that the result is valid. We also ignore any carry bit that remains from this final addition.
+We have to use 16-bit signed values in the above calculation to get the correct result. As you might expect, we have to add signed multi-byte values one byte pair at a time. We start with the LSBs and finish with the MSBs, and include any carry bits in the calculations. When performing the final addition of the MSBs, we need to check for overflow to ensure that the result is valid. We also ignore any carry bit that remains from this final addition.
 
-To illustrate adding 16-bit signed values, let us add `$80FF` and `$FFFE` (-32,513 + -2 in decimal). We first add the LSBs, `$FF` and `$FE`. The result is `$FD` plus a carry bit. Next we add the MSBs, `$80` and `$FF`, making sure to also add `$01` for the carry bit. The result is `$80` with a carry bit. We can ignore the carry bit, so the combined result is `$80FD`, or -32,515 in decimal. Now we need to check if overflow occurred. We added two negative values so the result should be negative too. The result `$80FD` does indeed represent a negative value (bit #7 of the MSB is set), therefore overflow has not occurred and the result is valid.
+To illustrate adding 16-bit signed values, let us add `$80FF` and `$FFFE` (-32,513 + -2 in decimal). We first add the LSBs, `$FF` and `$FE`. The result is `$FD` plus a carry bit. Next we add the MSBs, `$80` and `$FF`, making sure to also add `$01` for the carry bit. The result is `$80` with a carry bit. We can ignore the carry bit, so the combined result is `$80FD`, or -32,515 in decimal. Now we need to check if overflow occurred. We added two negative values so the result should be negative too. The result `$80FD` does indeed represent a negative value (bit #7 of the MSB is set). Overflow has not occurred and the result is valid.
 
 ### The implementation of addition in the 6502
 
-Mathematical operations are performed using the 6502's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU). The 6502 also includes a Carry flag that is used by the ALU in two ways:
+We perform mathematical operations using the 6502's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU). The 6502 includes a Carry flag that is used in two ways:
 
-1. It is used during addition to indicate if the ALU should add one to the current addition calculation. One will be added when the flag is set.
-2. It is updated by the ALU after an addition to indicate whether or not the result includes a carry bit. If the Carry flag is set then the result includes a carry bit. If the Carry flag is not set then it does not.
+1. It is used during addition to indicate if the ALU should add one to the current addition calculation. The ALU will add one when the flag is set.
+2. The ALU updates it after an addition to indicate whether the result includes a carry bit. If the Carry flag is set then the result includes a carry bit, but if the Carry flag is not set then it does not.
 
-The addition operation is used to add two byte values. The calculation that the ALU performs is therefore the following, where Carry has the value one if the Carry flag is set or zero if it is not:
+We use the addition operation to add two byte values. The calculation that the ALU performs is the following:
 
 ```markup
 Byte1 + Byte2 + Carry
 ```
 
-When starting an addition operation, we first ensure that the Carry flag is not set. When adding multi-byte values, we first ensure that the Carry flag is not set but we also do not update the state of the Carry flag as we proceed to add the byte pairs. This ensures that any carry bit generated as a result of adding one pair of bytes will get carried over into the addition of the next pair of bytes.
+Carry has the value one if the Carry flag is set, or zero if it is not.
+
+When starting an addition operation, we must first ensure that the Carry flag is not set. When adding multi-byte values, we must also not update the state of the Carry flag as we proceed to add the byte pairs. This way any carry bit generated as a result of adding one pair of bytes will get carried over into the next pair of bytes.
 
 ### Subtracting binary values
 
-In subtraction, the number we are subtracting from is called the minuend and the number we are subtracting by is called the subtrahend:
+In subtraction, we call the number we are subtracting from the minuend. We call the number we are subtracting by the subtrahend.
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/minuend-subtrahend-2x.png "Minuend and subtrahend in subtraction")
 
-When we subtract two decimal numbers, the digits of the numbers to subtract are subtracted column by column, from right to left. For each column where the result would be negative, we have to borrow one from the next column to the left:
+When we subtract two decimal numbers, we subtract the digits column by column, from right to left. For each column where the result would be negative, we have to borrow one from the next column to the left:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/subtraction-borrow-decimal-v2-2x.png "Borrowing when subtracting decimal values")
 
@@ -265,18 +267,18 @@ As you can see, borrowing still applies as necessary.
 
 #### Subtraction as addition
 
-As previously noted, mathematical operations are performed by the ALU. Designing an ALU that supports both addition and subtraction adds to its complexity and cost. There is an alternative approach: a subtraction can be implemented as an addition if we negate the subtrahend (the number that we are subtracting by) and then add it to the minuend. Let us say that we want to calculate +35 - +7, which equals +28. If we negate the subtrahend then it changes value from +7 to -7. By adding it to the minuend, the calculation now becomes +35 + -7 and we still get the answer +28.
+As noted before, the ALU performs the mathematical operations. Designing an ALU to support both addition and subtraction adds to its complexity and cost. There is an alternative approach: we can implement subtraction as addition if we negate the subtrahend and then add it to the minuend. Let us say that we want to calculate +35 - +7, which equals +28. If we negate the subtrahend then it changes value from +7 to -7. By adding it to the minuend, the calculation now becomes +35 + -7 and we still get the answer +28.
 
-For this technique to work in the binary world of the 6502, we need to know how to negate a signed binary value. As explained earlier in this post, the 6502 uses the two's complement representation for signed values and therefore the following negation process applies:
+For this technique to work in the binary world of the 6502, we need to know how to negate a signed binary value. As explained earlier, the 6502 uses the two's complement representation for signed values. Thus the following negation process applies:
 
 1. Find the one's complement of the number.
 2. Add one.
 
-Finding the one's complement of a binary value means inverting all of its bits (the ones becoming zeroes and the zeroes becoming ones). The symbol for taking the one's complement of a number is the tilde (~).
+Finding the one's complement of a binary value means inverting its bits. All the ones become zeroes and all the zeroes become ones. The symbol for taking the one's complement of a number is the tilde (~).
 
 Let us try calculating +35 - +7 again but this time in binary. Using the two's complement representation, this is `%00100011` - `%00000111`. The one's complement of the subtrahend is `%11111000`, or -8 in decimal. We add one to it, to give `%11111001`, or -7 in decimal. The subtraction now becomes an addition: `%00100011` + `%11111001`, or +35 + -7.
 
-There is a wrinkle to how this is implemented in the ALU. As shown earlier, the ALU implements addition like so:
+There is a wrinkle to how the ALU implements this. As shown earlier, the ALU implements addition like so:
 
 ```markup
 Byte1 + Byte2 + Carry
@@ -288,7 +290,7 @@ The ALU implements subtraction in the same way but with a single change — it t
 Byte1 + ~Byte2 + Carry
 ```
 
-What this means is that it is the Carry flag which performs the role of controlling whether or not the 'add one' stage of the negation process is performed. Normally we want to perform that stage of the negation process and so we have to ensure that the Carry flag is set before a subtraction operation. For example, let us calculate `$02` - `$01`, which is +2 - +1 in decimal. This is transformed by the ALU into the following calculation:
+This means that it is the Carry flag which controls whether the 'add one' stage of the negation process is performed. Normally we want to perform that stage of the negation process, and so we have to ensure that the Carry flag is set before a subtraction operation. For example, let us calculate `$02` - `$01`, which is +2 - +1 in decimal. The ALU transforms this into the following calculation:
 
 ```markup
   Byte1 + ~Byte2 + Carry
@@ -309,14 +311,14 @@ The correct answer to the calculation is `$01` or 1 in decimal. We only get the 
 
 Thus, before performing a subtraction operation, we have to ensure that the Carry flag is set.
 
-As explained previously, the Carry flag is updated by the ALU after an addition operation to indicate whether or not the result includes a carry bit. For a subtraction operation, the Carry flag is updated by the ALU to indicate whether or not a bit had to be borrowed as part of the operation. It is important to note that the Carry flag is set inversely in this role:
+As explained before, the ALU updates the Carry flag after an addition operation to indicate whether the result includes a carry bit. For a subtraction operation, the ALU updates the Carry flag to indicate whether it had to borrow a bit as part of the operation. It is important to note that the Carry flag is set inversely by the ALU:
 
-- If the Carry flag is set then no bit had to borrowed.
-- If the Carry flag is not set then a bit had to be borrowed.
+- If the Carry flag is set then the ALU did not need to borrow a bit.
+- If the Carry flag is not set then the ALU had to borrow a bit.
 
-With the previous calculation of `$02` - `$01`, the Carry flag is set after the subtraction because the result of adding `$02` + `$FE` + `$01` is `$01` and a carry bit. The carry bit here indicates that a bit did not need to be borrowed, which is correct.
+With the previous calculation of `$02` - `$01`, the Carry flag is set after the subtraction. This is because the result of adding `$02` + `$FE` + `$01` is `$01` and a carry bit. The carry bit indicates that a bit was not borrowed, which is correct.
 
-Let us see a calculation where a bit does need to be borrowed. For this, let us calculate `$02` - `$03`, which is +2 - +3 in decimal. This is transformed by the ALU into the following calculation:
+Let us see a calculation where a bit needs to be borrowed. For this, let us calculate `$02` - `$03`, which is +2 - +3 in decimal. The ALU transforms this into the following calculation:
 
 ```markup
   Byte1 + ~Byte2 + Carry
@@ -326,9 +328,9 @@ Let us see a calculation where a bit does need to be borrowed. For this, let us 
 = $FF
 ```
 
-The result of adding `$02` + `$FC` + `$01` is `$FF` with no carry bit, so the Carry flag is not set after this subtraction operation. If we were to actually perform this operation as a subtraction, rather than converting it into an addition, then we would need to borrow one and so that is why the Carry bit not being set indicates that a bit had to be borrowed.
+The result of adding `$02` + `$FC` + `$01` is `$FF` with no carry bit, so the Carry flag is not set after this subtraction operation. If we were to actually perform this operation as a subtraction then we would need to borrow one. That is why the Carry flag not being set indicates that the ALU had to borrow a bit.
 
-To get a complete result, we would have to perform this subtraction using 16-bit signed values, specifically as `$0002` - `$0003`. As with addition, if we want to subtract multi-byte values then we have to perform the operation one byte pair at a time, starting with the LSBs and finishing with the MSBs. We first ensure that the Carry flag is set before starting the subtraction process. The subtraction of the LSBs (`$02` - `$03`) has already been shown:
+To get a complete result, we would have to perform this subtraction using 16-bit signed values, as `$0002` - `$0003`. As with adding multi-byte values, we have to perform the operation one byte pair at a time. We start with the LSBs and finish with the MSBs. We first ensure that the Carry flag is set before starting the subtraction process. We have already seen the subtraction of the LSBs (`$02` - `$03`):
 
 ```markup
   $02 + ~$03 + Carry
@@ -338,7 +340,7 @@ To get a complete result, we would have to perform this subtraction using 16-bit
 = $FF
 ```
 
-The result is `$FF` with no carry bit. Now we can add the MSBs. We do not update the value of the Carry flag during the subtraction operation, so the ALU performs the following calculation:
+The result is `$FF` with no carry bit. Now we can add the MSBs. We do not update the value of the Carry flag during the subtraction operation. The ALU performs the following calculation:
 
 ```markup
   $00 + ~$00 + Carry
@@ -348,35 +350,35 @@ The result is `$FF` with no carry bit. Now we can add the MSBs. We do not update
 = $FF
 ```
 
-Thus the final answer is `$FFFF` with no carry bit, which is -1 in decimal when using the two's complement representation for binary values. By not adding one in the MSB calculation, achieved by the Carry flag not being set, we account for the fact that one had to be borrowed from that byte pair calculation.
+Thus the final answer is `$FFFF` with no carry bit. This is -1 in decimal when using the two's complement representation for binary values. As the Carry flag was not set in the MSB calculation, we did not add one. This accounted for the fact that one had to be borrowed from that byte pair calculation.
 
-Let us see how this works for some more multi-byte signed values. First let us calculate +255 - -1, which is `$00FF` - `$FFFF` in hex. We initially subtract the LSBs, `$FF` - `$FF`. This gets rewritten using addition as `$FF` + ~`$FF` + Carry, with Carry being `$01` because that is its required initial value. This simplifies to `$FF` + `$00` + `$01`, which equals `$00` with a carry bit. Now we subtract the MSBs: `$00` - `$FF`. This gets rewritten using addition as `$00` + ~`$FF` + Carry, with Carry being `$01` because there was a carry bit generated from adding the LSBs. This simplifies to `$00` + `$00` + `$01`, which equals `$01` with no carry bit. Therefore the combined result is `$0100`, or +256 in decimal.
+Let us see how this works for some more multi-byte signed values. First let us calculate +255 - -1, which is `$00FF` - `$FFFF` in hex. We subtract the LSBs, `$FF` - `$FF`. This gets rewritten using addition as `$FF` + ~`$FF` + Carry. Carry is `$01` because that is its required initial value. This simplifies to `$FF` + `$00` + `$01`, which equals `$00` with a carry bit. Now we subtract the MSBs: `$00` - `$FF`. This gets rewritten using addition as `$00` + ~`$FF` + Carry. Here Carry is `$01` because there was a carry bit generated from adding the LSBs. This simplifies to `$00` + `$00` + `$01`, which equals `$01` with no carry bit. Thus the combined result is `$0100`, or +256 in decimal.
 
-Now let us calculate +256 - +1, which is `$0100` - `$0001` in hex. Initially we subtract the LSBs, `$00` - `$01`. This gets rewritten using addition as `$00` + ~`$01` + Carry, with Carry being `$01` because that is its required initial value. This simplifies to `$00` + `$FE` + `$01`, which equals `$FF` with no carry bit. Now we subtract the MSBs, `$01` - `$00`. This gets rewritten using addition as `$01` + ~`$00` + Carry, with Carry being `$00` as there was no carry bit generated from adding the LSBs. This simplifies to `$01` + `$FF` + `$00`, which equals `$00` with a carry bit. We know to ignore that final carry bit because we are adding signed values. The combined result is `$00FF`, or +255 in decimal.
+Now let us calculate +256 - +1, which is `$0100` - `$0001` in hex. We subtract the LSBs, `$00` - `$01`. This gets rewritten using addition as `$00` + ~`$01` + Carry. Carry is `$01` because that is its required initial value. This simplifies to `$00` + `$FE` + `$01`, which equals `$FF` with no carry bit. Now we subtract the MSBs, `$01` - `$00`. This gets rewritten using addition as `$01` + ~`$00` + Carry. Here Carry is `$00` as there was no carry bit generated from adding the LSBs. This simplifies to `$01` + `$FF` + `$00`, which equals `$00` with a carry bit. We know to ignore that final carry bit because we are adding signed values. The combined result is `$00FF`, or +255 in decimal.
 
-In both cases, we need to ensure that overflow has not occurred when adding the MSBs. The rule for overflow when subtracting is different to the rule for overflow when adding: when subtracting one number from another, overflow occurs when their signs differ and the sign of the result is the same as the sign of the number you are subtracting by. In the case of the first example, +255 - -1, the signs do differ but the result (+256) is positive while the number being subtracted by (-1) is negative; overflow has not occurred. In the case of the second example, +256 - +1, the signs are the same and so overflow cannot occur.
+In both cases, we need to ensure that overflow has not occurred when adding the MSBs. The rule for overflow when subtracting is different to the rule for overflow when adding. When subtracting one number from another, overflow occurs when their signs differ and the sign of the result is the same as the sign of the number you are subtracting by. In the case of the first example, +255 - -1, the signs do differ but the result (+256) is positive while the number being subtracted by (-1) is negative; overflow has not occurred. In the case of the second example, +256 - +1, the signs are the same and so overflow cannot occur.
 
 ### Increasing bit counts
 
-When adding or subtracting two values, they should have the same byte count. If this is not the case then you need to add bits to the most significant side of the shorter value to make it equal in length to the longer value, but in a way that does not change the value being represented.
+When adding or subtracting two values, they should have the same byte count. If this is not the case then you need to add bits to the most significant side of the shorter value to make it equal in length to the longer value. But you need to do this in a way that does not change the value being represented.
 
-This is easy to do for unsigned values: you simply add as many significant zero bits as required. For example, the 8-bit unsigned value `%11111111` (255 in decimal) can be converted into a 16-bit value by prepending eight zero bits to give the value `%0000000011111111`.
+This is easy to do for unsigned values: you add as many significant zero bits as required. For example, you can convert the 8-bit unsigned value `%11111111` (255 in decimal) into a 16-bit value by prepending eight zero bits. This gives the value `%0000000011111111`.
 
-However, the approach is not as obvious for signed values. The solution is called [sign extension](https://en.wikipedia.org/wiki/Sign_extension). You still add as many significant bits as necessary, but now all of these added bits have the same value as the sign bit of the value that is being extended. For example, the value -128 as an 8-bit signed value is `%10000000`. The sign bit (bit #7) has the value 1 so the equivalent 16-bit signed value is formed by adding an MSB with all of its bits set to 1. This gives the value `%1111111110000000`, which still represents -128 in decimal.
+The approach is not as obvious for signed values. The solution is [sign extension](https://en.wikipedia.org/wiki/Sign_extension). You still add as many significant bits as necessary, but all the added bits have the same value as the sign bit of the value you are extending. For example, the value -128 as an 8-bit signed value is `%10000000`. The sign bit (bit #7) has the value 1 so the equivalent 16-bit signed value is formed by adding an MSB with all its bits set to 1. This gives the value `%1111111110000000`, which still represents -128 in decimal.
 
 ### Best practise for addition and subtraction
 
-As touched on in the previous sections, there are a few important caveats to bear in mind when adding or subtracting binary values:
+Bear the following in mind when adding or subtracting binary values:
 
 1. Avoid mixing signed and unsigned values. At the very least it is difficult to know when overflow has occurred and how any carry bits should be handled.
 2. The two values to add or subtract should have the same bit count. You would normally sign-extend the shorter value if this is not the case.
-3. Ignore any carry bit that remains after adding adding or subtracting signed values. However you do need to check for overflow.
+3. Ignore any carry bit that remains after adding adding or subtracting signed values. But you do need to check for overflow.
 
 ## Processor registers
 
-The 6502 has six [processor registers](https://en.wikipedia.org/wiki/Processor_register). These are special data storage areas that are separate from the CPU address space. These registers allow the 6502 to execute instructions faster than it otherwise could if it was only able to access the system RAM. Each has a special role within the CPU.
+The 6502 has six [processor registers](https://en.wikipedia.org/wiki/Processor_register). These are special data storage areas that are separate from the CPU address space. These registers allow the 6502 to execute instructions faster than it would if it could only access system RAM. Each has a special role within the CPU.
 
-The six registers, along with their commonly used abbreviations, are:
+The six registers, along with their abbreviations, are:
 
 - The Program Counter (PC).
 - The Stack Pointer (S).
@@ -385,45 +387,45 @@ The six registers, along with their commonly used abbreviations, are:
 - Index Register X (X).
 - Index Register Y (Y).
 
-The **Program Counter** (PC) stores the address of the next instruction to be executed. Normally that address gets updated automatically by the CPU as it sequentially executes your program, but certain instructions update the value of the Program Counter to an address somewhere else in the program code.
+The **Program Counter** (PC) stores the address of the next instruction to be executed. That address gets updated automatically by the CPU as it sequentially executes your program. You can also use instructions to update the value of the Program Counter to a particular address.
 
-Because the Program Counter stores an address and the 6502 uses 16-bit addresses, this register is two bytes in size. The rest of the registers each hold a single data value and, since the 6502 has an 8-bit data bus, all are one byte in size.
+This register is two bytes in size because the Program Counter stores an address. (The 6502 uses 16-bit addresses.) The rest of the registers each hold a single data value and, since the 6502 has an 8-bit data bus, all are one byte in size.
 
 The **Accumulator** (A) is the main register that instructions operate on. Many instructions use it in their inputs or write the result to it. It is also useful as a temporary storage area when moving data from one memory location to another.
 
-**Index Register X** (X) and **Index Register Y** (Y), or more simply the X register and the Y register, are both primarily used to specify a particular byte in the address space for an instruction to operate on, when the address of that byte is the sum of some base address plus the current value of the X or Y register. For example, if an instruction uses a base address of `$0C01` with the X register, and the current value in the X register is `$02`, then the address accessed by the instruction will be `$0C03` (`$0C01` plus `$02`). Indexing in this way is useful when you want to iterate through a sequence of bytes in memory. Like the Accumulator, these index registers can also be used as temporary storage areas.
+**Index Register X** (X) and **Index Register Y** (Y) are more simply called the X register and the Y register. Each can be used to specify a particular byte in the address space for an instruction to operate on, when the address of that byte is the sum of some base address and the current value in the register. For example, an instruction might using the X register with a base address of `$0C01`. If the current value in the X register is `$02` then the address accessed by the instruction will be `$0C03` (`$0C01` plus `$02`). Indexing in this way is useful when you want to iterate through a sequence of bytes in memory. You can also use these index registers as temporary storage areas.
 
-The **Stack Pointer** (S) is used to point to the next free byte in the 6502's call stack. The call stack is covered in detail later in this post.
+The **Stack Pointer** (S) is used to point to the next free byte in the 6502's call stack. I cover the call stack in detail later in this post.
 
-Finally there is the **Processor Status** (P) register. This register actually operates as eight flag bits, where each bit indicates if some particular processor status is currently true or not. A bit is set if it is a one, and clear or not set if it is a zero. Only seven out of the eight flag bits are used; bit #5 is unused.
+Finally there is the **Processor Status** (P) register. This register actually operates as eight flag bits. Each bit indicates if some particular processor status is currently true or not. A bit is set if it is a one, and clear or not set if it is a zero. Only seven out of the eight flag bits are used; bit #5 is unused.
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/processor-status-register-2x.png "The Processor Status register flags")
 
-The **[Carry](https://en.wikipedia.org/wiki/Carry_flag)** (C) flag is used by the ALU as a carry or borrow bit for addition and subtraction, and as a ninth bit for the bit shifting operations.
+The **[Carry](https://en.wikipedia.org/wiki/Carry_flag)** (C) flag is used by the ALU as a carry or borrow bit for addition and subtraction. The ALU also uses it as a ninth bit for the bit shifting operations.
 
-When the ALU is to be used for an addition operation, the Carry flag needs to be set if the addition should include a carry bit or cleared if it should not. This flag then gets updated by the ALU as part of the addition operation: it gets set if the result of the addition includes a carry bit, or it gets cleared if the result does not include a carry bit.
+Before an addition, the Carry flag needs to be set if the addition includes a carry bit or cleared if it does not. The ALU then updates this flag when the addition operation is complete. It gets set if the result of the addition includes a carry bit. It gets cleared if the result does not include a carry bit.
 
-When the ALU is to be used for a subtraction operation, the Carry flag needs to be set if the subtraction should not include a borrow bit or cleared if it should include it. This flag then gets updated by the ALU as part of the subtraction operation: it gets set if the subtraction did not require a bit to be borrowed, or it gets cleared if the subtraction did require a bit to be borrowed.
+Before a subtraction, the Carry flag needs to be set if the subtraction does not include a borrow bit or cleared if it does. The ALU then updates this flag when the subtraction operation is complete. It gets set if it did not need to borrow a bit. It gets cleared if it did need to borrow a bit.
 
-The **Negative** (N) flag is useful when values are being interpreted as signed values using the two's complement representation. As described earlier in this post, in that representation the most significant bit (the sign bit) indicates if the value is negative, when that bit is set, or positive, when that bit is not set. To assist with checking whether a signed value is positive or negative, some instructions update the state of this Negative flag to the same state as bit #7 of the instruction result. So if we know that the result represents the MSB of a signed value, the state of this flag tells us if the result is positive or negative.
+The **Negative** (N) flag is useful when values are being interpreted as signed values. The most significant bit (the sign bit) indicates if the value is positive or negative. Some instructions update this flag to the same state as bit #7 of the instruction result. If we know that the instruction result is the MSB of a signed value, this flag indicates if the value is positive or negative.
 
-(Note that the borrowing is conceptual since, as explained earlier, subtraction is implemented as a form of addition.)
+(Note that the borrowing is conceptual since, as explained earlier, the ALU turns subtraction into addition.)
 
-The [**Overflow**](https://en.wikipedia.org/wiki/Overflow_flag) (V) flag is set by the ALU when the sign bit of the result of an addition or subtraction does not have the expected state, specifically when the values being added or subtracted are interpreted as signed 8-bit values using the two's complement representation. If the Overflow flag is set then overflow has occurred and the result is not valid. If this flag is not set then overflow has not occurred. Note that it is only useful to check for overflow after adding or subtracting the MSBs of two signed values.
+The ALU sets the [**Overflow**](https://en.wikipedia.org/wiki/Overflow_flag) (V) flag when the sign bit of the result of an addition or subtraction does not have the expected state. This is specifically when the values being added or subtracted are interpreted as signed 8-bit values. It is only useful to check for overflow after adding or subtracting the MSBs of two signed values. If the Overflow flag is set then overflow has occurred and the result is not valid. If this flag is not set then overflow has not occurred.
 
-The Overflow and Negative flags are useful if you want to check the state of bit #6 or bit #7 of some byte. For example, this can be done for any byte in memory using a BIT instruction (as discussed later in this post). These flags makes these bit numbers cheap to test for, and so any flag bytes in your program should generally use bit #6 or bit #7 for the flags that are checked most frequently.
+The Overflow and Negative flags are useful if you want to check the state of bit #6 or bit #7 of some byte. For example, you can use a BIT instruction to do this for any byte in memory (as discussed later in this post). These flags makes these bit numbers cheap to test. Any flag bytes in your program should generally use bit #6 or bit #7 for the flags that you will check most.
 
 The **Zero** (Z) flag is set by some instructions if the result of the instruction is zero (i.e., `$00`). For example, subtracting `$04` from `$04` equals `$00`, which would result in the Zero flag being set.
 
-The **Interrupt Disable** (I) flag indicates if maskable interrupts are disabled, when this flag is set, or enabled, when the flag is not set. Interrupts are covered later in this post.
+The **Interrupt Disable** (I) flag indicates if maskable interrupts are disabled, when the flag is set, or enabled, when the flag is not set. I cover interrupts later in this post.
 
-The **Break** (B) flag is updated by the CPU as appropriate and is useful in an interrupt handler if you need to determine if the interrupt was triggered by a BRK instruction or whether it was triggered by a normal maskable interrupt. Interrupts are covered later in this post.
+The CPU updates the **Break** (B) flag as appropriate. It is useful in an interrupt handler if you need to determine how an interrupt was triggered. It could have been by a BRK instruction or by a normal maskable interrupt.
 
-The **Decimal Mode** (D) flag is used to control if the CPU is in binary coded decimal mode or not. The flag can be set and cleared, but because the CPU used in the NES does not implement this mode, these changes have no effect on the CPU's operation.
+The **Decimal Mode** (D) flag is used to control if the CPU is in binary coded decimal mode or not. The flag can be set and cleared, but this has no effect on the CPU's operation. The CPU used in the NES does not implement this mode.
 
 ## Addressing modes
 
-As stated earlier in this post, a program instruction represents a particular operation on a particular byte of data. The instruction's three-letter mnemonic determines the particular operation, but the byte of data to operate on also needs to be specified. Each means of specifying that byte of data is termed an addressing mode. The 6502 has thirteen such modes:
+A program instruction represents a particular operation on a particular byte of data. The instruction's three-letter mnemonic determines the particular operation. The byte of data to operate on can be specified in several ways. Each means of specifying that byte of data is termed an addressing mode. The 6502 has thirteen such modes:
 
 - Implied
 - Accumulator
@@ -443,31 +445,31 @@ Each of the 6502's operations support one or more of these addressing modes.
 
 In the **Implied** addressing mode, it is the operation itself that implies the byte to operate on. For example, the CLC (Clear Carry Flag) clears the Carry flag of the Processor Status register. The byte to operate on &mdash; the Processor Status register &mdash; is implied; you cannot specify a different byte of data.
 
-Related to the implied addressing mode is the **Accumulator** addressing mode, which takes the form `<mnemonic> A`. It specifies that the byte to operate on is the value in the Accumulator (hence 'A').
+Related to the implied addressing mode is the **Accumulator** addressing mode. This takes the form `<mnemonic> A`. It specifies that the byte to operate on is the value in the Accumulator (hence 'A').
 
-Instructions that use either the implied or Accumulator addressing modes are always just one byte long because they have no operand. The remainder of the addressing modes require an operand to specify the byte of data to operate on. I will mainly use the LDA (Load Accumulator with memory) operation to illustrate these addressing modes. It is used to load a byte of data from memory into the Accumulator.
+Instructions that use the Implied or Accumulator addressing modes are always one byte long because they have no operand. The rest of the addressing modes need an operand to specify the byte of data to operate on. I will mainly use the LDA (Load Accumulator with memory) operation to illustrate these addressing modes. It is used to load a byte of data from memory into the Accumulator.
 
-The **Immediate** addressing mode takes the form `<mnemonic> #<some_byte_value>` (note the hash character), where `<some_byte_value>` is the byte to operate on &mdash; it is embedded in the instruction. An instruction using this addressing mode will be two bytes long: one byte for the opcode and one byte for the embedded byte value. The following example loads the value `$04` into the Accumulator:
+The **Immediate** addressing mode takes the form `<mnemonic> #<some_byte_value>` (note the hash character). The `<some_byte_value>` is the byte to operate on &mdash; it is embedded in the instruction. An instruction that uses this addressing mode will be two bytes long: one byte for the opcode and one byte for the embedded byte value. The following example loads the value `$04` into the Accumulator:
 
 ```asm6502
 LDA #$04
 ```
 
-The **Absolute** addressing mode takes the form `<mnemonic> <some_address>`, where `<some_address>` is a two-byte address in the CPU address space. It is the byte at this address that will be operated on. An instruction using this addressing mode will be three bytes long: one byte for the opcode and two bytes for the address. The following example loads the byte at address `$027E` into the Accumulator:
+The **Absolute** addressing mode takes the form `<mnemonic> <some_address>`. The `<some_address>` is a two-byte address in the CPU address space. It is the byte at this address that will be operated on. An instruction that uses this addressing mode will be three bytes long: one byte for the opcode and two bytes for the address. The following example loads the byte at address `$027E` into the Accumulator:
 
 ```asm6502
 LDA $027E
 ```
 
-A variation on the absolute addressing mode is the **Zero Page** addressing mode. This takes the form `<mnemonic> <some_byte_value>`, where `<some_byte_value>` specifies an address within the zero page. The zero page is the first 256 bytes of the CPU address space, from addresses `$0000` to `$00FF`. Since we know that the most significant byte of a zero page address will always be `$00`, only a single byte is required to specify an address within it. It is the byte at this address that will be operated on. An instruction using this addressing mode will be two bytes long: one byte for the opcode and one byte for the address LSB. The following example loads the byte at address `$007E` into the Accumulator:
+A variation on the absolute addressing mode is the **Zero Page** addressing mode. This takes the form `<mnemonic> <some_byte_value>`. The `<some_byte_value>` specifies an address within the zero page. The zero page is the first 256 bytes of the CPU address space, from addresses `$0000` to `$00FF`. Since we know that the most significant byte of a zero page address will always be `$00`, we only need a single byte to specify an address within it. It is the byte at this address that will be operated on. An instruction that uses this addressing mode will be two bytes long: one byte for the opcode and one byte for the address LSB. The following example loads the byte at address `$007E` into the Accumulator:
 
 ```asm6502
 LDA $7E
 ```
 
-You could instead use the Absolute addressing mode to load this byte (using the instruction `LDA $007E`) but there are advantages to preferring the Zero Page addressing mode: the instruction is smaller (two bytes instead of three), and the instruction will take one less cycle to execute. The 6502 has relatively few registers, and the Zero Page addressing mode compensates somewhat for this by making the zero page more efficient to access than the rest of system RAM. Because of this, your most frequently accessed values should be stored in the zero page.
+You could use the Absolute addressing mode to load this byte (using the instruction `LDA $007E`) but there are advantages to the Zero Page addressing mode. The instruction is smaller (two bytes instead of three), and the instruction will take one less cycle to execute. The 6502 has relatively few registers. The Zero Page addressing mode compensates somewhat for this by making the zero page more efficient to access than the rest of system RAM. Because of this, you should store your most accessed values in the zero page.
 
-There are four addressing modes that are indexed variations of the Absolute and Zero Page addressing modes: **Absolute, X**; **Absolute, Y**; **Zero Page, X**; and **Zero Page, Y**. In each, the address of the byte to operate on is computed by adding the current value in either the X or Y register to the address specified in the instruction. Thus the address in the instruction is a base address to which an index value is added in order to obtain the final address of the byte to be operated on. (This is the reason why the X and Y registers are called index registers.) These modes are indicated by appending `, X` or `, Y` as appropriate.
+There are four addressing modes that are indexed variations of the Absolute and Zero Page addressing modes: **Absolute, X**; **Absolute, Y**; **Zero Page, X**; and **Zero Page, Y**. With each, the address of the byte to operate on is found by adding the current value in either the X or Y register to the address specified in the instruction. Thus the address in the instruction is a base address to which an index value is added to get the final address of the byte to operate on. (This is the reason why the X and Y registers are called index registers.) We indicate these modes by appending `, X` or `, Y` as appropriate.
 
 The following example instructions demonstrate these four modes:
 
@@ -478,11 +480,11 @@ LDA $027E, Y  ; Absolute, Y
 LDA $7E, Y    ; Zero Page, Y
 ```
 
-These indexed addressing modes are useful when you need to loop through some part of the address space. They allow you to write fewer instructions as compared to an [unrolled loop](https://en.wikipedia.org/wiki/Loop_unrolling), although this is at the expense of increased execution time. But be aware: in the zero page form the result is always an address within the zero page. For example, if the instruction `LDA $FF, X` is executed when the X register contains the value `$02`, then the address accessed is not `$0101` (`$FF` + `$02`) but is instead `$0001`. Only the LSB of the address changes when indexing within the zero page.
+These indexed addressing modes are useful when you need to loop through some part of the address space. They allow you to write fewer instructions compared to an [unrolled loop](https://en.wikipedia.org/wiki/Loop_unrolling), at the expense of increased execution time. But be aware: in the zero page form the result is always an address within the zero page. For example, if the instruction `LDA $FF, X` is executed when the X register contains the value `$02`, then the address accessed is not `$0101` (`$FF` + `$02`) but is `$0001`. Only the LSB of the address changes when indexing within the zero page.
 
-Up to now the addressing modes that specify the address of the byte to operate on have done so by hard-coding that address within the instruction. But what if it is only at runtime that you will know the address to use? Or what if you are creating a subroutine and the address needs to vary depending on the current program state? These are the scenarios that the various indirect addressing modes support.
+Up to now, the addressing modes that specify the address of the byte to operate on have done so by hard-coding the address within the instruction. But what if it is only at runtime that you will know the address to use? Or what if you are creating a subroutine and the address needs to vary depending on current program state? These are the scenarios that the various indirect addressing modes support.
 
-There are two indexed indirect addressing modes. The first one is the **(Indirect, X)** addressing mode and it takes the form `<mnemonic> (<some_byte_value>, X)`, where `<some_byte_value>` specifies an address within the zero page. The value in the X register is added to this address, with the result again specifying an address within the zero page. The byte of data at this adjusted address is then read, along with the byte after it, and the two bytes are interpreted as the LSB and MSB respectively of an address somewhere in the CPU address space. It is this final address that identifies the byte of data in memory that the instruction should operate on.
+There are two indexed indirect addressing modes. The first one is the **(Indirect, X)** addressing mode and it takes the form `<mnemonic> (<some_byte_value>, X)`. The `<some_byte_value>` specifies an address within the zero page. The value in the X register is added to this address, with the result again specifying an address within the zero page. The byte of data at this adjusted address is then read, along with the byte after it. The two bytes are interpreted as the LSB and MSB of an address somewhere in the CPU address space. This final address identifies the byte of data in memory that the instruction should operate on.
 
 The following is an example instruction that uses this addressing mode:
 
@@ -490,11 +492,11 @@ The following is an example instruction that uses this addressing mode:
 LDA ($04, X)
 ```
 
-The address specified represents the address `$0004`. The CPU first adds the current value in the X register to it. If the value in the X register is `$02` then the resulting address will be `$0006`. The CPU now reads the value of the byte at address `$0006` and the value of the byte after it, combining them to create a two-byte address. If the value of the byte at address `$0006` is `$34` and the value of the byte at address `$0007` is `$12` then the resulting address is `$1234`. This is the address that identifies the byte of data that the instruction should operate on. In this example, it is the byte in memory at address `$1234` that will be loaded into the Accumulator.
+The address specified represents the address `$0004`. The CPU first adds the current value in the X register to it. If the value in the X register is `$02` then the resulting address will be `$0006`. The CPU now reads the value of the byte at address `$0006` and the value of the byte after it. It combines them to create a two-byte address. If the value of the byte at address `$0006` is `$34` and the value of the byte at address `$0007` is `$12` then the result will be `$1234`. This is the address that identifies the byte of data that the instruction should operate on. In this example, it is the byte in memory at address `$1234` that the CPU will load into the Accumulator.
 
-Note that, as with the Zero Page, X and Zero Page, Y addressing modes, the result of adding the value in the X register to the zero page address is always another zero page address; only the LSB of the address is adjusted. For example, if the instruction is `LDA ($FF, X)` and the value in the X register is `$00`, then the CPU reads the value of the bytes at addresses `$00FF` and `$0000` to create the final two-byte address, not the bytes at addresses `$00FF` and `$0100`.
+Note that adding the value in the X register to the zero page address always gives another zero page address. Only the LSB of the address is adjusted. This is the same as with the Zero Page, X and Zero Page, Y addressing modes. For example, if the instruction is `LDA ($FF, X)` and the value in the X register is `$00`, then the CPU reads the value of the bytes at addresses `$00FF` and `$0000`. It does not read the bytes at addresses `$00FF` and `$0100`.
 
-The second indexed indirect addressing mode is the **(Indirect), Y** addressing mode and it takes the form `<mnemonic> (<some_byte_value>), Y`, where `<some_byte_value>` again specifies an address within the zero page, but the indexing is implemented differently. The byte of data at this zero page address is read, along with the byte after it, and the two bytes are interpreted as the LSB and MSB respectively of a base address somewhere in the CPU address space. The value in the Y register is then added to this base address to create the address that actually identities the byte of data that the instruction should operate on.
+The second indexed indirect addressing mode is the **(Indirect), Y** addressing mode. It takes the form `<mnemonic> (<some_byte_value>), Y`. The `<some_byte_value>` again specifies an address within the zero page, but indexing is implemented differently. The CPU reads the byte of data at this zero page address, along with the byte after it. It interprets the two bytes as the LSB and MSB of a base address somewhere in the CPU's address space. The value in the Y register is then added to this base address. This creates the final address of the byte of data that the instruction should operate on.
 
 The following is an example instruction that uses this addressing mode:
 
@@ -502,11 +504,11 @@ The following is an example instruction that uses this addressing mode:
 LDA ($04), Y
 ```
 
-The address specified represents the address `$0004`. The CPU reads the value of the byte at address `$0004` and then reads the value of the byte after it, combining them to create a two-byte address. If the value of the byte at address `$0004` is `$34` and the value of the byte at address `$0005` is `$12` then the resulting address is `$1234`. The CPU now adds the value in the Y register to this address. If the value in the Y register is `$02` then the result will be `$1236`. This is the address that identifies the byte of data that the instruction should operate on. In this example, it is the byte in memory at address `$1236` that will be loaded into the Accumulator.
+The address specified represents the address `$0004`. The CPU reads the value of the byte at address `$0004` and then reads the value of the byte after it. It combines them to create a two-byte address. If the value of the byte at address `$0004` is `$34` and the value of the byte at address `$0005` is `$12` then the resulting address is `$1234`. The CPU now adds the value in the Y register to this address. If the value in the Y register is `$02` then the result will be `$1236`. This is the address that identifies the byte of data that the instruction should operate on. In this example, the CPU will load the byte in memory at address `$1236` into the Accumulator.
 
-Note that if the zero page address specified in the instruction is `$FF`, then the CPU reads the value of the bytes at addresses `$00FF` and `$0000` to create the two-byte address, not the bytes at addresses `$00FF` and `$0100`.
+Note that if the zero page address specified in the instruction is `$FF`, then the CPU reads the value of the bytes at addresses `$00FF` and `$0000`. It does not read the bytes at addresses `$00FF` and `$0100`.
 
-There is a third indirect addressing mode, the **Absolute Indirect** addressing mode, but it is only used with the JMP operation. It takes the form `JMP (<some_address>)` (note the parentheses), where `<some_address>` is an address in the CPU address space. At runtime, the byte of data at this address is read along with the byte after it, and these two bytes are interpreted as the LSB and MSB respectively of an address that is used to update the Program Counter.
+There is a third indirect addressing mode, the **Absolute Indirect** addressing mode. It is only used with the JMP operation. It takes the form `JMP (<some_address>)` (note the parentheses). The `<some_address>` is an address in the CPU address space. At runtime, the CPU reads the byte of data at this address along with the byte after it. The CPU interprets these two bytes as the LSB and MSB of an address that it uses to update the Program Counter.
 
 The following is an example JMP instruction that uses this addressing mode:
 
@@ -514,9 +516,9 @@ The following is an example JMP instruction that uses this addressing mode:
 JMP ($1234)
 ```
 
-The CPU reads the value of the byte at address `$1234` and the value of the byte after it, combining them to create a two-byte address. If the value of the byte at address `$1234` is `$78` and the value of the byte at address `$1235` is `$56` then the resulting address is `$5678`. This is the address that the JMP instruction uses to update the Program Counter with, and so program execution jumps to that address.
+The CPU reads the value of the byte at address `$1234` and the value of the byte after it. It combines them to create a two-byte address. If the value of the byte at address `$1234` is `$78` and the value of the byte at address `$1235` is `$56` then the resulting address is `$5678`. This is the address that the CPU updates the Program Counter to. Program execution now jumps to that address.
 
-The final addressing mode is the **Relative** addressing mode. This is an addressing mode that is used exclusively by the branch operations (discussed later in this post). This mode takes the form `<mnemonic> <some_signed_byte_value>`, where `some_signed_byte_value` is a single byte that is interpreted by the CPU as a two's complement signed value. The magnitude of this value indicates how much to adjust the Program Counter by, and its sign indicates whether that adjustment is forward (a positive value) or backward (a negative value). Program execution then continues from the adjusted address.
+The final addressing mode is the **Relative** addressing mode. This is an addressing mode that is used exclusively by the branch operations. (I cover those operations later in this post.) This mode takes the form `<mnemonic> <some_signed_byte_value>`. The `some_signed_byte_value` is a single byte that is interpreted by the CPU as a two's complement signed value. The magnitude of this value indicates how much the CPU should adjust the Program Counter by. Its sign indicates whether that adjustment should be forward (a positive value) or backward (a negative value). Program execution then continues from the adjusted address.
 
 ```asm6502
 BMI $7F ; Jump forward 127 bytes if the branch condition is true.
@@ -530,7 +532,7 @@ Normally you would use a label as the operand:
 BMI some_label ; Jump to some_label if the branch condition is true.
 ```
 
-Given that a single signed byte value is used to indicate the adjustment, it can only be in the range -128 to +127; you cannot adjust the Program Counter beyond this. This restriction is discussed later in this post in the section on branching.
+Since a single signed byte value is used to indicate the adjustment, it can only be in the range -128 to +127. You cannot adjust the Program Counter beyond this range. I discuss this restriction later in this post in the section on branching.
 
 ## The operations in detail
 
@@ -2354,13 +2356,13 @@ Does not update any flags.
 
 ### The unofficial opcodes
 
-As stated previously in this post, there are 151 official opcodes. Given that an opcode is one byte in length and one byte can define 256 values, it is natural to wonder what would happen if a machine instruction were to use an opcode value that is not one of the 151 official values.
+As stated in this post, there are 151 official opcodes. Since an opcode is one byte in length and one byte can define 256 values, there are other possible opcode values. What would happen if a machine instruction were to have an opcode value that is not one of the 151 official values?
 
-The result depends on the exact unofficial value used. For some, the result is a no-op or the NES will freeze until the Reset button is pressed, but for others there are useful effects and [a few NES games](https://wiki.nesdev.com/w/index.php/CPU_unofficial_opcodes#Games_using_unofficial_opcodes) have made use of them. A good description of why the unofficial opcodes have the effects that they do can be found [here](https://www.pagetable.com/?p=39). [This page](https://wiki.nesdev.com/w/index.php/Programming_with_unofficial_opcodes) on the Nesdev wiki looks at which unofficial opcodes are actually useable.
+The result would depend on the exact unofficial value used. For some values, the result is a no-op or the NES will freeze until you press the Reset button. For others there are useful effects and [a few NES games](https://wiki.nesdev.com/w/index.php/CPU_unofficial_opcodes#Games_using_unofficial_opcodes) have made use of them. You can read a good description [here](https://www.pagetable.com/?p=39) of why the unofficial opcodes have the effects they do. [This page](https://wiki.nesdev.com/w/index.php/Programming_with_unofficial_opcodes) on the Nesdev wiki looks at which unofficial opcodes are actually useable.
 
 ## Conclusion
 
-If you have not done any low-level programming before then writing games for the NES, and so programming the 6502, involves learning a number of new concepts. This has been a long post and it has covered some tricky details, but the information presented here will provide a solid base for your future programming of the NES.
+If you have not done any low-level programming before then writing games for the NES involves learning many new concepts. The information presented here should provide a solid base for your NES programming.
 
 ## Further reading
 
@@ -2372,3 +2374,4 @@ If you have not done any low-level programming before then writing games for the
 
 - 2020-06-23 Draft version
 - 2020-08-02 A substantial rework of the explanations for addition and subtraction.
+- 2020-08-26: Plain English improvements
