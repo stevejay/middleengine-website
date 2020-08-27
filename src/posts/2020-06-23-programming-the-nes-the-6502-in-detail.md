@@ -11,7 +11,7 @@ issueNumber: 47
 
 ## Introduction
 
-In the previous post from this series, I presented an overview of the NES and its subsystems. A key component is the CPU, which is a version of the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) CPU. To write games for the NES, it is necessary to understand how it functions and how to program it using assembly. This post covers the basics that you will need.
+In the previous post from this series, I presented an overview of the NES and its subsystems. A key component is the CPU, which is a version of the [MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502) CPU. To write games for the NES, it is necessary to understand how this CPU functions and how to program it using assembly. This post covers the basics that you will need.
 
 The main reference used in this post is the original [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf). It is a dense read but it does include a lot of useful advice and many worked examples. You can ignore any information about the 6502's binary coded decimal mode as it is not supported by the NES's CPU.
 
@@ -57,9 +57,9 @@ LDA #$04 ; This comment comes after an instruction
 
 ### Opcodes
 
-A program instruction represents a particular operation to be performed. It may or may not include an operand. The [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) used in the instruction identifies the operation. The opcode is a byte value in the range 0 to 255 inclusive. The 6502 officially supports 151 opcodes and they are grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). Each opcode in a group performs the same basic operation, such as adding two numbers together. They differ by the addressing mode used to specify the data to operate on. (I cover addressing modes later in this post.)
+A program instruction represents a particular operation for the CPU to perform. It may or may not include an operand. The [instruction operation code](https://en.wikipedia.org/wiki/Opcode) (opcode) used in the instruction identifies the operation. The opcode is a byte value in the range 0 to 255 inclusive. The 6502 supports 151 opcodes and they are grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). Each opcode in a group performs the same basic operation, such as adding two numbers together. They differ by the addressing mode used to specify the data to operate on. (I cover addressing modes later in this post.)
 
-For each instruction in your program, the assembler needs to determine the opcode to output. You state the basic operation by the particular three-letter mnemonic that you use. The mnemonic is not case sensitive.
+For each instruction in your program, the assembler needs to determine the opcode to use. You state the basic operation by the particular three-letter mnemonic that you use. The mnemonic is not case sensitive.
 
 ```asm6502
 SEI       ; The mnemonic is SEI.
@@ -68,7 +68,7 @@ LDA $0211 ; This instruction has the mnemonic LDA
           ; and it is followed by an operand.
 ```
 
-You state the addressing mode by either omitting an operand or by the syntax you use to define it. The assembler uses this combination of mnemonic and addressing mode to identify which of the 151 opcodes to output. As an example, let us consider the operation 'Add memory to Accumulator with Carry' which has the mnemonic `ADC`{lang=asm6502}. All the following instructions use that mnemonic and an operand value of `$04`, but the syntax used to define the operand differs:
+You state the addressing mode by either omitting the operand or by the syntax you use to define it. The assembler uses the mnemonic and the addressing mode to work out which opcode to output. As an example, let us consider the operation 'Add memory to Accumulator with Carry'. It has the mnemonic `ADC`{lang=asm6502}. All the following instructions use that mnemonic and an operand value of `$04`:
 
 ```asm6502
 ADC #$04     ; The opcode is $69.
@@ -76,15 +76,15 @@ ADC $04, X   ; The opcode is $61.
 ADC ($04), Y ; The opcode is $71.
 ```
 
-The particular syntax you use for the operand tells the assembler which addressing mode is being used. This allows it to choose which one of the `ADC`{lang=asm6502}-related opcodes to output.
+What differs is the syntax used to define the operand. The particular syntax you use tells the assembler which addressing mode to use. This allows it to choose which one of the `ADC`{lang=asm6502}-related opcodes to output.
 
 The assembler outputs the opcode first and the operand second, if there is one. The operand is one or two bytes in size so every machine instruction is either one, two, or three bytes in size.
 
-The 6502 is little endian so any addresses in the program get encoded LSB first and MSB second. For example, if an operation has an operand of the address `$1234` then the assembler will encode that address as `$3412` (`$12` being the MSB and `$34` being the LSB).
+The 6502 is little endian so any addresses in the program get encoded LSB first and MSB second. If an operation has an operand of the address `$1234` then the assembler will encode that address as `$3412`. (Here `$12` is the MSB and `$34` is the LSB.)
 
 ### Labels
 
-You can use a label to associate a name with a particular location in the program code. The assembler replaces any uses of a label with either the program address that it is associated with or the relative offset to it. (The exact replacement value depends on the addressing mode used.) Using labels makes the code more readable and avoids the use of hardcoded program addresses.
+You can use a label to associate a name with a particular location in the program code. The assembler replaces any uses of a label with the address of that location or the relative offset to it. (The exact replacement value depends on the addressing mode used.) Using labels makes your code more readable and avoids hardcoded program addresses.
 
 You declare each label as a case-insensitive identifier followed by a colon. The following code declares the label `this_is_a_label`:
 
@@ -138,7 +138,7 @@ It is common to use uppercase for the names of constants.
 
 ### Embedded bytes
 
-Your program code will mostly consist of instructions but sometimes you will need to embed some data. For example, you might need to embed colour palette data. An assembler will include a means for doing so. The following assembly embeds some data into the program code:
+Sometimes you will need to embed data in your program. For example, you might need to embed colour palette data. An assembler will include a means for doing so. The following assembly embeds some data into the program code:
 
 ```asm6502
 .byte $02,$30,$20,$20 ; Embeds these four one-byte values.
@@ -146,7 +146,7 @@ Your program code will mostly consist of instructions but sometimes you will nee
 .addr some_label      ; Embeds the address associated with the label.
 ```
 
-In this assembler dialect, `.byte`, `.word` and `.addr` are instructions for the assembler. These assembler instructions are termed control commands.
+In this assembler dialect, `.byte`, `.word` and `.addr` are instructions for the assembler. We term these assembler instructions _control commands_.
 
 ## Binary number theory
 
@@ -161,7 +161,7 @@ A byte consists of 8 bits, from bit #0, the least significant bit, to bit #7, th
 %11111111 ; Largest 8-bit unsigned value (255 in decimal).
 ```
 
-An alternative interpretation is that they represent a signed value. In that case, bit #7 indicates if the value is negative &mdash; when it is set &mdash; or positive &mdash; when it is not set. Bits #0 to #6 give the size of this positive or negative value. The representation of signed binary values used in the 6502 is called [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement). The following values illustrate this representation:
+An alternative interpretation is that they represent a signed value. In that case, bit #7 indicates if the value is negative &mdash; when it is set &mdash; or positive &mdash; when it is not set. Bits #0 to #6 give the size of this positive or negative value. The 6502 uses the [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement) representation for signed binary values. The following values illustrate this representation:
 
 ```asm6502
 %00000000 ; Positive 8-bit signed value with smallest magnitude (0 in decimal).
@@ -173,7 +173,7 @@ An alternative interpretation is that they represent a signed value. In that cas
 
 ### Multi-byte binary values
 
-Larger unsigned and signed values can be represented by increasing the number of bits. For example, 16-bit (two byte) values can represent an unsigned value in the range 0 to 65,535:
+We can represent larger unsigned and signed values by increasing the number of bits. For example, 16-bit (two byte) values can represent an unsigned value in the range 0 to 65,535:
 
 ```asm6502
 %0000000000000000 ; Smallest 16-bit unsigned value (0 in decimal).
@@ -226,7 +226,7 @@ When adding unsigned binary values, we could detect an invalid result: there wou
 
 More generally, when adding a negative value to a positive value or a positive value to a negative value, overflow cannot occur. But when the result of adding two positive values is negative or the result of adding two negative values is positive, overflow has occurred.
 
-It is important to note that a remaining carry bit does **not** indicate an invalid result in the way that it does when adding unsigned values. You should in fact ignore any remaining carry bit.
+It is important to note that a remaining carry bit does **not** show an invalid result in the way that it does when adding unsigned values. You should in fact ignore any remaining carry bit.
 
 We have to use 16-bit signed values in the above calculation to get the correct result. As you might expect, we have to add signed multi-byte values one byte pair at a time. We start with the LSBs and finish with the MSBs, and include any carry bits in the calculations. When performing the final addition of the MSBs, we need to check for overflow to ensure that the result is valid. We also ignore any carry bit that remains from this final addition.
 
@@ -234,9 +234,9 @@ To illustrate adding 16-bit signed values, let us add `$80FF` and `$FFFE` (-32,5
 
 ### The implementation of addition in the 6502
 
-We perform mathematical operations using the 6502's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU). The 6502 includes a Carry flag that is used in two ways:
+We perform mathematical operations using the 6502's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU). The 6502 includes a Carry flag that it uses in two ways:
 
-1. It is used during addition to indicate if the ALU should add one to the current addition calculation. The ALU will add one when the flag is set.
+1. During addition it indicates if the ALU should add one to the current addition calculation. The ALU will add one when the flag is set.
 2. The ALU updates it after an addition to indicate whether the result includes a carry bit. If the Carry flag is set then the result includes a carry bit, but if the Carry flag is not set then it does not.
 
 We use the addition operation to add two byte values. The calculation that the ALU performs is the following:
@@ -247,7 +247,7 @@ Byte1 + Byte2 + Carry
 
 Carry has the value one if the Carry flag is set, or zero if it is not.
 
-When starting an addition operation, we must first ensure that the Carry flag is not set. When adding multi-byte values, we must also not update the state of the Carry flag as we proceed to add the byte pairs. This way any carry bit generated as a result of adding one pair of bytes will get carried over into the next pair of bytes.
+When starting an addition operation, we must first ensure that the Carry flag is not set. When adding multi-byte values, we must also not update the state of the Carry flag as we proceed to add the byte pairs. This way any carry bit generated as a result of adding one pair of bytes gets carried over into the next pair of bytes.
 
 ### Subtracting binary values
 
@@ -267,14 +267,14 @@ As you can see, borrowing still applies as necessary.
 
 #### Subtraction as addition
 
-As noted before, the ALU performs the mathematical operations. Designing an ALU to support both addition and subtraction adds to its complexity and cost. There is an alternative approach: we can implement subtraction as addition if we negate the subtrahend and then add it to the minuend. Let us say that we want to calculate +35 - +7, which equals +28. If we negate the subtrahend then it changes value from +7 to -7. By adding it to the minuend, the calculation now becomes +35 + -7 and we still get the answer +28.
+As noted before, the ALU performs the mathematical operations. Creating an ALU that supports both addition and subtraction adds to its complexity. There is an alternative approach. We can implement subtraction as addition if we negate the subtrahend and then add it to the minuend. This is best illustrated with an example. Let us say that we want to calculate +35 - +7, which equals +28. If we negate the subtrahend then it changes value from +7 to -7. By adding it to the minuend, the calculation now becomes +35 + -7 and we still get the answer +28.
 
 For this technique to work in the binary world of the 6502, we need to know how to negate a signed binary value. As explained earlier, the 6502 uses the two's complement representation for signed values. Thus the following negation process applies:
 
 1. Find the one's complement of the number.
 2. Add one.
 
-Finding the one's complement of a binary value means inverting its bits. All the ones become zeroes and all the zeroes become ones. The symbol for taking the one's complement of a number is the tilde (~).
+Finding the one's complement of a binary value means inverting its bits. All the ones become zeros and all the zeros become ones. The symbol for taking the one's complement of a number is the tilde (~).
 
 Let us try calculating +35 - +7 again but this time in binary. Using the two's complement representation, this is `%00100011` - `%00000111`. The one's complement of the subtrahend is `%11111000`, or -8 in decimal. We add one to it, to give `%11111001`, or -7 in decimal. The subtraction now becomes an addition: `%00100011` + `%11111001`, or +35 + -7.
 
@@ -290,7 +290,7 @@ The ALU implements subtraction in the same way but with a single change — it t
 Byte1 + ~Byte2 + Carry
 ```
 
-This means that it is the Carry flag which controls whether the 'add one' stage of the negation process is performed. Normally we want to perform that stage of the negation process, and so we have to ensure that the Carry flag is set before a subtraction operation. For example, let us calculate `$02` - `$01`, which is +2 - +1 in decimal. The ALU transforms this into the following calculation:
+Thus it is the Carry flag which controls whether the 'add one' stage of the negation process is performed. Normally we want to add one, and so we have to ensure that the Carry flag is set before a subtraction operation. For example, let us calculate `$02` - `$01`, which is +2 - +1 in decimal. The ALU transforms this into the following calculation:
 
 ```markup
   Byte1 + ~Byte2 + Carry
@@ -311,7 +311,7 @@ The correct answer to the calculation is `$01` or 1 in decimal. We only get the 
 
 Thus, before performing a subtraction operation, we have to ensure that the Carry flag is set.
 
-As explained before, the ALU updates the Carry flag after an addition operation to indicate whether the result includes a carry bit. For a subtraction operation, the ALU updates the Carry flag to indicate whether it had to borrow a bit as part of the operation. It is important to note that the Carry flag is set inversely by the ALU:
+As explained before, the ALU updates the Carry flag after an addition operation to show whether the result includes a carry bit. For a subtraction operation, the ALU updates the Carry flag to indicate whether it had to borrow a bit. It is important to note that the Carry flag is set inversely by the ALU:
 
 - If the Carry flag is set then the ALU did not need to borrow a bit.
 - If the Carry flag is not set then the ALU had to borrow a bit.
@@ -356,27 +356,27 @@ Let us see how this works for some more multi-byte signed values. First let us c
 
 Now let us calculate +256 - +1, which is `$0100` - `$0001` in hex. We subtract the LSBs, `$00` - `$01`. This gets rewritten using addition as `$00` + ~`$01` + Carry. Carry is `$01` because that is its required initial value. This simplifies to `$00` + `$FE` + `$01`, which equals `$FF` with no carry bit. Now we subtract the MSBs, `$01` - `$00`. This gets rewritten using addition as `$01` + ~`$00` + Carry. Here Carry is `$00` as there was no carry bit generated from adding the LSBs. This simplifies to `$01` + `$FF` + `$00`, which equals `$00` with a carry bit. We know to ignore that final carry bit because we are adding signed values. The combined result is `$00FF`, or +255 in decimal.
 
-In both cases, we need to ensure that overflow has not occurred when adding the MSBs. The rule for overflow when subtracting is different to the rule for overflow when adding. When subtracting one number from another, overflow occurs when their signs differ and the sign of the result is the same as the sign of the number you are subtracting by. In the case of the first example, +255 - -1, the signs do differ but the result (+256) is positive while the number being subtracted by (-1) is negative; overflow has not occurred. In the case of the second example, +256 - +1, the signs are the same and so overflow cannot occur.
+In both cases, we need to ensure that overflow has not occurred when adding the MSBs. The rule for overflow when subtracting is different to the rule for overflow when adding. When subtracting two numbers, overflow occurs when their signs differ and the sign of the result is the same as the sign of the subtrahend. In the example of +255 - -1 the signs do differ, but the result (+256) is positive while the subtrahend (-1) is negative. Thus overflow has not occurred. In the case of the example of +256 - +1, the signs are the same and so overflow cannot occur.
 
 ### Increasing bit counts
 
-When adding or subtracting two values, they should have the same byte count. If this is not the case then you need to add bits to the most significant side of the shorter value to make it equal in length to the longer value. But you need to do this in a way that does not change the value being represented.
+When adding or subtracting two values, they should have the same byte count. If this is not the case then you need to add bits to the most significant side of the shorter value. You need to make it equal in length to the longer value. But you need to do this in a way that does not change the value being represented.
 
 This is easy to do for unsigned values: you add as many significant zero bits as required. For example, you can convert the 8-bit unsigned value `%11111111` (255 in decimal) into a 16-bit value by prepending eight zero bits. This gives the value `%0000000011111111`.
 
-The approach is not as obvious for signed values. The solution is [sign extension](https://en.wikipedia.org/wiki/Sign_extension). You still add as many significant bits as necessary, but all the added bits have the same value as the sign bit of the value you are extending. For example, the value -128 as an 8-bit signed value is `%10000000`. The sign bit (bit #7) has the value 1 so the equivalent 16-bit signed value is formed by adding an MSB with all its bits set to 1. This gives the value `%1111111110000000`, which still represents -128 in decimal.
+The approach is not as obvious for signed values. The solution is [sign extension](https://en.wikipedia.org/wiki/Sign_extension). You still add as many significant bits as necessary, but all the added bits have the same value as the sign bit. For example, the value -128 as an 8-bit signed value is `%10000000`. The sign bit (bit #7) has the value 1 so you form the 16-bit signed value by adding an MSB with all its bits set to 1. This gives the value `%1111111110000000`, which still represents -128 in decimal.
 
 ### Best practise for addition and subtraction
 
 Bear the following in mind when adding or subtracting binary values:
 
 1. Avoid mixing signed and unsigned values. At the very least it is difficult to know when overflow has occurred and how any carry bits should be handled.
-2. The two values to add or subtract should have the same bit count. You would normally sign-extend the shorter value if this is not the case.
+2. The two values to add or subtract should have the same bit count. You would sign-extend the shorter value if this is not the case.
 3. Ignore any carry bit that remains after adding adding or subtracting signed values. But you do need to check for overflow.
 
 ## Processor registers
 
-The 6502 has six [processor registers](https://en.wikipedia.org/wiki/Processor_register). These are special data storage areas that are separate from the CPU address space. These registers allow the 6502 to execute instructions faster than it would if it could only access system RAM. Each has a special role within the CPU.
+The 6502 has six [processor registers](https://en.wikipedia.org/wiki/Processor_register). These are special data storage areas that are separate from the CPU address space. These registers allow the 6502 to execute instructions faster than it could if it only had access to system RAM. Each has a special role within the CPU.
 
 The six registers, along with their abbreviations, are:
 
@@ -387,13 +387,13 @@ The six registers, along with their abbreviations, are:
 - Index Register X (X).
 - Index Register Y (Y).
 
-The **Program Counter** (PC) stores the address of the next instruction to be executed. That address gets updated automatically by the CPU as it sequentially executes your program. You can also use instructions to update the value of the Program Counter to a particular address.
+The **Program Counter** (PC) stores the address of the next instruction to be executed. The CPU automatically updates that address as it sequentially executes your program. You can also use instructions to update the value of the Program Counter to a particular address.
 
 This register is two bytes in size because the Program Counter stores an address. (The 6502 uses 16-bit addresses.) The rest of the registers each hold a single data value and, since the 6502 has an 8-bit data bus, all are one byte in size.
 
 The **Accumulator** (A) is the main register that instructions operate on. Many instructions use it in their inputs or write the result to it. It is also useful as a temporary storage area when moving data from one memory location to another.
 
-**Index Register X** (X) and **Index Register Y** (Y) are more simply called the X register and the Y register. Each can be used to specify a particular byte in the address space for an instruction to operate on, when the address of that byte is the sum of some base address and the current value in the register. For example, an instruction might using the X register with a base address of `$0C01`. If the current value in the X register is `$02` then the address accessed by the instruction will be `$0C03` (`$0C01` plus `$02`). Indexing in this way is useful when you want to iterate through a sequence of bytes in memory. You can also use these index registers as temporary storage areas.
+**Index Register X** (X) and **Index Register Y** (Y) are more simply called the X register and the Y register. Each can be used to specify a particular byte in the address space for an instruction to operate on. The address of that byte is the sum of some base address and the current value in the register. For example, an instruction might using the X register with a base address of `$0C01`. If the current value in the X register is `$02` then the address accessed by the instruction will be `$0C03` (`$0C01` plus `$02`). Indexing in this way is useful when you want to iterate through a sequence of bytes in memory. You can also use these index registers as temporary storage areas.
 
 The **Stack Pointer** (S) is used to point to the next free byte in the 6502's call stack. I cover the call stack in detail later in this post.
 
@@ -403,13 +403,13 @@ Finally there is the **Processor Status** (P) register. This register actually o
 
 The **[Carry](https://en.wikipedia.org/wiki/Carry_flag)** (C) flag is used by the ALU as a carry or borrow bit for addition and subtraction. The ALU also uses it as a ninth bit for the bit shifting operations.
 
-Before an addition, the Carry flag needs to be set if the addition includes a carry bit or cleared if it does not. The ALU then updates this flag when the addition operation is complete. It gets set if the result of the addition includes a carry bit. It gets cleared if the result does not include a carry bit.
+Before an addition, you need to set the Carry flag if it includes a carry bit or clear it if it does not. The ALU then updates this flag when the addition operation is complete. It gets set if the result of the addition includes a carry bit. It gets cleared if the result does not include a carry bit.
 
-Before a subtraction, the Carry flag needs to be set if the subtraction does not include a borrow bit or cleared if it does. The ALU then updates this flag when the subtraction operation is complete. It gets set if it did not need to borrow a bit. It gets cleared if it did need to borrow a bit.
+Before a subtraction, you need to set the Carry flag if it does not include a borrow bit or clear it if it does. The ALU then updates this flag when the subtraction operation is complete. It gets set if it did not need to borrow a bit. It gets cleared if it did need to borrow a bit.
 
 The **Negative** (N) flag is useful when values are being interpreted as signed values. The most significant bit (the sign bit) indicates if the value is positive or negative. Some instructions update this flag to the same state as bit #7 of the instruction result. If we know that the instruction result is the MSB of a signed value, this flag indicates if the value is positive or negative.
 
-(Note that the borrowing is conceptual since, as explained earlier, the ALU turns subtraction into addition.)
+(The borrowing is conceptual since the ALU turns subtraction into addition.)
 
 The ALU sets the [**Overflow**](https://en.wikipedia.org/wiki/Overflow_flag) (V) flag when the sign bit of the result of an addition or subtraction does not have the expected state. This is specifically when the values being added or subtracted are interpreted as signed 8-bit values. It is only useful to check for overflow after adding or subtracting the MSBs of two signed values. If the Overflow flag is set then overflow has occurred and the result is not valid. If this flag is not set then overflow has not occurred.
 
@@ -417,7 +417,7 @@ The Overflow and Negative flags are useful if you want to check the state of bit
 
 The **Zero** (Z) flag is set by some instructions if the result of the instruction is zero (i.e., `$00`). For example, subtracting `$04` from `$04` equals `$00`, which would result in the Zero flag being set.
 
-The **Interrupt Disable** (I) flag indicates if maskable interrupts are disabled, when the flag is set, or enabled, when the flag is not set. I cover interrupts later in this post.
+The **Interrupt Disable** (I) flag indicates if maskable interrupts are disabled or enabled. They are disabled when the flag is set and enabled when the flag is not set. I cover interrupts later in this post.
 
 The CPU updates the **Break** (B) flag as appropriate. It is useful in an interrupt handler if you need to determine how an interrupt was triggered. It could have been by a BRK instruction or by a normal maskable interrupt.
 
@@ -461,15 +461,20 @@ The **Absolute** addressing mode takes the form `<mnemonic> <some_address>`. The
 LDA $027E
 ```
 
-A variation on the absolute addressing mode is the **Zero Page** addressing mode. This takes the form `<mnemonic> <some_byte_value>`. The `<some_byte_value>` specifies an address within the zero page. The zero page is the first 256 bytes of the CPU address space, from addresses `$0000` to `$00FF`. Since we know that the most significant byte of a zero page address will always be `$00`, we only need a single byte to specify an address within it. It is the byte at this address that will be operated on. An instruction that uses this addressing mode will be two bytes long: one byte for the opcode and one byte for the address LSB. The following example loads the byte at address `$007E` into the Accumulator:
+A variation on the absolute addressing mode is the **Zero Page** addressing mode. This takes the form `<mnemonic> <some_byte_value>`. The `<some_byte_value>` specifies an address within the zero page. The zero page is the first 256 bytes of the CPU address space, from addresses `$0000` to `$00FF`. The most significant byte of a zero page address will always be `$00`. Thus we only need a single byte to specify an address within it. It is the byte at this address that will be operated on. An instruction that uses this addressing mode will be two bytes long: one byte for the opcode and one byte for the address LSB. The following example loads the byte at address `$007E` into the Accumulator:
 
 ```asm6502
 LDA $7E
 ```
 
-You could use the Absolute addressing mode to load this byte (using the instruction `LDA $007E`) but there are advantages to the Zero Page addressing mode. The instruction is smaller (two bytes instead of three), and the instruction will take one less cycle to execute. The 6502 has relatively few registers. The Zero Page addressing mode compensates somewhat for this by making the zero page more efficient to access than the rest of system RAM. Because of this, you should store your most accessed values in the zero page.
+You could have used the Absolute addressing mode to load this byte, using the instruction `LDA $007E`. But there are advantages to the Zero Page addressing mode:
 
-There are four addressing modes that are indexed variations of the Absolute and Zero Page addressing modes: **Absolute, X**; **Absolute, Y**; **Zero Page, X**; and **Zero Page, Y**. With each, the address of the byte to operate on is found by adding the current value in either the X or Y register to the address specified in the instruction. Thus the address in the instruction is a base address to which an index value is added to get the final address of the byte to operate on. (This is the reason why the X and Y registers are called index registers.) We indicate these modes by appending `, X` or `, Y` as appropriate.
+- The instruction is smaller, being two bytes rather than three.
+- The instruction will take one less cycle to execute.
+
+The 6502 has relatively few registers. The Zero Page addressing mode compensates somewhat for this by making the zero page more efficient to access than the rest of system RAM. Because of this, you should store the most accessed values in the zero page.
+
+There are four addressing modes that are indexed variations of the Absolute and Zero Page addressing modes. They are **Absolute, X**, **Absolute, Y**, **Zero Page, X**, and **Zero Page, Y**. For each, the address of the byte to operate on is found by adding the current value in the X or Y register to the address specified in the instruction. Thus the address in the instruction is the base address to which the CPU adds an index value. This gives the final address of the byte to operate on. (This usage is the reason why we call the X and Y registers the index registers.) We show this mode by appending `, X` or `, Y` as appropriate.
 
 The following example instructions demonstrate these four modes:
 
@@ -480,11 +485,11 @@ LDA $027E, Y  ; Absolute, Y
 LDA $7E, Y    ; Zero Page, Y
 ```
 
-These indexed addressing modes are useful when you need to loop through some part of the address space. They allow you to write fewer instructions compared to an [unrolled loop](https://en.wikipedia.org/wiki/Loop_unrolling), at the expense of increased execution time. But be aware: in the zero page form the result is always an address within the zero page. For example, if the instruction `LDA $FF, X` is executed when the X register contains the value `$02`, then the address accessed is not `$0101` (`$FF` + `$02`) but is `$0001`. Only the LSB of the address changes when indexing within the zero page.
+These indexed addressing modes are useful when you want to loop through some part of the address space. They allow you to write fewer instructions compared to an [unrolled loop](https://en.wikipedia.org/wiki/Loop_unrolling), at the expense of increased execution time. But be aware: in the zero page form the result is always an address within the zero page. For example, if the instruction `LDA $FF, X` is executed when the X register contains the value `$02`, then the address accessed is not `$0101` (`$FF` + `$02`). It is instead `$0001`. Only the LSB of the address changes when indexing within the zero page.
 
-Up to now, the addressing modes that specify the address of the byte to operate on have done so by hard-coding the address within the instruction. But what if it is only at runtime that you will know the address to use? Or what if you are creating a subroutine and the address needs to vary depending on current program state? These are the scenarios that the various indirect addressing modes support.
+Up to now, the addressing modes that specify an address have done so by hard-coding it. But what if it is only at runtime that you will know the address to use? What if you want to have a pointer to the code to execute when some user action occurs? What if you want to sometimes change that pointer at runtime to point to different code? These are the scenarios that the various indirect addressing modes support.
 
-There are two indexed indirect addressing modes. The first one is the **(Indirect, X)** addressing mode and it takes the form `<mnemonic> (<some_byte_value>, X)`. The `<some_byte_value>` specifies an address within the zero page. The value in the X register is added to this address, with the result again specifying an address within the zero page. The byte of data at this adjusted address is then read, along with the byte after it. The two bytes are interpreted as the LSB and MSB of an address somewhere in the CPU address space. This final address identifies the byte of data in memory that the instruction should operate on.
+There are two indexed indirect addressing modes. The first one is the **(Indirect, X)** addressing mode and it takes the form `<mnemonic> (<some_byte_value>, X)`. The `<some_byte_value>` specifies an address within the zero page. The value in the X register is added to this address. The result again specifies an address within the zero page. The byte of data at this adjusted address is then read, along with the byte after it. The two bytes are interpreted as the LSB and MSB of an address somewhere in the CPU's address space. It is this final address that identifies the byte of data the instruction should operate on.
 
 The following is an example instruction that uses this addressing mode:
 
@@ -494,9 +499,9 @@ LDA ($04, X)
 
 The address specified represents the address `$0004`. The CPU first adds the current value in the X register to it. If the value in the X register is `$02` then the resulting address will be `$0006`. The CPU now reads the value of the byte at address `$0006` and the value of the byte after it. It combines them to create a two-byte address. If the value of the byte at address `$0006` is `$34` and the value of the byte at address `$0007` is `$12` then the result will be `$1234`. This is the address that identifies the byte of data that the instruction should operate on. In this example, it is the byte in memory at address `$1234` that the CPU will load into the Accumulator.
 
-Note that adding the value in the X register to the zero page address always gives another zero page address. Only the LSB of the address is adjusted. This is the same as with the Zero Page, X and Zero Page, Y addressing modes. For example, if the instruction is `LDA ($FF, X)` and the value in the X register is `$00`, then the CPU reads the value of the bytes at addresses `$00FF` and `$0000`. It does not read the bytes at addresses `$00FF` and `$0100`.
+Note that adding the value in the X register to the zero page address always gives another zero page address. Only the LSB of the address gets adjusted. This is the same as with the Zero Page, X and Zero Page, Y addressing modes. For example, if the instruction is `LDA ($FF, X)` and the value in the X register is `$00`, then the CPU reads the value of the bytes at addresses `$00FF` and `$0000`. It does not read the bytes at addresses `$00FF` and `$0100`.
 
-The second indexed indirect addressing mode is the **(Indirect), Y** addressing mode. It takes the form `<mnemonic> (<some_byte_value>), Y`. The `<some_byte_value>` again specifies an address within the zero page, but indexing is implemented differently. The CPU reads the byte of data at this zero page address, along with the byte after it. It interprets the two bytes as the LSB and MSB of a base address somewhere in the CPU's address space. The value in the Y register is then added to this base address. This creates the final address of the byte of data that the instruction should operate on.
+The second indexed indirect addressing mode is the **(Indirect), Y** addressing mode. It takes the form `<mnemonic> (<some_byte_value>), Y`. The `<some_byte_value>` again specifies an address within the zero page, but indexing behaves differently. The CPU reads the byte of data at this zero page address, along with the byte after it. It interprets the two bytes as the LSB and MSB of a base address somewhere in the CPU's address space. The value in the Y register is then added to this base address. This creates the final address of the byte of data that the instruction should operate on.
 
 The following is an example instruction that uses this addressing mode:
 
@@ -504,9 +509,9 @@ The following is an example instruction that uses this addressing mode:
 LDA ($04), Y
 ```
 
-The address specified represents the address `$0004`. The CPU reads the value of the byte at address `$0004` and then reads the value of the byte after it. It combines them to create a two-byte address. If the value of the byte at address `$0004` is `$34` and the value of the byte at address `$0005` is `$12` then the resulting address is `$1234`. The CPU now adds the value in the Y register to this address. If the value in the Y register is `$02` then the result will be `$1236`. This is the address that identifies the byte of data that the instruction should operate on. In this example, the CPU will load the byte in memory at address `$1236` into the Accumulator.
+The address specified represents the address `$0004`. The CPU reads the value of the byte at address `$0004` and then reads the value of the byte after it. It combines them to create a two-byte address. If the value of the byte at address `$0004` is `$34` and the value of the byte at address `$0005` is `$12`, the resulting address is `$1234`. The CPU now adds the value in the Y register to this address. If the value in the Y register is `$02` then the result will be `$1236`. This is the address that identifies the byte of data that the instruction should operate on. In this example, the CPU will load the byte in memory at address `$1236` into the Accumulator.
 
-Note that if the zero page address specified in the instruction is `$FF`, then the CPU reads the value of the bytes at addresses `$00FF` and `$0000`. It does not read the bytes at addresses `$00FF` and `$0100`.
+If the zero page address specified in the instruction is `$FF`, the CPU reads the bytes at addresses `$00FF` and `$0000`. It does not read the bytes at addresses `$00FF` and `$0100`.
 
 There is a third indirect addressing mode, the **Absolute Indirect** addressing mode. It is only used with the JMP operation. It takes the form `JMP (<some_address>)` (note the parentheses). The `<some_address>` is an address in the CPU address space. At runtime, the CPU reads the byte of data at this address along with the byte after it. The CPU interprets these two bytes as the LSB and MSB of an address that it uses to update the Program Counter.
 
@@ -516,9 +521,9 @@ The following is an example JMP instruction that uses this addressing mode:
 JMP ($1234)
 ```
 
-The CPU reads the value of the byte at address `$1234` and the value of the byte after it. It combines them to create a two-byte address. If the value of the byte at address `$1234` is `$78` and the value of the byte at address `$1235` is `$56` then the resulting address is `$5678`. This is the address that the CPU updates the Program Counter to. Program execution now jumps to that address.
+The CPU reads the value of the byte at address `$1234` and the value of the byte after it. It combines them to create a two-byte address. If the value of the byte at address `$1234` is `$78` and the value of the byte at address `$1235` is `$56`, the resulting address is `$5678`. This is the address that the CPU updates the Program Counter to. Program execution now jumps to that address.
 
-The final addressing mode is the **Relative** addressing mode. This is an addressing mode that is used exclusively by the branch operations. (I cover those operations later in this post.) This mode takes the form `<mnemonic> <some_signed_byte_value>`. The `some_signed_byte_value` is a single byte that is interpreted by the CPU as a two's complement signed value. The magnitude of this value indicates how much the CPU should adjust the Program Counter by. Its sign indicates whether that adjustment should be forward (a positive value) or backward (a negative value). Program execution then continues from the adjusted address.
+The final addressing mode is the **Relative** addressing mode. This is an addressing mode used exclusively by the branch operations. (I cover those operations later in this post.) This mode takes the form `<mnemonic> <some_signed_byte_value>`. The `some_signed_byte_value` is a single byte that the CPU interprets as a two's complement signed value. The magnitude of this value indicates by how much the CPU should adjust the Program Counter by. Its sign indicates if the adjustment should be forwards (a positive value) or backwards (a negative value). Program execution then continues from the adjusted address.
 
 ```asm6502
 BMI $7F ; Jump forward 127 bytes if the branch condition is true.
@@ -536,11 +541,11 @@ Since a single signed byte value is used to indicate the adjustment, it can only
 
 ## The operations in detail
 
-The 6502 supports 151 opcodes, grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). This section includes a summary for each operation, including its mnemonic, the supported addressing modes, and what changes are made to the Process Status register on execution.
+The 6502 supports 151 opcodes, grouped into [56 operations](http://www.6502.org/tutorials/6502opcodes.html). I summarise each operation in this section. This includes its addressing modes and how it changes the Process Status register.
 
 ### Running the assembly code examples
 
-I include a number of examples of 6502 assembly to demonstrate various algorithms and patterns. Most of them can be run as-is in a 6502 emulator. The easiest option is to use [this browser-based 6502 emulator](http://biged.github.io/6502js/). Note that it has limitations, such as not supporting binary literals and constants.
+I include examples of 6502 assembly to show various algorithms and patterns. You can run most of them as-is in a 6502 emulator. The easiest one to use [this browser-based 6502 emulator](http://biged.github.io/6502js/). Note that it has limitations, such as not supporting binary literals and constants.
 
 To use the emulator:
 
@@ -548,11 +553,11 @@ To use the emulator:
 2. Click the Assemble button. You can check for any assembler errors in the message box at the bottom of the page.
 3. Click the Run button to run the program.
 
-The state of the registers after the program runs is shown in the righthand column. To see the state of the system RAM, tick the Monitor option located just below the text area.
+It shows the state of the registers after the program runs in the righthand column. To see the state of the system RAM, tick the Monitor option located below the text area.
 
 ### Operations for setting and clearing the Processor Status register flags
 
-Some of the Processor Status register flags can be set and/or cleared by the programmer. This is generally only useful in specific situations, such as when performing addition or subtraction, or when handling an interrupt. For the sake of completeness I have included the operations for setting and clearing the Decimal Mode flag. (Recall that the CPU in the NES does not support the binary coded decimal mode.)
+Some of the Processor Status register flags can be set and/or cleared by the programmer. This is generally only useful in specific situations. Examples include addition and subtraction, and when handling an interrupt. I have included the operations for setting and clearing the Decimal Mode flag. But recall that the CPU in the NES does not support that mode.
 
 ::: opcode
 
@@ -654,7 +659,7 @@ Clears the Decimal Mode flag of the Processor Status register.
 
 ### Operations for transferring bytes of data
 
-Many of the instructions in your programs will be for shuffling data around from the system RAM to the registers, between registers, and from the registers back to the system RAM. This is because very few operations directly mutate data in memory. You need to instead load a value into a register, operate on it, and then store the result somewhere.
+Many of the instructions in your programs will be for shuffling data around. This is because very few operations mutate data in place in memory. You need to instead load a value into a register, operate on it, and then store the result somewhere.
 
 The following diagram shows the supported transfers:
 
@@ -888,7 +893,7 @@ Copies the value in the Y register to the Accumulator.
 
 :::
 
-The final two operations below are for data transfers between the X register and the Stack Pointer. Their usage is covered later in this post in the section on the call stack.
+The two operations below are for data transfers between the X register and the Stack Pointer. I cover their usage later in this post in the section on the call stack.
 
 ::: opcode
 
@@ -929,7 +934,7 @@ Copies the value in the Stack Pointer to the X register.
 
 :::
 
-The following assembly demonstrates how these data transfer operations can be used to store a given 16-bit value in memory and then copy it to a another memory location:
+The following assembly demonstrates how you can use these data transfer operations. I store a given 16-bit value in memory and then copy it to another memory location:
 
 ```asm6502
 ; Store the 16-bit value $0123 into system RAM, in little endian format.
@@ -995,11 +1000,11 @@ LDA #$01  ; Load $01 as an immediate value into Accumulator.
 ADC $00   ; Add value at address $0000 to the Accumulator.
 ```
 
-After this code runs, the value in the Accumulator is now `$FF` and the Carry flag is not set; there is no carry bit as the result still fits into one byte.
+After this code runs, the value in the Accumulator is now `$FF` and the Carry flag is not set. Thus there is no carry bit as the result still fits into one byte.
 
-The CLC instruction in the above assembly example is important. Before starting an addition operation, you need to ensure that the Carry flag is not set otherwise the result will be incorrect. (It is possible for the Carry flag to be set if, say, a previous addition or subtraction operation set it.)
+The CLC instruction in the example above is important. Before starting an addition operation, you need to ensure that the Carry flag is not set. If it is, the result will be incorrect. (It is possible for the Carry flag to be set if, say, a previous addition or subtraction operation set it.)
 
-The following assembly again demonstrates adding two 8-bit unsigned values, but now the result will not fit into a single byte:
+The following assembly also demonstrates adding two 8-bit unsigned values. In this case the result will not fit into a single byte:
 
 ```asm6502
 ; $FE + $03 (254 + 3 in decimal)
@@ -1011,7 +1016,7 @@ LDA #$03  ; Load $01 as an immediate value into the Accumulator.
 ADC $00   ; Add value at address $0000 to the Accumulator.
 ```
 
-After this code runs, the value in the Accumulator is `$01` and the Carry flag is set; we are missing that 9th carry bit in the result. Instead we have to perform the calculation using 16-bit unsigned values:
+After this code runs, the value in the Accumulator is `$01` and the Carry flag is set. We are missing the 9th carry bit in the result. Instead we have to perform the calculation using 16-bit unsigned values:
 
 ```asm6502
 ; $00FE + $0003 (254 + 3 in decimal)
@@ -1057,7 +1062,7 @@ LDA #$FB  ; Load $FB as an immediate value into the Accumulator.
 ADC $00   ; Add value at address $0000 to the Accumulator.
 ```
 
-After this code runs, the Carry flag is set and the Overflow flag is not set. We are adding signed values so we are only interested in checking for overflow. Since the Overflow flag is not set, the result is valid. On the other hand, if the above addition was changed to `$80` + `$FB`, or -128 + -5 in decimal, then the Overflow flag would be set and the result would be invalid. The answer is to use 16-bit signed values:
+After this code runs, the Carry flag is set and the Overflow flag is not set. We are adding signed values so we are only interested in checking for overflow. Since the Overflow flag is not set, the result is valid. But if we change the above addition to `$80` + `$FB`, or -128 + -5 in decimal, the Overflow flag would get set. Thus the result would be invalid. The answer is to use 16-bit signed values:
 
 ```asm6502
 ; $FF80 + $FFFB (-128 + -5 in decimal)
@@ -1091,7 +1096,7 @@ ADC $03   ; Add MSB of second value to the Accumulator.
 STA $05   ; Store LSB of result in memory at address $0005.
 ```
 
-The section on binary number theory earlier in this post described how sign extension can be used to add two signed values that have different bit counts. A useful operation to demonstrate is adding an 8-bit signed value &mdash; a delta value &mdash; to a 16-bit signed value, as described [here](https://codebase64.org/doku.php?id=base:signed_8bit_16bit_addition). The following assembly shows how this can be done, with the delta value first being sign-extended before the addition:
+Earlier I described how to use sign extension to add two signed values with different bit counts. Now I can show you how to add an 8-bit signed value &mdash; a delta value &mdash; to a 16-bit signed value, as discussed [here](https://codebase64.org/doku.php?id=base:signed_8bit_16bit_addition). In the following assembly, I first sign-extend the delta value before the addition:
 
 ```asm6502
 ; $0030 + $9C = $FFCC
@@ -1169,9 +1174,9 @@ Subtracts the byte value specified by the operand from the current value in the 
 
 :::
 
-As described earlier in this post, the subtraction of one byte from another is implemented in the ALU as an addition, but where the byte to subtract by (the subtrahend) is first negated. The ALU automatically performs that negation, including using the state of the Carry flag to determine if it needs to add one as part of the negation operation. (The ALU only adds one if the Carry flag is set.) This use of the Carry flag's current state works well when subtracting the non-LSB bytes of multi-byte signed values, but it will fail when subtracting the LSBs unless we first set the Carry flag. We use the SEC operation to do so.
+As I described earlier, the ALU implements subtraction as an addition where the byte to subtract by (the subtrahend) is first negated. The ALU automatically negates that value. It also uses the state of the Carry flag to determine if it needs to add one as part of the negation process. (The ALU only adds one if the Carry flag is set.) This use of the Carry flag's current state works well when subtracting the non-LSB bytes of multi-byte signed values. But it fails when subtracting the LSBs unless we first set the Carry flag. We use the SEC operation to do so.
 
-Notice how this is the opposite of the requirement for addition: when adding we have to first clear the Carry flag, but when subtracting we have to first set the Carry flag.
+Notice how this is the opposite of addition: when adding we have to first clear the Carry flag, but when subtracting we have to first set that flag.
 
 The following assembly demonstrates subtracting two 8-bit signed values:
 
@@ -1313,7 +1318,7 @@ Performs a bitwise XOR operation between the value in the Accumulator and the sp
 
 :::
 
-The AND operation can be used to clear bits in a given byte. This requires loading a suitable [bitmask](<https://en.wikipedia.org/wiki/Mask_(computing)>) into the Accumulator, one in which the bits to be cleared are zeros and all other bits are ones. This example assembly shows how to clear bit #3 of a given byte:
+You can use the AND operation to clear bits in a given byte. This requires loading a suitable [bitmask](<https://en.wikipedia.org/wiki/Mask_(computing)>) into the Accumulator. In the bitmask, the bits to clear are zeros and the other bits are ones. This example assembly shows how to clear bit #3 of a given byte:
 
 ```asm6502
 ; Set up the example.
@@ -1328,7 +1333,7 @@ STA $00  ; Save the altered value back to memory at address $0000.
 
 After this code runs, the value in memory at address `$0000` is `%10000111`, or `$87` in hex.
 
-The ORA operation can be used to set bits in a given byte. This requires loading a suitable bitmask into the Accumulator, one in which the bits to be set are ones and all other bits are zeros. This example assembly shows how to set bit #5 of a given byte:
+You can use the ORA operation to clear bits in a given byte. This requires loading a suitable bitmask into the Accumulator. In the bitmask, the bits to set are ones and the other bits are zeros. This example assembly shows how to set bit #5 of a given byte:
 
 ```asm6502
 ; Set up the example.
@@ -1343,7 +1348,7 @@ STA $00  ; Save the altered value back to memory at address $0000.
 
 After this code runs, the value in memory at address `$0000` is `%10011111`, or `$9F` in hex.
 
-The EOR operation can be used to flip bits in a given byte. This requires loading a suitable bitmask into the Accumulator, one in which the bits to be flipped are ones and all other bits are zeros. This example assembly shows how to flip all the bits of a given byte:
+You can use the EOR operation to flip bits in a given byte. This requires loading a suitable bitmask into the Accumulator. In the bitmask, the bits to flip are ones and the other bits are zeros. This example assembly shows how to flip all the bits of a given byte:
 
 ```asm6502
 ; Set up the example.
@@ -1448,9 +1453,9 @@ Decrements the value in the Y register by one, wrapping around so that the resul
 
 ### Operations for incrementing and decrementing memory
 
-Normally if you want to mutate a byte in memory, you have to first load it into a register, operate on it, and then copy it back to memory. Two exceptions are the INC and DEC operations, which allow you to directly increment and decrement bytes in memory without needing to use a register to do so. This is useful for implementing counters in memory, and for directly setting or clearing bit #0 of a byte in memory. (If bit #0 of such a byte is initialised to be not set, then incrementing the byte by one sets that bit and subsequently decrementing it clears it. This is regardless of the values of the other bits in the byte.)
+If you want to mutate a byte in memory, you have to first load it into a register, operate on it, and then copy it back to memory. There are two exceptions to this: the INC and DEC operations. These allow you to increment and decrement bytes in memory without needing to use a register. This is useful for implementing counters in memory, and for setting or clearing bit #0 of a byte in memory. (If you initialise bit #0 of such a byte to a zero, then incrementing the byte by one will set that bit. If you then decrement the byte by one you will clear that bit. This is regardless of the values of the other bits in the byte.)
 
-Incrementing or decrementing a value directly in memory takes a greater number of CPU cycles than incrementing or decrementing a register, but it is more efficient overall since memory does not need to be moved to and from a register.
+It takes more CPU cycles to increment or decrement a value in memory than in a register. But it is more efficient overall since you do not need to shuffle memory to and from a register.
 
 ::: opcode
 
@@ -1502,9 +1507,9 @@ Decrements the value in the specified byte in memory by one, wrapping around so 
 
 ### Operations for byte comparison
 
-Comparison is a common operation in programming. The 6502 has operations for comparing the byte specified by the operand with the value currently in either the Accumulator, the X register, or the Y register. The result of the comparison is not stored anywhere, so a comparison can be performed without disturbing the contents of those registers.
+Comparison is a common operation in programming. The 6502 has operations for comparing the byte specified by the operand with either the Accumulator, the X register, or the Y register. The result of the comparison is not stored anywhere. Thus you can perform a comparison without disturbing the contents of those registers.
 
-The comparison instructions are often used with the branch instructions, as covered later in this post.
+The comparison instructions are often used with the branch instructions. I cover these later in this post.
 
 ::: opcode
 
@@ -1583,7 +1588,7 @@ Subtracts the byte specified by the operand from the value in the Y register, th
 
 :::
 
-When using these comparison operators, it is the state of the Carry and Zero flags that are the useful flags for making program flow decisions:
+With these comparisons, it is the state of the Carry and Zero flags that are useful for making program flow decisions:
 
 - The Carry flag is not set when the register value is less than the operand byte.
 - The Carry flag is set when the register value is greater than or equal to the operand byte.
@@ -1591,11 +1596,11 @@ When using these comparison operators, it is the state of the Carry and Zero fla
 
 #### The BIT operation
 
-The byte comparison operations (CMP, CPX and CPY) are useful for comparing whole bytes, but sometimes you only want to test particular bits of a byte in the CPU's address space. The answer is to use the BIT operation.
+The byte comparison operations (CMP, CPX and CPY) are useful for comparing whole bytes. But sometimes you only want to test particular bits of a byte in the CPU's address space. The answer is to use the BIT operation.
 
-A BIT operation performs a bitwise AND operation between the value in the Accumulator and the specified byte in memory. The value in the Accumulator is normally a bitmask for the test. The result of the operation is either zero (none of the bits tested were set in both bytes) or non-zero (one or more of the bits tested were set in both bytes). The Zero flag of the Processor Status register is used to communicate this result. The Negative and Overflow flags also get updated, but they are updated solely to the state of bits #7 and #6 respectively of the byte in the address space; they are not affected by the value in the Accumulator.
+A BIT operation performs a bitwise AND operation between the Accumulator and the specified byte in memory. The value in the Accumulator is normally a bitmask for the test. The result of the operation is either zero or non-zero. If it is zero then none of the bits tested were set in both bytes. If it is non-zero then one or more of the bits tested were set in both bytes. The CPU uses the Zero flag of the Processor Status register to communicate this result. The CPU also updates the Negative and Overflow flags, but only to the state of bits #7 and #6 of the byte in memory. They are not affected by the value in the Accumulator.
 
-The result of the AND operation is not stored anywhere; the value in the Accumulator is not updated. This is unlike the AND bitwise operation, which does store the operation's result in the Accumulator and so does update it.
+The result of the AND operation is not stored anywhere; the value in the Accumulator is not updated. This is in contrast to the AND _bitwise_ operation. With that operation, the result is stored in the Accumulator and so that register is updated.
 
 ::: opcode
 
@@ -1627,7 +1632,7 @@ LDA #%00000010 ; Load a bitmask into the Accumulator to isolate bit #1.
 BIT $0C01      ; Test the byte at address $0C01 against the bitmask.
 ```
 
-If the byte value at that address is `%10001111`, then after the BIT instruction the state of the Processor Status register will be as follows:
+Let us say that the byte value at that address is `%10001111`. After the BIT instruction the state of the Processor Status register will be as follows:
 
 - The Negative flag will be set.
 - The Overflow flag will not be set.
@@ -1635,19 +1640,19 @@ If the byte value at that address is `%10001111`, then after the BIT instruction
 
 Since the Zero flag is not set, we know that bit #1 of the byte at address `$0C01` is set; this is the correct result.
 
-As mentioned, the Negative and Overflow flags are updated based solely on the state of the byte in memory specified by the operand. If you only need to check if bit #7 or bit #6 of a byte in memory is set, you do not need to first load a bitmask into the Accumulator. This makes it more efficient to check the state of these particular bits rather than bits #0 to #5 because you can omit an LDA instruction. You also do not overwrite any value already in the Accumulator. Thus bit #7 and bit #6 are the best bits to use for any flags in your programs.
+As I mentioned, the CPU updates the Negative and Overflow flags based only on the state of the byte in memory specified by the operand. If you only need to check if bit #7 or bit #6 of a byte in memory is set, you do not need to first load a bitmask into the Accumulator. This makes it more efficient to check the state of these particular bits (rather than bits #0 to #5) because you can omit an LDA instruction. You also do not overwrite any value already in the Accumulator. Thus bit #7 and bit #6 are the best bits to use for any flags in your programs.
 
 ### Bit shift operations
 
 A [bit shift](https://en.wikipedia.org/wiki/Bitwise_operation#Bit_shifts) is a type of bitwise operation where the bits of a value are shifted to the left or to the right. The 6502 supports two types of bit shift &mdash; shift and rotate &mdash; with a left and a right version for each.
 
-For both types, the bits of the specified byte are shift by one bit to the left or right. The bit that is shifted out of the byte is stored in the Carry flag. (The Carry flag is effectively used as a ninth bit for the operation.) The different between the two types of bit shift is the handling of the bit that is shifted in. For the shift type, the shifted-in bit is always a zero. For the rotate type, the shifted-in bit is set to the old value of the Carry flag.
+For both types, the bits of the specified byte are shift by one bit to the left or right. The bit that is shifted out of the byte is stored in the Carry flag. (The Carry flag is used as a ninth bit for the operation.) The different between the two types of bit shift is the handling of the bit that is shifted in. For the shift type, the shifted-in bit is always a zero. For the rotate type, the shifted-in bit is set to the old value of the Carry flag.
 
 The following diagram visualises the effect of LSR, the shift right operation:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/lsr-2x.png "The effect of LSR, the shift right operation")
 
-The following diagram visualises the effect of ROR, the rotate right operation, showing how the shifted-in bit is treated differently compared to LSR:
+The following diagram visualises the effect of ROR, the rotate right operation. It shows how the shifted-in bit is treated differently compared to LSR:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/ror-2x.png "The effect of ROR, the rotate right operation")
 
@@ -1655,7 +1660,7 @@ The following diagram visualises the effect of ASL, the shift left operation:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/asl-2x.png "The effect of ASL, the shift left operation")
 
-The following diagram visualises the effect of ROL, the rotate left operation, showing how the shifted-in bit is treated differently compared to ASL:
+The following diagram visualises the effect of ROL, the rotate left operation. It shows how the shifted-in bit is treated differently compared to ASL:
 
 ![](/images/2020-06-23-programming-the-nes-the-6502-in-detail/rol-2x.png "The effect of ROL, the rotate left operation")
 
@@ -1765,9 +1770,9 @@ Rotates the bits of the specified byte by one bit to the right, i.e., bit #7 bec
 
 ### The JMP operation
 
-As described earlier, the Program Counter stores the address of the next instruction to be executed. Normally the CPU is automatically updating the address in this register, incrementing it to execute the program sequentially. However, in any non-trivial program, more control is needed. For example, you might want to conditionally execute a particular instruction, or loop over a sequence of instructions a certain number of times. Consequently there are several operations for adjusting the value of the Program Counter.
+The Program Counter stores the address of the next instruction for the CPU. Normally the CPU is automatically updating the address in this register. It increments the address so that it sequentially executes the program. But in any non-trivial program, you will need more control. For example, you might want to conditionally execute a particular instruction. Or you might want to loop over a sequence of instructions a certain number of times. For this, there are operations for adjusting the value of the Program Counter.
 
-A simple means of controlling program execution is the JMP operation. This is the equivalent of the 'goto' instruction that exists in some programming languages. It is an unconditional update of the Program Counter to the address specified in the operand.
+A simple means of controlling program execution is the JMP operation. This is like the 'goto' instruction that exists in some programming languages. It is an unconditional update of the Program Counter to the address specified in the operand.
 
 ::: opcode
 
@@ -1788,9 +1793,9 @@ Does not update any flags.
 
 :::
 
-Note that normally a label would be used as the operand, rather than a literal address.
+Note that normally you would use a label as the operand, rather than a literal address.
 
-A JMP instruction can be used to create an infinite loop:
+You can use a JMP instruction to create an infinite loop:
 
 ```asm6502
 loop:
@@ -1801,9 +1806,9 @@ loop:
 
 ### Branch operations
 
-A JMP instruction results in an unconditional update of the Program Counter. But sometimes you only want to update the Program Counter if some condition is true. This can be done using one of eight branch operations. Each tests the condition of a particular flag in the Processor Status register, only updating the Program Counter if that flag has a particular state. If the flag is not in the required state, the instruction has no effect and program execution continues sequentially as normal.
+A JMP instruction results in an unconditional update of the Program Counter. But sometimes you only want to update the Program Counter if some condition is true. You can do this using one of eight branch operations. Each tests the condition of a particular flag in the Processor Status register. The instruction only updates the Program Counter if that flag has a particular state. If the flag is not in the required state, the instruction has no effect. Program execution continues sequentially as normal.
 
-There are eight branch operations. Each branch operation does not update the state of any Processor Status flags, and there is only one supported address mode: Relative.
+There are eight branch operations. Each branch operation does not update the state of any Processor Status flags. Each only supports the Relative addressing mode.
 
 ::: opcode
 
@@ -1949,21 +1954,21 @@ Does not update any flags.
 
 :::
 
-The operand for each branch instruction is a single byte, a relative shift that should be applied to the Program Counter if the branch instruction's condition evaluates as true. The fact that the operand is a single byte means that the resulting adjustment to the Program Count can only be in the range -128 to +127 inclusive. You cannot branch to absolutely anywhere in your program in the way that you can with a JMP instruction.
+The operand for each branch instruction is a single byte. It is a relative shift that the CPU should apply to the Program Counter if the branch condition evaluates to true. The fact that the operand is a single byte means that the resulting shift can only be in the range -128 to +127 inclusive. You cannot branch to anywhere in your program in the way that you can with a JMP instruction.
 
-This restriction in the reach of branch instructions is a deliberate optimisation by the 6502's designers. A program will typically include many branch instructions, and using a one-byte adjustment value rather than a two-byte address as the operand means that these instructions can be one byte smaller than they otherwise would be. Over an entire program, this results in a useful reduction in program size. If you do make the mistake of trying to branch too far, the assembler should emit an error.
+This restriction is a deliberate optimisation by the 6502's designers. A program will typically include many branch instructions. Using a one-byte shift rather than a two-byte address means that they are one byte smaller. Over an entire program, this results in a useful reduction in program size. If you do make the mistake of trying to branch too far, the assembler should emit an error.
 
-Normally a label is used as the operand for a branch instruction:
+Normally you would use a label as the operand for a branch instruction:
 
 ```asm6502
 BMI some_label ; some_label is declared elsewhere.
 ```
 
-When using a label, the assembler automatically replaces it by a value representing the relative shift required to jump from the branch instruction to where the label was declared.
+When using a label, the assembler automatically replaces it by a calculated value. This is the relative shift required to jump from the branch to the label declaration.
 
-Branch instructions are often used with byte comparison and bit test instructions (CMP, CPX, CPY, and BIT). First a test is performed using one of these comparison instructions and then a branch instruction is used to branch based on the result of that test. This technique can be used to implement [for-loops](https://en.wikipedia.org/wiki/For_loop).
+Branch instructions are often used with the byte comparison and bit test instructions. (These are CMP, CPX, CPY, and BIT.) First you perform a test using one of the comparison instructions. Then you use a branch instruction to branch based on the result of that test. You can use this technique to create [for-loops](https://en.wikipedia.org/wiki/For_loop).
 
-Imagine a for-loop to initialise a sequence of 8 bytes in memory, in the address range `$0010` to `$0017`, setting them all to the value `$FF`. The following assembly implements this using the equivalent of a for-loop in the form `for (i = 0; i < 8; i++)`:
+Say you want to initialise a sequence of 8 bytes in memory. The address range of the sequence is `$0010` to `$0017` and you want to set all the bytes to the value `$FF`. The following assembly implements this using a for-loop in the form `for (i = 0; i < 8; i++)`:
 
 ```asm6502
   LDA #$FF ; Load the Accumulator with the value to set all bytes to.
@@ -1979,7 +1984,7 @@ loop:
   ; Execution continues here if the branch is not taken.
 ```
 
-The branch condition evaluates as true (and so the branch is taken) until the value in the X register is equal to the limit value, which in the above code is `$08`. The loop then exits.
+The branch condition initially evaluates as true and so the CPU takes the branch. Eventually the value in the X register is equal to the limit value. In the above code that limit value is `$08`. The branch is now not taken and the loop exits.
 
 A more efficient approach is to count down rather than up:
 
@@ -1996,14 +2001,13 @@ loop:
   ; Execution continues here if the branch is not taken.
 ```
 
-By counting down, no comparison instruction is required. This is because the DEX instruction not only decrements the value in the X register, it also sets the Negative flag if the value in the X register is now less than zero. The BPL instruction allows us to branch based on the state of that Negative flag without having to first perform a comparison.
+By counting down, you do not need a comparison instruction. This is because the DEX instruction does not only decrement the value in the X register. It also sets the Negative flag if the value in the X register is now less than zero. Now you can use the BPL instruction to branch based on that Negative flag. This is without having to first perform a comparison.
 
-A limitation to counting down in this way is that the counter has to be treated as a signed byte and so the maximum starting value for the counter is +127. An alternative way to count down is to initialise the X register to the limit value and use BEQ for the branch instruction. This permits a maximum starting value for the counter of 255, but with the significant downside
-that the counter is no longer [zero-based](https://en.wikipedia.org/wiki/Zero-based_numbering#Usage_in_programming_languages).
+Counting down in this way forces you to treat the counter as a signed byte. This means that the maximum possible starting value for the counter is +127 rather than 255. An alternative is to initialise the X register to the limit value and use BEQ for the branch instruction. This permits a maximum starting value of 255. But the downside that the counter is no longer [zero-based](https://en.wikipedia.org/wiki/Zero-based_numbering#Usage_in_programming_languages).
 
-If you need to index more than 256 bytes, you can use one of the two techniques described on pages 94 and 95 of the [MOS MCS6500 microcomputer family programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf).
+If you do need to index more than 256 bytes, you can use one of the two techniques described on pages 94 and 95 of the [MOS MCS6500 programming manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf).
 
-If you need to branch to a location that is too far away, you can combine a JMP instruction with a contrary (a.k.a. complementary) branch instruction. The JMP instruction is used to reach the desired location, and the branch instruction is used to conditionally skip over the JMP instruction:
+If you need to branch to a location that is too far away, you can combine a JMP instruction with a contrary (a.k.a. complementary) branch instruction. You use the JMP instruction to reach the desired location. You use the branch instruction to conditionally skip over that JMP instruction:
 
 ```asm6502
   LDA #$00               ; Load the Accumulator with the value to test
@@ -2013,7 +2017,7 @@ no_jump:
   ; Code here that executes if there was no jump.
 ```
 
-A common selection mechanism in a high level language is the [switch statement](https://en.wikipedia.org/wiki/Switch_statement). It can be implemented in assembly by combining byte comparison (CMP, CPX, and CPY) and branch instructions. The following is a pseudo-code switch statement that tests the value in the Accumulator against a series of constants in order to decide how to proceed:
+A common selection mechanism in a high level language is the [switch statement](https://en.wikipedia.org/wiki/Switch_statement). You can create it by combining the byte comparison and branch instructions. The following is a pseudo-code switch statement. It tests the value in the Accumulator against a series of constants to decide how to proceed:
 
 ```clike
 switch (a) {
@@ -2028,7 +2032,7 @@ switch (a) {
 }
 ```
 
-This can be implemented in assembly like so:
+You can create it in assembly like so:
 
 ```asm6502
   LDA #$01      ; Load the value to test into the Accumulator.
@@ -2043,15 +2047,15 @@ This can be implemented in assembly like so:
 
 ### Operations for subroutines and call stack management
 
-The JMP and branch instructions are very useful for controlling program execution, but there is a common programming construct that they do not support: the [subroutine](https://en.wikipedia.org/wiki/Subroutine). A subroutine is a sequence of instructions for performing some task, useful when we want to invoke that task at various points during program execution. It is usually identified with a label. We could easily use a JMP instruction to start executing it, but what should happen at its end? We cannot JMP back because the subroutine could have been invoked from one of presumably many locations in the program code; we would not know which particular location to return to. And what should happen when that subroutine itself invokes a subroutine?
+The JMP and branch instructions are very useful for controlling program execution. But there is a common programming construct that they do not support: the [subroutine](https://en.wikipedia.org/wiki/Subroutine). A subroutine is a sequence of instructions for performing some task. It is useful when we want to invoke that sequence at various points during program execution. It is usually identified with a label. We could use a JMP instruction to start executing it, but what should happen at the subroutine's end? We cannot JMP back because we could have invoked the subroutine from many possible locations in the program code. We would not know which particular location to return to. And what should happen when that subroutine itself invokes a subroutine?
 
-We need to be able to remember the value of the Program Counter when we enter a subroutine so that we can restore that value to the Program Counter on exit. We also need to be able to do this in a nested fashion, to support calling subroutines from subroutines.
+We need to be able to remember the value of the Program Counter when we enter a subroutine. Doing so would allow use to restore that value to the Program Counter on exit. We also need to be able to do this in a nested fashion, to support calling subroutines from subroutines.
 
-The solution to this problem is a data structure called the [call stack](https://en.wikipedia.org/wiki/Call_stack). Being a stack it supports pushing values onto it and then popping them off. The call stack in the 6502 is implemented as a top-down stack, meaning that it grows downwards in memory rather than upwards. One page of system RAM, from addresses `$0100` to `$01FF`, is assigned to it. (This is the page directly after the zero page.)
+The solution to this problem is a data structure called the [call stack](https://en.wikipedia.org/wiki/Call_stack). Being a stack it supports pushing values onto it and then popping them off. The CPU implements the call stack as a top-down stack. This means that it grows downwards in memory rather than upwards. One page of system RAM, from addresses `$0100` to `$01FF`, is assigned to it. (This is the page right after the zero page.)
 
-The Stack Pointer is used to keep track of the top of the stack. This register is only one byte in size, but it only needs to be because only one page is used for the stack; the MSB of any stack address will always be `$01`. When a byte is pushed onto the stack, the Stack Pointer is decremented by one. When a byte is popped from the stack, the Stack Pointer is incremented by one.
+The Stack Pointer keeps track of the top of the stack. This register is only one byte in size. This is okay because only a single page is used for the stack; the MSB of any stack address will always be `$01`. When a byte is pushed onto the stack, the Stack Pointer is decremented by one. When a byte is popped from the stack, the Stack Pointer is incremented by one.
 
-We _must_ initialise the value of the Stack Pointer at program start. This is done using the TXS operation that was summarised earlier in this post. Because the stack is a top-down stack, we have to initialise the Stack Pointer to the value `$FF`, which is the LSB of the address of the stack page's last byte:
+We _must_ initialise the value of the Stack Pointer at program start. We do this using the TXS operation from earlier in this post. Because the stack is a top-down stack, we have to initialise the Stack Pointer to the value `$FF`. This is the LSB of the address of the stack page's last byte.
 
 ```asm6502
 ; Initialising the call stack:
@@ -2059,17 +2063,18 @@ LDX #$FF
 TXS
 ```
 
-To invoke a subroutine, the JSR operation is used. The operand is the address of the subroutine, normally specified using the subroutine's label. When a JSR instruction is executed, the CPU performs the following actions:
+To invoke a subroutine, we use the the JSR operation. The operand is the address of the subroutine. You would normally specify this using the subroutine's label. When a JSR instruction is executed, the CPU performs the following actions:
 
 - It pushes the current value of the Program Counter onto the Stack. This is an address so it is two bytes of data.
 - It decrements the Stack Pointer by two bytes.
 - It updates the Program Counter to the address of the specified subroutine.
 
-The RTS operation is used to exit a subroutine. When an RTS instruction is executed, the CPU will perform the following actions:
+Use the RTS operation to exit a subroutine. When it reaches the RTS instruction, the CPU will perform the following actions:
 
-- It gets the current value of the Stack Pointer and reads the values of the two bytes above that location in the stack.
+- It fetches the current value of the Stack Pointer.
+- It reads the values of the two bytes above that location in the stack.
 - It interprets these two bytes as an address in memory and it uses them to update the Program Counter's value.
-- It increments the Stack Point by two bytes, effectively 'removing' that stored address from the stack.
+- It increments the Stack Point by two bytes, so 'removing' that stored address from the stack.
 
 ::: opcode
 
@@ -2107,16 +2112,16 @@ Does not update any flags.
 
 :::
 
-Since only one page of memory is allocated to the stack, there is a limit to how deeply you can nest subroutine calls. (The result of exceeding this limit is termed [stack overflow](https://en.wikipedia.org/wiki/Stack_overflow).) However, it is unlikely that you will ever reach this limit. Instead, it is more likely that you will not need to devote all of the stack page to the stack, in which case you are free to treat the unused space as regular system RAM. Since the stack grows downwards from `$01FF`, it is the initial bytes of the stack page that you would be able to use in this way.
+Since only one page of memory is allocated to the stack, there is a limit to how deeply you can nest subroutine calls. (The result of exceeding this limit is termed [stack overflow](https://en.wikipedia.org/wiki/Stack_overflow).) It is unlikely that you will ever reach this limit. It is more likely that you will not need to devote the entire stack page to the stack. In that case you are free to treat the unused space as regular system RAM. Since the stack grows downwards from `$01FF`, it is the initial bytes of the stack page that would be unused.
 
-The MOS MCS6500 microcomputer family programming manual has the following guidance regarding when to use subroutines:
+The MOS MCS6500 programming manual includes the following guidance about subroutines:
 
 > [T]he use of subroutines should be limited to those cases where the user expects to duplicate code of significant length several times in the program. In these cases, and only in these cases, is subroutine call warranted rather than the normal mode of knowing the addresses and specifying them in an instruction. In all cases where timing [is] of significant interest, subroutines should also be avoided. Subroutines add significantly to the setup and execution time of problem solution.
 > — [Section 8.8, MOS MCS6500 microcomputer family programming manual](http://users.telenet.be/kim1-6502/6502/proman.html#88)
 
-When entering a subroutine, it is sometimes not only the current value of the Program Counter that needs to be stored on the stack. Consider a scenario where you have a particular value in the Accumulator and you then call a subroutine. The subroutine might load a different value into the Accumulator, overwriting that original value. When the subroutine returns, you would not be able to just pick up from where you were before.
+When entering a subroutine, you might need to store more than the value of the Program Counter. You might have a particular value in the Accumulator before you call the subroutine. The subroutine might load a different value into the Accumulator. When the subroutine returns, you would not be able to pick up from where you were before.
 
-To deal with this, there are operations to push the current value of the Accumulator and the Processor Status register onto the stack, and corresponding operations to pop them off. This allows you to save extra information onto the stack, although you have to manage pushing and popping this extra data yourself. Pushing should be performed right at the start of the subroutine, and popping should be performed just before returning.
+To deal with this, you can push the value of the Accumulator and the Processor Status register on to the stack. You can also pop them off. This allows you to save extra information onto the stack. You have to manage pushing and popping this data yourself. Perform pushing right at the start of the subroutine, and popping before returning.
 
 ::: opcode
 
@@ -2212,7 +2217,7 @@ some_subroutine:
 
 ### Operations for interrupt handling
 
-Sometimes a system event will occur that requires your program's immediate attention. For example, the player might have pressed the Reset button on the NES, or the PPU might have started vblank. Such an event is termed an [interrupt](https://en.wikipedia.org/wiki/Interrupt).
+Sometimes a system event will occur that requires your program's immediate attention. For example, the player might have pressed the Reset button on the NES, or the PPU might have started vblank. We term such an event an [interrupt](https://en.wikipedia.org/wiki/Interrupt).
 
 The 6502 supports three types of interrupt event:
 
@@ -2220,7 +2225,7 @@ The 6502 supports three types of interrupt event:
 - The interrupt request / break (IRQ/BRK) event.
 - The non-maskable interrupt (NMI) event.
 
-It is required that you include a handler in your program code for each of these three event types, with each handler simply being a subroutine that gets invoked by the CPU when the corresponding event type occurs. An [interrupt vector table](https://en.wikipedia.org/wiki/Interrupt_vector_table) is used to map each of the three event types to its handler. Each entry in the table is simply the address of the handler. The very last six bytes of the CPU address space, `$FFFA` to `$FFFF`, is reserved for this table. Every program that you write for the NES must include it and it must be found at that particular range of addresses. Note that the table is not executable code &mdash; it is simply a sequence of three two-byte addresses.
+You have to include a handler in your program code for each of these three event types. Each handler is a subroutine invoked by the CPU when the corresponding event type occurs. You use an [interrupt vector table](https://en.wikipedia.org/wiki/Interrupt_vector_table) to map each of the three event types to its handler. Each entry in the table is the address of the handler. The very last six bytes of the CPU address space, `$FFFA` to `$FFFF`, is reserved for this table. Every program that you write must include it and it must be found at that particular range of addresses. Note that the table is not executable code &mdash; it is only a sequence of three two-byte addresses.
 
 The three addresses, or vectors, in the table are organised as follows:
 
@@ -2239,7 +2244,7 @@ As is standard for the 6502, these addresses are stored in little-endian format.
 .addr irq_brk_handler
 ```
 
-This example uses the assembler control command syntax described earlier in this post to embed the addresses of the handlers. The `.segment` control command is used to position the vector table at the correct address in the final program code. How this works will be explained fully in a future post.
+The assembler control command syntax to used to embed the addresses of the handlers. The `.segment` control command positions the vector table at the correct address. I will explain how this works in a future post.
 
 #### The Reset event
 
@@ -2250,19 +2255,19 @@ The Reset event is special. It only occurs when the player powers the NES on or 
 
 Your program now begins execution.
 
-The value of the Reset vector is the address of the first instruction that should be executed on program start. This will be the start of the program initialisation code, after which your program will likely enter an infinite loop that is your main game loop; the Reset handler never returns.
+The value of the Reset vector is the address of the first instruction for the CPU to execute on program start. This will be the start of your program's initialisation code. Then your program will likely enter an infinite loop that is your main game loop. Thus the Reset handler never returns.
 
 #### The NMI and IRQ/BRK events
 
-The NMI and IRQ/BRK events occur many times during program execution, and so the handlers for these two events need to deal with exiting the handler as well as entering it. Additionally, these events will interrupt the regular execution of your program, so you may need to save particular program state on entering a handler and then restore it on exit
+The NMI and IRQ/BRK events occur many times during program execution. The handlers for these two events need to deal with exiting the handler as well as entering it. These events will also interrupt the regular execution of your program. You may need to save particular program state on entering a handler and then restore it on exit.
 
-The following is the effective sequence of actions that occur when an interrupt is signalled:
+This is the effective sequence of actions that occur when an interrupt is signalled:
 
-1. The current value of the Program Counter is pushed onto the stack.
-2. The current value of the Processor Status register is pushed onto the stack.
-3. The vector for the particular type of interrupt that has occurred (NMI or IRQ/BRK) is read.
-4. The value of the Program Counter is set to that vector.
-5. The Interrupt Disable flag of the Processor Status register is set, which prevents any other IRQ/BRK interrupts from occurring.
+1. The CPU pushes the current value of the Program Counter onto the stack.
+2. The CPU pushes the current value of the Processor Status register onto the stack.
+3. The CPU reads the vector for the particular type of interrupt that has occurred (NMI or IRQ/BRK).
+4. The CPU sets the value of the Program Counter to that vector.
+5. The CPU sets the Interrupt Disable flag of the Processor Status register. This prevents any other IRQ/BRK interrupts from occurring.
 
 Now program execution continues within the handler. When you wish to exit the handler, you must do so using an RTI instruction.
 
@@ -2286,20 +2291,20 @@ Effectively clears the Interrupt Disable flag if the updated value does not have
 
 :::
 
-The following is the effective sequence of event that occurs when a handler is exited via an RTI instruction:
+This is effective sequence of event that occurs when a handler is exited via an RTI instruction:
 
-1. The old value of the Processor Status register is popped from the stack.
-2. The value of the Processor Status register is updated to that old value. If that old value of the register did not have the Interrupt Disable flag set then this re-enables maskable interrupts.
-3. The old value of the Program Counter is popped from the stack.
-4. The value of the Program Counter is updated to that old value.
+1. The CPU pops the old value of the Processor Status register from the stack.
+2. The CPU updates the value of the Processor Status register to that old value. If the old value did not have the Interrupt Disable flag set then this re-enables maskable interrupts.
+3. The CPU pops the old value of the Program Counter from the stack.
+4. The CPU updates the value of the Program Counter to that old value.
 
-Only the values of the Processor Status register and Program Counter are stored automatically on the stack when an NMI or IRQ/BRK interrupt occurs. Your interrupt handler code will likely alter the values in other registers, so if you wish to save them you need to push them to the stack immediately on entering the handler and pop them from the stack just before the RTI instruction.
+The CPU only pushes the values of the Processor Status register and Program Counter onto the stack. Your interrupt handler code will likely alter the values of other registers. If you wish to save them then you need to push them to the stack immediately on entering the handler and pop them before exiting.
 
-The difference between the NMI and IRQ/BRK interrupt is that the latter is maskable while the former is not. A maskable interrupt is one that can be silenced, which means that the CPU will ignore whenever it occurs. This will happen as long as the Interrupt Disable flag of the Processor Status register is set. As covered earlier in this post, there are two operations, SEI and CLI, that can be used to respectively set and clear the Interrupt Disable flag.
+The difference between the NMI and IRQ/BRK interrupt is that the latter is maskable while the former is not. A maskable interrupt is one that you can silence, meaning that the CPU will ignore whenever it occurs. This will happen as long as the Interrupt Disable flag of the Processor Status register is set. As I covered earlier in this post, you can use the SEI and CLI operations to set and clear the Interrupt Disable flag.
 
-But some interrupts are very important and it matters that they are serviced as quickly as possible. For such interrupts, the 6502 includes the NMI (non-maskable interrupt) which is not affected by the Interrupt Disable flag. The NES has one NMI: for the interrupt event that occurs when the PPU starts vblank. This event occurs 60 times a second and is used to indicate when the PPU is idle and so when you can update its state.
+But some interrupts are very important and they have to be handled as quickly as possible. For these cases, the 6502 includes the NMI (non-maskable interrupt). It is not affected by the Interrupt Disable flag. The NES has a single NMI: for the interrupt event that occurs when the PPU starts vblank. This event occurs 60 times a second and indicates when the PPU is idle and so when you can update its state.
 
-The 6502 includes the BRK operation that is used to programmatically signal the IRQ/BRK interrupt event and so cause the IRQ/BRK event handler to be executed.
+The 6502 includes a BRK operation that you can use to signal the IRQ/BRK interrupt event. This causes the IRQ/BRK event handler to be executed.
 
 ::: opcode
 
@@ -2319,7 +2324,7 @@ Sets the Interrupt Disable flag.
 
 :::
 
-A BRK instruction is useful for debugging. You can insert the instruction in your program at the point where you would like to examine the current state of the system. This will cause the IRQ / BRK event handler to be invoked, at which point you can perform some debug-related actions. However, since this event handler is invoked both when a maskable interrupt event occurs and when a BRK instruction is executed, you need to be able to detect the latter case. An extra step that is performed when the CPU executes a BRK instruction is that the Processor Status register value that is pushed to the stack is updated so that the Break flag is set. This allows you, in your IRQ / BRK event handler, to check if the interrupt is actually a break interrupt:
+The BRK instruction is useful for debugging. You can insert the instruction in your program where you would like to examine the state of the system. It causes the IRQ / BRK event handler to be invoked, at which point you can perform some debug actions. But this handler gets invoked both when a maskable interrupt event occurs and when you use a BRK instruction. You need to be able to detect the latter case in your handler. When an interrupt occurs the CPU pushes the Processor Status register value to the stack. If the interrupt is because of a BRK instruction, that value is first updated so that the Break flag is set. This allows you, in your IRQ / BRK event handler, to check if the interrupt is actually a break interrupt:
 
 ```asm6502
 PLA      ; Pop the top byte from stack into the Accumulator.
@@ -2331,7 +2336,7 @@ BNE your_break_routine ; Branch to your break interrupt handling.
 
 ### The no-op operation
 
-The final operation to cover is NOP, the no-op operation. At first glance an instruction that does nothing seems to be of little use, but Wikipedia describes the following possibilities:
+The final operation to cover is NOP, the no-op operation. An instruction that does nothing seems to be pointless, but it does have its uses:
 
 > A NOP is most commonly used for timing purposes, to force memory alignment, to prevent hazards, to occupy a branch delay slot, to render void an existing instruction such as a jump, or as a place-holder to be replaced by active instructions later on in program development (or to replace removed instructions when reorganising would be problematic or time-consuming).
 > — [Wikipedia](<https://en.wikipedia.org/wiki/NOP_(code)>)
@@ -2362,7 +2367,7 @@ The result would depend on the exact unofficial value used. For some values, the
 
 ## Conclusion
 
-If you have not done any low-level programming before then writing games for the NES involves learning many new concepts. The information presented here should provide a solid base for your NES programming.
+If you have not done any low-level programming before then writing games for the NES involves learning many new concepts. The information presented here should provide a solid base for your NES adventure.
 
 ## Further reading
 
