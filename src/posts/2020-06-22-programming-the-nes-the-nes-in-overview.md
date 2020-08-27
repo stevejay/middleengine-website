@@ -79,9 +79,9 @@ The NES has many limitations compared to today's game consoles and personal comp
 
 ## Changelog
 
-- 2020-06-22: Initial version
-- 2020-06-23: Minor formatting changes
-- 2020-06-27: Minor formatting changes
-- 2020-06-28: Minor formatting changes
-- 2020-08-03: Minor wording changes
-- 2020-08-26: Plain English improvements
+- 2020-06-22 Initial version
+- 2020-06-23 Minor formatting changes
+- 2020-06-27 Minor formatting changes
+- 2020-06-28 Minor formatting changes
+- 2020-08-03 Minor wording changes
+- 2020-08-26 Plain English improvements
