@@ -11,7 +11,7 @@ issueNumber: 51
 
 ## Introduction
 
-The code review is a necessary step in the software development process. Code written by a developer or developer pair gets submitted as a pull request for review by a peer. The aims are to catch errors and omissions, get change suggestions, and to disseminate knowledge. In this way the team enhance themselves and the code base that they work on. In this post I discuss best practise for the code review process.
+The code review is a necessary step in the software development process. Code written by a developer or developer pair gets submitted as a pull request for review by a peer. The aims are to catch errors and omissions, get change suggestions, and to disseminate knowledge. In this way the team enhance themselves and the code base that they work on. In this post I discuss best practises for the code review process.
 
 ## The keys to success
 
@@ -22,7 +22,7 @@ In my opinion a successful code review:
 - Is performed by one developer working for a maximum of one hour on the task.
 - Consists of feedback that is constructive and considerate.
 
-This advice is driven by how code reviews were organized in a recent role I worked. I found this approach sensible and highly effective. The remainder of this post expands on each of the above points.
+This advice is driven by how code reviews were organized in a recent role I worked. I found this approach sensible and effective. The remainder of this post expands on each of the above points.
 
 ## Submitter assistance
 

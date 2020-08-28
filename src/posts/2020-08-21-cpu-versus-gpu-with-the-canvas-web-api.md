@@ -27,7 +27,7 @@ Sometimes you already know that a CPU canvas would be best for your use case. Cu
 
 ## The problem with heuristics
 
-The browser's use of heuristics points to a fundamental limitation of the Canvas API: it is up to the browser whether a given canvas is a CPU canvas or a GPU canvas. You are relying on heuristics and they can change between browser versions. In one version, the browser might determine that a given canvas should be a GPU canvas. In another version, it might make the opposite determination. [A reason that Figma gave](https://www.figma.com/blog/building-a-professional-design-tool-on-the-web/) for using WebGL rather than the Canvas API was not being able to guarantee GPU acceleration.
+The browser's use of heuristics points to a fundamental limitation of the Canvas API: it is up to the browser whether a given canvas is a CPU canvas or a GPU canvas. You are relying on heuristics and they can change between browser versions. In one version, the browser might determine that a given canvas should be a GPU canvas. In another version, it might make the opposite determination. [One reason that Figma gave](https://www.figma.com/blog/building-a-professional-design-tool-on-the-web/) for using WebGL rather than the Canvas API was not being able to guarantee GPU acceleration.
 
 The performance difference between the two types of canvas can be significant. I used the [JSBench.me](https://jsbench.me/) Web site to test this. In [this first test](https://jsbench.me/bbke790qc2/1) I try to get the browser to use a CPU canvas. In [this second test](https://jsbench.me/8ake791cw4/1) I try to get the browser to use a GPU canvas. The test itself is identical. It copies a part of the canvas to itself:
 

@@ -33,7 +33,7 @@ The [explanations](https://www.youtube.com/watch?v=RGB-wlatStc) [available](http
 
 ![](/images/2020-07-28-bresenhams-line-algorithm/04_bresenham-guide-2x.png "The line to be rasterised")
 
-In rasterising this line, we will _always_ be incrementing the X-axis coordinate. We will only _sometimes_ be incrementing the Y-axis coordinate. This is because the change in X, which is 3, is greater than the change in Y, which is 2. The change in X is termed delta X (ΔX) and the change in Y is termed delta Y (ΔY). We are using the Bresenham line algorithm is to answer one question: when should we increment the Y-axis coordinate value?
+In rasterising this line, we will _always_ be incrementing the X-axis coordinate. We will only _sometimes_ be incrementing the Y-axis coordinate. This is because the change in X, which is 3, is greater than the change in Y, which is 2. The change in X is termed delta X (ΔX) and the change in Y is termed delta Y (ΔY). We are using the Bresenham line algorithm is to answer one question: _when_ should we increment the Y-axis coordinate value?
 
 The 'always' axis is called the fast axis and the 'sometimes' axis is called the slow axis:
 
