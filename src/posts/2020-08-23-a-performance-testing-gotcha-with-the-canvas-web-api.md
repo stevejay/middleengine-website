@@ -11,7 +11,7 @@ issueNumber: 78
 
 ## Introduction
 
-The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is a rich and performant API for drawing two-dimensional (2D) graphics in a Web browser. This blog post details a gotcha that I found when performance testing the [`drawImage`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage) method.
+The [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) is a rich and performant API for drawing 2D graphics in a Web browser. This blog post details a gotcha that I found when performance testing the [`drawImage`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage) method.
 
 ## The initial attempt
 
@@ -23,13 +23,13 @@ The test is simple. In the set-up I create a small source `<canvas>` element and
 $destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 900, 900);
 ```
 
-When I ran the test in Chrome v84 on macOS v10.15 (Catalina), my laptop froze and then crashed a few moments later. I tried [a new test](https://jsbench.me/nmke2uordl/1) with a smaller destination canvas which froze the Web page for a minute or so but did prevent a crash. But the result of that test was too good to be true: the browser was able to manage over 300,000 `drawImage` operations per second.
+When I ran the test in Chrome v84 on macOS v10.15, my laptop froze and then crashed after a few moments. I tried [a new test](https://jsbench.me/nmke2uordl/1) with a smaller destination canvas which froze the Web page for a minute or so but did prevent a crash. But the result of that test was too good to be true: the browser was able to manage over 300,000 `drawImage` operations per second.
 
 My understanding is that the `drawImage` action does not always get executed immediately. The action might instead get queued as part of a batching mechanism used to cut the number of GPU render calls. These calls are expensive so it is worth the browser performing this optimisation. Thus the `drawImage` call only has to queue the action. This speed encourages the [benchmarking code](https://benchmarkjs.com/) to invoke it many times to improve the accuracy of the test. Now there will be many pending `drawImage` actions which, when flushed, could overload the system.
 
 ## Finding a fix
 
-I reasoned that the answer was to find a way to flush the batched action within the test body. The WebKit performance tests in the Chromium source code [include tests for `drawImage`](https://github.com/chromium/chromium/blob/2ca8c5037021c9d2ecc00b787d58a31ed8fc8bcb/third_party/blink/perf_tests/canvas/draw-dynamic-canvas-2d-to-hw-accelerated-canvas-2d.html). They use a completion action to trigger flushing:
+I reasoned that I had to find a way to flush the batched action within the test body. The WebKit performance tests in the Chromium source code [include tests for `drawImage`](https://github.com/chromium/chromium/blob/2ca8c5037021c9d2ecc00b787d58a31ed8fc8bcb/third_party/blink/perf_tests/canvas/draw-dynamic-canvas-2d-to-hw-accelerated-canvas-2d.html). They use a completion action to trigger flushing:
 
 ```js
 function ensureComplete() {
@@ -39,7 +39,7 @@ function ensureComplete() {
 }
 ```
 
-I tried this approach in [this version](https://jsbench.me/h9ke2s1seb) of the test suite. The following is an example test from that suite:
+I tried this approach in [a version](https://jsbench.me/h9ke2s1seb) of the test suite. The following is an example test from that suite:
 
 ```js
 $destContext.drawImage($sourceCanvas, 0, 0, 300, 300, 0, 0, 900, 900);
@@ -86,9 +86,9 @@ Again I only read the image data for a single pixel. There is no page freezing w
 | Scaling from a 300x300 canvas area to a 900x900 canvas area              | 45.29 ops/s ± 3.04% |
 | Scaling from a 300x300 canvas area to a 3000x3000 canvas area            | 19.88 ops/s ± 1.47% |
 
-My suspicion is that the destination canvas gets turned into a CPU canvas because of the calls to `getImageData`. Thus these results are without hardware acceleration. It is noticeable how much slower these results are compared to the previous test suite. This shows how much of a performance hit it can be if the browser runs a canvas as a CPU canvas rather than as a GPU canvas. For more on this topic, see [my post here](/blog/posts/2020/08/21/cpu-versus-gpu-with-the-canvas-web-api).
+My suspicion is that the destination canvas gets turned into a CPU canvas because of the calls to `getImageData`. Thus these results are without hardware acceleration. It is noticeable how much slower these results are compared to the previous test suite. This shows how much of a performance hit it can be if the browser runs a canvas as a CPU canvas rather than as a GPU canvas. (For more on this topic, see [my post here](/blog/posts/2020/08/21/cpu-versus-gpu-with-the-canvas-web-api).)
 
-Note that how you flush the action might need to vary depending on the browser or even the browser version. You would have to experiment with the approaches given in this post.
+Note that how you flush the action might depend on the browser or even the browser version. You would have to experiment with the approaches given in this post.
 
 ## Some results for the `drawImage` method performance tests
 
@@ -117,7 +117,7 @@ The following is an example result for scaling down performance:
 
 I got comparable results running the tests in Chrome v84 and Edge v84 on Windows 10. I noticed that the results could vary a lot between runs, but the general trend was consistent.
 
-Scaling up was performant regardless of the destination canvas area. Scaling down was only performant for the smallest destination canvas area. Thus the lower the total number of pixels involved (source plus destination), the more performant scaling will be. This observation of course makes sense intuitively.
+Scaling up was performant regardless of the destination canvas area. Scaling down was only performant for the smallest destination canvas area. Thus the lower the total number of pixels involved (source plus destination), the more performant scaling will be. Of course, this makes sense intuitively.
 
 ## Conclusion
 
