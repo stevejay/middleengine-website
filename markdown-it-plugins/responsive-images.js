@@ -46,7 +46,7 @@ const postImages = (md, opts) => {
     const title =
       titleAttrIndex > -1 ? imageToken.attrs[titleAttrIndex][1] : null;
 
-    const alt = imageToken.content || "";
+    const alt = imageToken.content || title;
 
     const imagePath = path.join(opts.imageRootPath, src);
     const imageContent = fs.readFileSync(imagePath);

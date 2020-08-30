@@ -27,17 +27,17 @@ I soon saw a problem with the updated image editor. When all the layered canvase
 
 To show this, I have created a widget that consists of two equal-sized canvases, one on top of the other. Using the Canvas API I fill the lower canvas with grey, except for a square in the centre. I then draw a square in the centre of the upper canvas that exactly covers the empty area on the lower canvas:
 
-![](/images/2020-08-22-layered-canvas-rendering-issues-in-web-workers/canvas-rendering-test-image-2x.png "Canvas test with two layered canvases")
+![How the two layered canvases combine to create a totally grey combined image](/images/2020-08-22-layered-canvas-rendering-issues-in-web-workers/canvas-rendering-test-image-2x.png "Canvas test with two layered canvases")
 
 I use a slider to control the size of the squares, simulating zooming in and out of the image. The colour behind the canvases is [rebeccapurple](https://medium.com/@valgaze/the-hidden-purple-memorial-in-your-web-browser-7d84813bb416). When I move the slider, both canvases get updated to show the grey/empty square at its new size. If the two canvases always get updated on the same frame then the purple background will never be visible. The square on the upper canvas and the hole in the bottom canvas will always match up exactly. If the canvases get updated on different frames then there will be a momentary mismatch. One canvas will show the new square size while the other canvas will still show the old image. If this happens when zooming out, the purple background may become visible for a moment.
 
 I tried this test in Chrome v84 on macOS v10.15 Catalina and Windows 10. I first tried it when performing the canvas updates on the main thread and then when performing the updates on the Web Worker. I never saw the purple background when using the main thread, but I did when using the Web Worker, as shown in this video:
 
-![](/images/2020-08-22-layered-canvas-rendering-issues-in-web-workers/tearing-1-2x.gif "Tearing when using a Web Worker for canvas updates")
+![A recording of tearing when using a Web Worker for canvas updates](/images/2020-08-22-layered-canvas-rendering-issues-in-web-workers/tearing-1-2x.gif "Tearing when using a Web Worker for canvas updates")
 
 I also sometimes saw nasty rendering glitches when the canvases flashed white:
 
-![](/images/2020-08-22-layered-canvas-rendering-issues-in-web-workers/tearing-2-2x.gif "Flashes when using a Web Worker for canvas updates")
+![A recording of rendering glitches when using a Web Worker for canvas updates](/images/2020-08-22-layered-canvas-rendering-issues-in-web-workers/tearing-2-2x.gif "Flashes when using a Web Worker for canvas updates")
 
 If you want to try this test for yourself then the HTML file I used is available <a href="/iframes/canvas-tearing.html" data-turbolinks="false">here</a>. It contains two demonstration widgets. The first one uses a Web Worker to update the canvases and the second one uses the main thread. The file will only work in a browser that supports `transferControlToOffscreen`.
 
