@@ -84,3 +84,4 @@ The result is that all of these files (images, JavaScript and CSS) can have very
 
 - Callicode - Building Docker Containers for Go Applications.
 - Lazy load the comments.
+- Better page descriptions.

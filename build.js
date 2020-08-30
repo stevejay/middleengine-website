@@ -106,6 +106,10 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
   const post = await readFile(blogPostFile.path, { encoding: "utf-8" });
   const content = markdownIt.render(post);
 
+  if (!markdownIt.meta.description) {
+    markdownIt.meta.description = markdownIt.meta.summary;
+  }
+
   // TODO could have a build-time template cache.
   const layoutContent = await readFile(
     path.join(TEMPLATES_SRC_DIR, `${markdownIt.meta.layout}.hbs`),
