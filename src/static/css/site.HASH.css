@@ -66,6 +66,10 @@
   --font-size-8: 3rem;
 
   --shadow-small: 2px 4px 8px 2px #00000088;
+
+  --octomments-link-color: var(--color-secondary);
+  --octomments-divider-color: var(--color-neutral-400);
+  --octomments-meta-color: var(--color-neutral-600);
 }
 
 /********************************/
@@ -1408,15 +1412,3 @@ body.index header.hero h1 strong {
 .opcode-detail table td:last-of-type {
   padding-right: 0;
 }
-
-/********************************/
-/*           Comments           */
-/********************************/
-
-.comments-info {
-  font-size: 0.75rem;
-  color: var(--color-neutral-600);
-  margin-left: calc(60px + 1em);
-}
-
-/********************************/
