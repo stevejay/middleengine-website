@@ -44,7 +44,7 @@ class Comments extends HTMLElement {
         this.shadowRoot.appendChild(style);
 
         const script = document.createElement("script");
-        script.src = "/js/ocs-core.min.1-0-4.js";
+        script.src = "https://unpkg.com/octomments@1.0.4/build/ocs-core.min.js";
         script.id = "ocs-core.min.js";
 
         script.onload = () => {
