@@ -54,7 +54,7 @@ class Comments extends HTMLElement {
 
               if (comments.length === 0) {
                 const p = document.createElement("p");
-                p.innerText =
+                p.textContent =
                   "No comments found. Be the first to post a comment!";
                 container.appendChild(p);
                 return;
@@ -85,21 +85,21 @@ class Comments extends HTMLElement {
               console.error(error);
               container.innerHTML = "";
               const p = document.createElement("p");
-              p.innerText = "Failed to load comments for this post.";
+              p.textContent = "Failed to load comments for this post.";
               container.appendChild(p);
             });
           };
 
           Octomments({
             github: {
-              owner: this.getAttribute("data-owner"),
-              repo: this.getAttribute("data-repo"),
+              owner: this.attributes.owner.value,
+              repo: this.attributes.repo.value,
             },
-            issueNumber: parseInt(this.getAttribute("data-issue-number"), 10),
+            issueNumber: parseInt(this.attributes["issue-number"].value, 10),
             renderer: [renderer, ""],
             debug: false,
             endpoints: {
-              issue: this.getAttribute("data-issue-endpoint"),
+              issue: this.attributes["issue-endpoint"].value,
               token: "",
             },
           }).init();

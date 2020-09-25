@@ -26,12 +26,11 @@
                     <h2 id="comments"><a class="header-anchor" href="#comments">#</a> Comments</h2>
                     <p class="note">
                         Comments on this site are implemented using GitHub Issues.
-                        To add your comment to this post, please add it
+                        To add your comment, please add it
                         to <a href="https://github.com/stevejay/middleengine-website/issues/{{issueNumber}}">this GitHub
                             Issue</a>. It will then appear below.</p>
-                    <comments-list data-owner="stevejay" data-repo="middleengine-website"
-                        data-issue-number="{{issueNumber}}"
-                        data-issue-endpoint="https://middleengine-website-comments.vercel.app/octomments/issue">
+                    <comments-list owner="stevejay" repo="middleengine-website" issue-number="{{issueNumber}}"
+                        issue-endpoint="https://middleengine-website-comments.vercel.app/octomments/issue">
                     </comments-list>
                 </article>
                 {{/if}}
