@@ -22,23 +22,22 @@
             <div class="article-body">
                 {{{content}}}
                 {{#if issueNumber}}
-                <section>
-                    <h2 id="comments"><a class="header-anchor" href="#changelog">#</a> Comments</h2>
-                    <div id="comments-list"></div>
-                    <p class="comments-info">
-                        Comments on this site are implemented using GitHub Issues. Commenting here requires that you
-                        authorise a GitHub App to post the comment for you. You can instead post your comment directly
+                <article>
+                    <h2 id="comments"><a class="header-anchor" href="#comments">#</a> Comments</h2>
+                    <p class="note">
+                        Comments on this site are implemented using GitHub Issues.
+                        To add your comment, please add it
                         to <a href="https://github.com/stevejay/middleengine-website/issues/{{issueNumber}}">this GitHub
-                            Issue</a>.</p>
-                </section>
+                            Issue</a>. It will then appear below.</p>
+                    <comments-list owner="stevejay" repo="middleengine-website" issue-number="{{issueNumber}}"
+                        issue-endpoint="https://middleengine-website-comments.vercel.app/octomments/issue">
+                    </comments-list>
+                </article>
                 {{/if}}
             </div>
         </article>
     </main>
     {{> footer }}
-    {{#if issueNumber}}
-    <script src="{{staticFile "/js/octomments.HASH.js"}}"></script>
-    {{/if}}
 </body>
 
 </html>

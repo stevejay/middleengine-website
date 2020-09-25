@@ -17,10 +17,11 @@
     <link rel="manifest" href="/site.webmanifest">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turbolinks/5.2.0/turbolinks.js"
         integrity="sha256-iM4Yzi/zLj/IshPWMC1IluRxTtRjMqjPGd97TZ9yYpU=" crossorigin="anonymous" defer></script>
-    <link rel="stylesheet" href="https://unpkg.com/octomments/build/ocs-ui.min.css" />
-    <script src="https://unpkg.com/octomments/build/ocs.min.js"></script>
-    <script src="{{staticFile "/js/cookie-banner.HASH.js"}}" defer></script>
-    <link href="{{staticFile "/css/site.HASH.css"}}" rel="stylesheet">
+    <script src="{{staticFile "/js/cookie-banner.HASH.js"}}" defer data-turbolinks-track="reload"></script>
+    <link href="{{staticFile "/css/site.HASH.css"}}" rel="stylesheet" data-turbolinks-track="reload">
+    {{#if issueNumber}}
+    <script src="{{staticFile "/js/comments-component.HASH.js"}}" defer data-turbolinks-track="reload"></script>
+    {{/if}}
     <link
         href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400;1,700&family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap"
         defer rel="stylesheet">

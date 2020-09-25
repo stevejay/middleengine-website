@@ -243,7 +243,7 @@ const processStaticFile = async (staticFile, buildContext) => {
     const content = fs.readFileSync(staticFile.path);
     const processedCSS = await postcss([
       postCssImport(),
-      postCssCssVariables(),
+      postCssCssVariables({ preserve: true }),
       postCssPresetEnv({ stage: 0 }),
       postCssAutoprefixer(),
       postCssCssNano(),
