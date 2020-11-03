@@ -237,7 +237,7 @@ The 'Using State' solution had the problem of requiring a state change right aft
 }
 ```
 
-This works because even if the ID to scroll to is the same as the previous ID, I always create a new object. React state cannot be mutated.
+This works because even if the ID to scroll to is the same as the previous ID, I always create a new object; React state cannot be mutated.
 
 The parent component contains the state object as `scrollState`, initialized to `null`. This is passed to each section as a prop. An effect is required to reset `scrollState` to `null` if the value of `sections` changes. There is a handler (`handleNavClick`) for setting the scroll state object to the clicked section ID:
 

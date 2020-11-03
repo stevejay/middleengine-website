@@ -664,6 +664,7 @@ body.blog #site-header nav a.blog-link {
 /*        Cookie banner         */
 /********************************/
 
+/*
 #cookie-banner {
   display: none;
   z-index: 2;
@@ -711,7 +712,6 @@ body.blog #site-header nav a.blog-link {
     justify-content: space-between;
   }
 
-  /* Control vertical margins manually */
   #cookie-banner > * {
     margin-top: 0;
     margin-bottom: 0;
@@ -729,6 +729,7 @@ body.blog #site-header nav a.blog-link {
     padding: var(--space-3) var(--space-5);
   }
 }
+*/
 
 /********************************/
 /*             Main             */
