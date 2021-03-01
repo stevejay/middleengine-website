@@ -41,7 +41,7 @@
     "postcss-css-variables": "^0.17.0",
     "postcss-import": "^13.0.0",
     "postcss-preset-env": "^6.7.0",
-    "prismjs": "^1.22.0",
+    "prismjs": "^1.23.0",
     "probe-image-size": "^5.0.0",
     "reload": "^3.1.1",
     "rev-hash": "^3.0.0"
