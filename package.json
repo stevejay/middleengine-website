@@ -47,8 +47,8 @@
     "rev-hash": "^3.0.0"
   },
   "engines": {
-    "node": "> 16.0.0",
-    "npm": ">= 6.6"
+    "node": ">=16.0.0",
+    "npm": ">=6.6"
   },
   "browserslist": [
     "last 2 versions"
