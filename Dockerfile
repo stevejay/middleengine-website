@@ -1,7 +1,7 @@
 # ----- Stage 1: build the Web site pages ----- 
 
 # Use a node docker image:
-FROM node:13.12.0-stretch AS src-build
+FROM node:16-stretch AS src-build
 
 # Copy just the files required to install the required node modules.
 COPY package.json package-lock.json /tmp/
