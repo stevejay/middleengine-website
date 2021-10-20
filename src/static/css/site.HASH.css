@@ -161,32 +161,12 @@ h6 {
 /*         Header anchor        */
 /********************************/
 
-h2,
-h3,
-h4,
-h5,
-h6 {
-  position: relative;
-}
+/* See https://github.com/valeriangalliat/markdown-it-anchor#permalinks */
 
 .header-anchor {
-  color: var(--color-neutral-400);
-  border: none;
-}
-
-.header-anchor:hover {
-  color: var(--color-primary);
-  border: none;
-}
-
-@media (--viewport-tablet) {
-  /* Push the anchor to the left on wider screens */
-  .header-anchor {
-    position: absolute;
-    left: -1.5ch;
-    top: 50%;
-    transform: translateY(-50%);
-  }
+  text-decoration: none;
+  border-bottom: none;
+  color: inherit;
 }
 
 /********************************/
