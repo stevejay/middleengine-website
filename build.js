@@ -1,37 +1,37 @@
-const _ = require("lodash");
-const minimist = require("minimist");
-const mimetype = require("mimetype");
-const Graceful = require("node-graceful");
-const chokidar = require("chokidar");
-const express = require("express");
-const http = require("http");
-const reload = require("reload");
-const getPort = require("get-port");
-const fsWalk = require("@nodelib/fs.walk");
-const util = require("util");
-const fs = require("fs-extra");
-const path = require("path");
-const MarkdownIt = require("markdown-it");
-const markdownItMeta = require("markdown-it-meta");
-const markdownItAttribution = require("markdown-it-attribution");
-const markdownItContainer = require("markdown-it-container");
-const markdownItPrism = require("markdown-it-prism");
-const markdownItPrismBackticks = require("markdown-it-prism-backticks");
-const markdownItAnchor = require("markdown-it-anchor");
-const markdownItAttrs = require("markdown-it-attrs");
-const markdownItMultimdTable = require("markdown-it-multimd-table");
-const Handlebars = require("handlebars");
-const HandlebarsIntl = require("handlebars-intl");
-const revisionHash = require("rev-hash");
-const dotenv = require("dotenv");
-const fetch = require("node-fetch");
-const postcss = require("postcss");
-const postCssImport = require("postcss-import");
-const postCssCssVariables = require("postcss-css-variables");
-const postCssPresetEnv = require("postcss-preset-env");
-const postCssAutoprefixer = require("autoprefixer");
-const postCssCssNano = require("cssnano");
-const markdownItResponsiveImages = require("./markdown-it-plugins/responsive-images.js");
+import _ from "lodash";
+import minimist from "minimist";
+import mimetype from "mimetype";
+import Graceful from "node-graceful";
+import chokidar from "chokidar";
+import express from "express";
+import http from "http";
+import reload from "reload";
+import getPort from "get-port";
+import fsWalk from "@nodelib/fs.walk";
+import util from "util";
+import fs from "fs-extra";
+import path from "path";
+import MarkdownIt from "markdown-it";
+import markdownItMeta from "markdown-it-meta";
+import markdownItAttribution from "markdown-it-attribution";
+import markdownItContainer from "markdown-it-container";
+import markdownItPrism from "markdown-it-prism";
+import markdownItPrismBackticks from "markdown-it-prism-backticks";
+import markdownItAnchor from "markdown-it-anchor";
+import markdownItAttrs from "markdown-it-attrs";
+import markdownItMultimdTable from "markdown-it-multimd-table";
+import Handlebars from "handlebars";
+import HandlebarsIntl from "handlebars-intl";
+import revisionHash from "rev-hash";
+import dotenv from "dotenv";
+import fetch from "node-fetch";
+import postcss from "postcss";
+import postCssImport from "postcss-import";
+import postCssCssVariables from "postcss-css-variables";
+import postCssPresetEnv from "postcss-preset-env";
+import postCssAutoprefixer from "autoprefixer";
+import postCssCssNano from "cssnano";
+import markdownItResponsiveImages from "./markdown-it-plugins/responsive-images.js";
 
 Graceful.captureExceptions = true;
 Graceful.captureRejections = true;
@@ -54,7 +54,8 @@ const STATIC_SRC_DIR = "./src/static";
 const POSTS_SRC_DIR = "./src/posts";
 const TEMPLATES_SRC_DIR = "./src/templates";
 const PARTIALS_SRC_DIR = path.join(SRC_DIR, "templates");
-const POST_NAME_REGEXP = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})-(?<name>.+)$/;
+const POST_NAME_REGEXP =
+  /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})-(?<name>.+)$/;
 const WATCH_DEBOUNCE_MS = 500;
 
 HandlebarsIntl.registerWith(Handlebars);
@@ -82,10 +83,9 @@ const processBlogPostFile = async (blogPostFile, buildContext) => {
     .use(markdownItMeta)
     .use(markdownItAnchor, {
       level: [1, 2, 3, 4],
-      permalink: true,
-      permalinkClass: "header-anchor",
-      permalinkSymbol: "#",
-      permalinkBefore: true,
+      permalink: markdownItAnchor.permalink.headerLink({
+        safariReaderFix: true,
+      }),
     })
     .use(markdownItAttribution, { removeMarker: false })
     .use(markdownItResponsiveImages)
@@ -361,7 +361,6 @@ const generateBuildContext = async (watchMode) => {
   await generateHTMLFile(buildContext, "privacy.hbs", "/privacy");
   await generateSitemapFile(buildContext);
 
-  console.log("Built build context");
   return buildContext;
 };
 

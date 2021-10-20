@@ -59,7 +59,7 @@ You can access the Web site via the URL `http://localhost/`.
 
 #### Building and pushing to Docker Hub
 
-```
+```bash
 docker build --tag middleengine/website:latest --file Dockerfile .
 docker login -u middleengine
 [enter access token]
