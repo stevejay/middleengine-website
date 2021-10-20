@@ -49,7 +49,7 @@ The [Picture Processing Unit](https://en.wikipedia.org/wiki/Picture_Processing_U
 
 The PPU has a 16 KiB address space, from `$0000` to `$3FFF`. The PPU also includes a block of 256 bytes of memory termed the [Object Attribute Memory](https://wiki.nesdev.com/w/index.php/PPU_OAM) (OAM). This memory is separate from the PPU's 16 KiB address space. The PPU reads from it when rendering the sprites to determine their appearance and position. Whenever we want to change the image displayed on the screen, we have to update the PPU's state. This is usually done using special addresses in the CPU address space. By writing to these addresses we can update the state of the PPU and the OAM.
 
-The NES was created at a time when the display technology in common use was the [cathode-ray tube](https://en.wikipedia.org/wiki/Cathode-ray_tube) (CRT). The CRT works by projecting one or more electron beams onto a fluorescent screen. It scans the beam from side to side and from top to bottom to build up an image. When the beam has reached the bottom, it needs to be returned to the top of the screen to begin scanning the next frame. Moving back to the top of the screen takes a short amount of time, and this time is termed the [vertical blanking interval](https://en.wikipedia.org/wiki/Vertical_blanking_interval), or vblank. During vblank the PPU is not rendering a frame and so it is safe to update the state of the PPU. The NTSC NES renders at 60 frames per second, while the PAL NES renders at 50 frames per second.
+The NES was created at a time when the display technology in common use was the [cathode-ray tube](https://en.wikipedia.org/wiki/Cathode-ray_tube) (CRT). The CRT works by projecting one or more electron beams onto a fluorescent screen. The beam is scanned from side to side and from top to bottom to build up the current video frame. When the beam reaches the bottom, it returns to the top of the screen to start rendering the next frame. This return takes a short amount of time which is termed the [vertical blanking interval](https://en.wikipedia.org/wiki/Vertical_blanking_interval), or vblank. During vblank the PPU is not actively rendering a frame. This is the only time that it is safe to update the state of the PPU. The NTSC NES renders 60 frames per second, while the PAL NES renders 50 frames per second.
 
 ## Audio support
 
@@ -85,3 +85,4 @@ The NES has many limitations compared to today's game consoles and personal comp
 - 2020-06-28 Minor formatting changes
 - 2020-08-03 Minor wording changes
 - 2020-08-26 Plain English improvements
+- 2021-10-20 Rephrased the CRT scanning description

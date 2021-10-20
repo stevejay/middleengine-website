@@ -102,3 +102,9 @@ Designers and clients can consider focus rings to be unsightly additions to a de
 ## Conclusion
 
 An effective collaboration between designer and developer is important for the success of a project and the quality of its implementation. This post has covered some best practises to adopt and some decisions to be made to simplify and streamline that collaboration. The outcome should be designs that are suited to accurate recreation in the browser.
+
+---
+
+## Changelog
+
+- 2021-10-20 Initial version
