@@ -19,7 +19,7 @@ RUN node ./build.js
 
 # ----- Stage 2: create the final nginx docker image ----- 
 
-FROM nginx:1.17.10
+FROM nginx:1.20
 
 # Copy the built Web pages into it:
 COPY --from=src-build /app/build /usr/share/nginx/html
