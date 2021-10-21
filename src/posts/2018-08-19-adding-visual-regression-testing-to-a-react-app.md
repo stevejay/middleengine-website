@@ -47,7 +47,7 @@ As I say, I settled on storybook-chrome-screenshot and reg-suit, largely because
 1. I set up [CircleCI](https://circleci.com/) so that when I create a pull request, a job runs the storybook-chrome-screenshot CLI tool.
 1. It builds and runs Storybook in a headless browser, saving all the screenshots to a directory on the CI server.
 1. The job then runs the reg-suit tool, which checks for the commit that is the parent for the branch, downloads its associated screenshots from the s3 bucket, and then diffs them with the local ones.
-1. It generates a [nice report](https://artfullylondon-admin-reg-suit.s3.amazonaws.com/d247fd3ce7444ec2ce597497cf6e2db38d2a9b08/index.html) and adds [a comment](https://github.com/stevejay/artfullylondon-web-admin/pull/13) to the pull request with the result.
+1. It generates a nice report and adds [a comment](https://github.com/stevejay/artfullylondon-web-admin/pull/13) to the pull request with the result.
 1. If I am happy with the differences, I squash and rebase the PR into master.
 1. CircleCI runs on master to deploy the changes, and in the process runs a job similar to the above to generate and upload the new expected images.
 

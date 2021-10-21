@@ -105,7 +105,7 @@ You can also declare a label on the same line as an instruction:
 some_label: LDA #$00
 ```
 
-Some assemblers support other types of label. A [cheap local label](https://cc65.github.io/doc/ca65.html#ss6.6) allows you to reuse common labels. For example, you can reuse the label 'loop'. This means that you do not need to create a unique label every time you loop over a series of instructions:
+Some assemblers support other types of label. A [cheap local label](https://cc65.github.io/doc/ca65.html#ss6.5) allows you to reuse common labels. For example, you can reuse the label 'loop'. This means that you do not need to create a unique label every time you loop over a series of instructions:
 
 ```asm6502
 @loop:      ; A cheap local label
@@ -2380,4 +2380,5 @@ If you have not done any low-level programming before then writing games for the
 
 - 2020-06-23 Draft version
 - 2020-08-02 A substantial rework of the explanations for addition and subtraction.
-- 2020-08-26: Plain English improvements
+- 2020-08-26 Plain English improvements
+- 2021-10-21 Fixed a link

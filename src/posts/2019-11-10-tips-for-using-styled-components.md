@@ -15,7 +15,9 @@ The library [Styled Components](https://styled-components.com/) is one of many C
 
 ## Theming
 
-A key feature of Styled Components is that [it supports theming](https://styled-components.com/docs/advanced#theming). It makes sense to base your theme's shape around the [System UI Theme Specification](https://system-ui.com/theme/). Your theme will be compatible with any Styled Components-based library that uses it. For example, both [Styled System](https://styled-system.com/theme-specification/) and [XStyled System](https://xstyled.dev/docs/theme-specification/) follow the specification.
+A key feature of Styled Components is that [it supports theming](https://styled-components.com/docs/advanced#theming). It makes sense to base your theme's shape around the [System UI Theme Specification](https://system-ui.com/theme/). Your theme will be compatible with any Styled Components-based library that uses it. For example, both [Styled System](https://styled-system.com/theme-specification/) and [XStyled System](https://xstyled.dev/docs/theme/) follow the specification.
+
+**Note:** XStyled System has [changed significantly](https://xstyled.dev/docs/introduction/#story) since this post was written. It still looks like an excellent library to use in combination with Styled Components.
 
 The specification defines a set of key/value pairs for the theme. Example keys are `space`, `fontSizes`, and `colors`. You need to decide what the type of each value will be. Generally your choice is for a value to be an array, an object, or an array with aliases:
 
@@ -101,13 +103,13 @@ You might find this version easier to read. The technique is in the Styled Compo
 
 ## Helper libraries
 
-If you are writing styled components from scratch then you can also use [Styled System](https://styled-system.com/theme-specification/) or [XStyled System](https://xstyled.dev/docs/theme-specification/). Both have the same benefits:
+If you are writing styled components from scratch then you can also use [Styled System](https://styled-system.com/theme-specification/) or [XStyled System](https://xstyled.dev/docs/theme/). Both have the same benefits:
 
 - Simplifying the creation of Styled Components that expose style props.
 - Providing a succinct syntax for responsive styles.
 - Providing alternative ways to access theme values.
 
-The XStyled System site explains on [this page](https://xstyled.dev/docs/motivation/) why two libraries exist for this rather than one.
+The XStyled System site explains on [this page](https://xstyled.dev/docs/introduction/#story) why two libraries exist for this rather than one.
 
 Styled System and XStyled System have TypeScript declarations in the [Definitely Typed](https://github.com/DefinitelyTyped/DefinitelyTyped) repository
 
@@ -306,7 +308,7 @@ const StyledExample = styled.div`
 `;
 ```
 
-Or you can use the [th function](https://xstyled.dev/docs/system-utilities/#theme-getters) which has the same getter functions attached to it:
+Or you can use the `th` function which has the same getter functions attached to it:
 
 ```ts
 import { th } from "@xstyled/system";
@@ -479,5 +481,6 @@ Styled Components is a popular library for CSS-in-JS and it has a rich ecosystem
 ## Changelog
 
 - 2019-11-10 Initial version
-- 2020-06-28: Minor formatting and grammatical changes
+- 2020-06-28 Minor formatting and grammatical changes
 - 2020-08-27 Plain English improvements
+- 2021-10-21 Added a note about the new version of xstyled
