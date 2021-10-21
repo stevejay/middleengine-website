@@ -67,7 +67,7 @@ The [Checking Integrated Circuit](<https://en.wikipedia.org/wiki/CIC_(Nintendo)>
 
 The following image shows an opened game cartridge:
 
-![](/images/2020-06-22-programming-the-nes-the-nes-in-overview/NES-MissionCtrlRAMCart32K1.jpg "An opened game cartridge")
+![](/images/2020-06-22-programming-the-nes-the-nes-in-overview/NES-MissionCtrlRAMCart32K1.jpg "An opened NES game cartridge")
 
 The topmost chip is the MMU. On the lower row, from left to right, are the CIC, the CHR-ROM, and the PRG-ROM chips.
 
