@@ -20,7 +20,7 @@ The deployed Web site is an `nginx` Docker image to which is added the Web site 
 
 - `.dockerignore` is to prevent problematic or irrelevant files being included in the final Docker image.
 - `src` - the directory containing the raw Web site files.
-- `build.js` - a script for turning the raw Web site files in `src` into the site's static HTML, CSS, JS and image files that get output to the temporary `build` directory.
+- `build.js` - an ESM module script for turning the raw Web site files in `src` into the site's static HTML, CSS, JS and image files that get output to the temporary `build` directory.
 - `nginx` - contains the configuration files for running the Web site using `nginx`.
 - `Dockerfile` - builds the Web site image file, which includes invoking the `build.sh` file and copying into the image the resulting Web site files in the `build` directory.
 - `docker-compose.test.yml` - invoked automatically by Docker Hub to test each Web site Docker image file that it builds.
@@ -46,7 +46,21 @@ The created Docker image includes the following files and directories:
 
 ### Building the Docker image
 
-The image is build automatically by Docker Hub when a commit is pushed to this repository's `master` branch. If the build succeeds and the test script in the resulting image executes successfully then the image is added to Docker Hub with a tag of `latest`.
+The image currently needs to be manually built locally and then pushed to Docker Hub. The image is built and pushed with a tag of `latest`.
+
+First log in to Docker:
+
+```bash
+docker login -u middleengine
+[enter your password]
+```
+
+Then build and push the image:
+
+```bash
+docker build --tag middleengine/website:latest --file Dockerfile .
+docker push middleengine/website:latest
+```
 
 #### Building and running locally
 
@@ -56,15 +70,6 @@ If you want to test building and running the image locally, then run the followi
 2. `docker run --name middleengine-website-instance --publish 80:80 --rm --detach middleengine/website` to run the image in Docker.
 
 You can access the Web site via the URL `http://localhost/`.
-
-#### Building and pushing to Docker Hub
-
-```bash
-docker build --tag middleengine/website:latest --file Dockerfile .
-docker login -u middleengine
-[enter access token]
-docker push middleengine/website:latest
-```
 
 ## Services used
 
