@@ -26,7 +26,7 @@ The core of a design system consists of the permitted font styles, colors, icons
 
 ## Use Figma's auto layout and layout grid options
 
-Figma includes auto layout and layout grid options on frame elements. They are analogous respectively to flexbox and grid in CSS. Use them to create the design system and the designs. Their use will encourage consistency. The layout is controlled automatically rather than through manual positioning. It is also straightforward for the developer to recreate the designs in the browser.
+Figma includes [auto layout](https://help.figma.com/hc/en-us/articles/360040451373-Create-dynamic-designs-with-Auto-Layout) and [layout grid](https://help.figma.com/hc/en-us/articles/360039957934-Combine-Layout-Grids-and-Constraints) options on frame elements. They are analogous respectively to flexbox and grid in CSS. Use them to create the design system and the designs. Their use will encourage consistency. The layout is controlled automatically rather than through manual positioning. It is also straightforward for the developer to recreate the designs in the browser.
 
 These layout options also allow the designer to explore and specify the responsive behaviour of a design. They are very useful for specifying the layout _between_ each breakpoint, not only exactly at each breakpoint. If the developer has the ability to resize layouts in Figma then they can see for themselves how a layout should resize.
 
@@ -109,3 +109,4 @@ Designer and developer need to collaborate to produce designs that can be accura
 
 - 2021-10-20 Initial version
 - 2021-10-21 Plain English improvements
+- 2021-10-22 Added Figma layout links
