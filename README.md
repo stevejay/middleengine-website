@@ -64,12 +64,7 @@ docker push middleengine/website:latest
 
 #### Building and running locally
 
-If you want to test building and running the image locally, then run the following commands from the project root:
-
-1. `docker build --tag middleengine/website:latest --file Dockerfile .` to build the image.
-2. `docker run --name middleengine-website-instance --publish 80:80 --rm --detach middleengine/website` to run the image in Docker.
-
-You can access the Web site via the URL `http://localhost/`.
+If you want to test building and running the image locally, then run the following command from the project root: `docker-compose up --force-recreate --build --detach`. You should now be able to access the Web site at `http://localhost:3009/`.
 
 ## Services used
 
