@@ -56,3 +56,9 @@ If using Yarn Berry PnP or pnpm is not possible then the choice is between npm o
 ## Conclusion
 
 Nowadays the package managers for the Node.js ecosystem have a reasonable degree of feature parity, particularly regarding workspace support. However, there are other considerations to take into account, such as a better solution for the `node_modules` directory, better checking of dependency declarations, and faster performance. Exactly which package manager you chose to use will depend on your own particular circumstances and concerns.
+
+---
+
+## Changelog
+
+- 2021-12-20 Initial version
