@@ -20,7 +20,7 @@ Chris Krycho [wrote](https://v5.chriskrycho.com/journal/small-non-trivial-projec
 
 With this pattern, multiple tab stops are presented to the keyboard user as a single logical tab stop. The toolbar is a widget that benefits from the pattern. Ordinarily, a keyboard user navigating a page with a toolbar would have to tab through all of the controls in the toolbar to get beyond it. But with this pattern only one of the controls in the toolbar is ever focusable. This is achieved by setting the `tabindex` of the focusable control to `0` and the tabindex of the other controls to `-1`. The user now has to tab over only one control in the toolbar to navigate beyond it. To navigate within the toolbar, the user tabs into it and then uses the arrow, Home or End keys to shift focus to a different control. As a bonus, the toolbar now has a memory: when the user tabs back into the toolbar, the control they last interacted with will be the focused control.
 
-## Implementation
+## Roving tabindex implementation
 
 There are two main parts to the pattern: the tab stops themselves, and the higher logic for moving focus between them. The current implementation in react-roving-tabindex uses React context to support communication between the tab stops and the higher logic. The rover state and various callbacks are passed down through context to the tab stops. A tab stop can then invoke a callback to trigger an action in the higher logic.
 
@@ -59,6 +59,8 @@ export const ButtonWithRovingTabIndex: FC<Props> = ({
   );
 };
 ```
+
+## The prop getters pattern
 
 I was aware of a React design pattern called the [prop getters pattern](https://kentcdodds.com/blog/how-to-give-rendering-control-to-users-with-prop-getters) (with further discussion [here](https://kentcdodds.com/blog/react-hooks-whats-going-to-happen-to-render-props) and [here](https://javascript.plainenglish.io/5-advanced-react-patterns-a6b7624267a6)) that could be used instead of context. This pattern is used in the [downshift](https://github.com/downshift-js/downshift) and [react-table](https://github.com/tannerlinsley/react-table) packages.
 
@@ -146,6 +148,8 @@ Usefully, prop getters can be implemented to support a solution to the problem. 
 ```
 
 The returned ref and event handler props will result in both the developer code and the library code being executed.
+
+## Performance issues with prop getters
 
 To me there are notable advantages to the prop getter pattern and this motivated me to try using it in my library. I did succeed in creating an implementation, but I did find two performance-related issues:
 

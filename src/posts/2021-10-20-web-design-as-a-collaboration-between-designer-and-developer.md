@@ -12,7 +12,7 @@ draft: false
 
 ## Introduction
 
-I recently read a Web developer job specification. It stressed the need for pixel perfect design implementations. I do strive to achieve this, but it relies on close collaboration between developer and designer. A Web developer cannot be a passive recipient of Web site designs. They should instead raise certain issues for discussion before work starts. These issues will be the focus for this post. Note that I assume the designer is using [Figma](https://www.figma.com) as that has been my recent experience.
+I recently read a Web developer job specification that stressed the need for pixel perfect design implementations. I do strive to achieve this, but ultimately it relies on a close collaboration between developer and designer. A Web developer cannot be a passive recipient of Web site designs. They should instead raise certain issues for discussion before work starts. These issues will be the focus of this post. Note that I assume the designer is using [Figma](https://www.figma.com) as that has been my recent experience.
 
 ## Use a design system
 
