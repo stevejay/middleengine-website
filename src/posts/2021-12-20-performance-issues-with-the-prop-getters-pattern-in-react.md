@@ -12,7 +12,7 @@ draft: false
 
 ## Introduction
 
-I recently tried implementing the prop getter React pattern in a simple npm library that I maintain. The process revealed a performance limitation with the pattern that I discuss in this blog post.
+I recently tried implementing the prop getters React pattern in a simple npm library that I maintain. The process revealed a performance limitation with the pattern that I discuss in this blog post.
 
 ## Background
 
@@ -60,7 +60,7 @@ export const ButtonWithRovingTabIndex: FC<Props> = ({
 };
 ```
 
-I was aware of a React design pattern called the [prop getter pattern](https://kentcdodds.com/blog/how-to-give-rendering-control-to-users-with-prop-getters) (with further discussion [here](https://kentcdodds.com/blog/react-hooks-whats-going-to-happen-to-render-props) and [here](https://javascript.plainenglish.io/5-advanced-react-patterns-a6b7624267a6)) that could be used instead of context. This pattern is used in the [downshift](https://github.com/downshift-js/downshift) and [react-table](https://github.com/tannerlinsley/react-table) packages.
+I was aware of a React design pattern called the [prop getters pattern](https://kentcdodds.com/blog/how-to-give-rendering-control-to-users-with-prop-getters) (with further discussion [here](https://kentcdodds.com/blog/react-hooks-whats-going-to-happen-to-render-props) and [here](https://javascript.plainenglish.io/5-advanced-react-patterns-a6b7624267a6)) that could be used instead of context. This pattern is used in the [downshift](https://github.com/downshift-js/downshift) and [react-table](https://github.com/tannerlinsley/react-table) packages.
 
 The downshift library includes a `useSelect` hook that encapsulates the logic for creating a custom select dropdown. The [usage example in its documentation](https://github.com/downshift-js/downshift/tree/master/src/hooks/useSelect) is the following:
 
@@ -261,7 +261,7 @@ const { getTabContainerProps, getTabStopProps, getTabStopTabIndex } = useItemRov
 
 ## Conclusion
 
-The prop getter pattern is useful to know. It can be used to create a clean API for developers, one that allows them to easily integrate their own refs and callbacks. However, there can issues with supporting memoization of the prop getters when trying to improve rendering performance. There are solutions but they might not be concurrent mode safe or they may make the API trickier to use.
+The prop getters pattern is useful to know. It can be used to create a clean API for developers, one that allows them to easily integrate their own refs and callbacks. However, there can issues with supporting memoization of the prop getters when trying to improve rendering performance. There are solutions but they might not be concurrent mode safe or they may make the API trickier to use.
 
 ---
 
