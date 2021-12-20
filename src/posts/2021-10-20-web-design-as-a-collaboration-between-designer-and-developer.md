@@ -112,3 +112,4 @@ Designer and developer need to collaborate to produce designs that can be accura
 - 2021-10-20 Initial version
 - 2021-10-21 Plain English improvements
 - 2021-10-22 Added Figma layout links
+- 2021-12-20 Minor wording changes
