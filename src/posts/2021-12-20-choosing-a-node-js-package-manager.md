@@ -52,7 +52,7 @@ So why should you not just chose npm? There are several reasons for using an alt
 
 Yarn Classic was release in 2016 to fix some of the shortcomings with npm at the time. It introduced workspaces and included security and performance improvements. It had a better algorithm for building the package dependency tree and introduced a file (`yarn.lock`) for saving that tree and the exact package versions used in your project.
 
-Today it is well supported by build tools and services. However, development of Yarn Classic has been [frozen](https://github.com/yarnpkg/yarn). (The only releases now appear to be for major bug fixes and updating dependencies.) The developers decided to make fundamental changes and the result was Yarn Berry.
+Today it is well supported by build tools and services. However, development of Yarn Classic has been frozen and it is now [in maintenance mode only](https://dev.to/arcanis/introducing-yarn-2-4eh1). The developers decided to make fundamental changes and the result was Yarn Berry.
 
 ### Yarn Berry
 
@@ -80,7 +80,7 @@ The downsides of pnpm are that it is probably the least supported of the package
 
 So, which package manager should you use?
 
-Firstly, I believe that Yarn Classic should be excluded because development of it is now frozen.
+Firstly, I believe that Yarn Classic should be excluded because development of it has effectively ended.
 
 The most compelling options are the two package managers that provide a better solution for the problems of the `node_modules` directory: Yarn Berry in PnP mode, and pnpm. However, it might not be possible for you to use one of these. The tools and services you are using might not support them.
 
@@ -91,9 +91,6 @@ A final consideration is that it is perfectly possible to use a particular packa
 ## Conclusion
 
 Nowadays the package managers for the Node.js ecosystem have a reasonable degree of feature parity, particularly regarding workspace support. However, there are other considerations to take into account, including a better solution for the `node_modules` directory, checking of dependency declarations, and performance. Exactly which package manager you chose to use will depend on your own particular circumstances and concerns.
-
-https://www.kochan.io/nodejs/why-should-we-use-pnpm.html
-http://npm.github.io/how-npm-works-docs/npm3/how-npm3-works.html
 
 ---
 
