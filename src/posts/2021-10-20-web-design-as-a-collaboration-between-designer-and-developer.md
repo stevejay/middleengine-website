@@ -101,9 +101,17 @@ The result is that the card headings need to wrap more, and some might consider 
 
 Designers and clients often decide that focus rings are an unsightly addition to a Web site. Even so, they are important for accessibility and so you should reject the idea of removing them. A compromise is to only show them when the user is using their keyboard to navigate the site.
 
+## Restrict use of hover
+
+Hover as an interaction is restricted to mouse users. If used, it requires an alternative interaction to be created for non-mouse users. An example would be a tooltip that is shown by hovering over or touching an information icon, as long as the icon looks suitably 'touchable'.
+
+But my experience of implementing hover interactions has generally been negative, particularly with hover on navigation elements. Examples of such elements are menus that open on hover or sidebars that expand on hover. There can be unexpected interactions with these, both between the hover interaction and the alternative interaction for non-mouse users, and with elements showing on hover at unexpected moments. An example of the former is the sidebar that expands either on hover or when the user clicks or touches an expand button. The mouse user could go to click the button, but the sidebar expands as they move towards it and they end up clicking on a different control, one that has moved to where the expand button was.
+
+Avoiding hover as much as possible will avoid such headaches and any hacks that get added to fix the resulting problems.
+
 ## Conclusion
 
-Designer and developer need to collaborate to produce designs that can be accurately recreated in the browser. In this post I have detailed some best practises and decisions that they need to make to achieve this.
+Designer and developer need to collaborate to produce designs that can be accurately and successfully recreated in the browser. In this post I have detailed some best practices and decisions that they should jointly make to achieve this.
 
 ---
 
@@ -113,3 +121,4 @@ Designer and developer need to collaborate to produce designs that can be accura
 - 2021-10-21 Plain English improvements
 - 2021-10-22 Added Figma layout links
 - 2021-12-20 Minor wording changes
+- 2022-03-17 Add a section about hover interactions
