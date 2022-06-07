@@ -34,6 +34,14 @@ The configuration file `nginx.conf` is a basic `nginx` server configuration. Sup
 
 The configuration file `conf.d/default.conf` is the configuration for the Web site.
 
+## Changing file permissions
+
+```bash
+ls -l
+xattr -c flow-chart-1-2x.png
+chmod 644 flow-chart-1-2x.png
+```
+
 ### The Docker image
 
 #### Files
@@ -58,7 +66,7 @@ docker login -u middleengine
 Then build and push the image:
 
 ```bash
-docker build --tag middleengine/website:latest --file Dockerfile .
+docker build --platform linux/amd64 --tag middleengine/website:latest --file Dockerfile .
 docker push middleengine/website:latest
 ```
 
@@ -89,7 +97,3 @@ Image files are versioned manually. I simply add a `vN`-type suffix to the image
 JavaScript and CSS files are versioned automatically by the build script if they are in the `src/static` directory and have include the path part `.HASH` just before the file extension, e.g., `src/static/css/site.HASH.css`. A hash value is generated from the file content and it replaces the `HASH` part of the file name.
 
 The result is that all of these files (images, JavaScript and CSS) can have very long cache control TTL values.
-
-## TODO
-
-- Callicode - Building Docker Containers for Go Applications.
