@@ -12,15 +12,16 @@ draft: false
 
 ## Introduction
 
-I recently did some work for [Ocula Technologies](https://www.ocula.tech/), a startup that provides AI-driven retail insights to B2C companies. One task was to add [Auth0](https://auth0.com/) to a React Single-Page App (SPA). There are lots of knobs to adjust in an Auth0 tenant and I found it hard to understand exactly what effect they were having and how they related to each other. To tackle this, I spent some time creating a flow chart for each of two authorization-related scenarios in the SPA. Thanks go to Ocula for letting me share them in this post.
+I recently did some work for [Ocula Technologies](https://www.ocula.tech/), a startup that provides AI-driven retail insights to B2C companies. One task was to add [Auth0](https://auth0.com/) to a React Single-Page App (SPA). There are lots of knobs to adjust in an Auth0 tenant and I found it hard to understand exactly what effect they were having and how they related to each other. To tackle this, I spent some time creating a flow chart for each of two authorization-related scenarios in the SPA. I would like to thank Ocula for letting me share these flow charts in this post.
 
 ## Caveats
 
-The flow charts only cover the [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) grant option for the Auth0 integration. This is the [recommended flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use#is-the-client-a-single-page-app-) for an SPA. 
+The flow charts only cover the [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) grant option for the Auth0 integration. This is the recommended flow for an SPA; see [here](https://auth0.com/docs/get-started/authentication-and-authorization-flow/which-oauth-2-0-flow-should-i-use#is-the-client-a-single-page-app-) and
+[here](https://developer.okta.com/blog/2018/12/13/oauth-2-for-native-and-mobile-apps).
 
 I also assume that the SPA is using Auth0 in order to authenticate with some backend API. The SPA has to include a bearer token with each API request that it makes. In Auth0, that bearer token is called an Access Token.
 
-Finally, I have included using a custom domain in the flow charts but I have not tested this. (Ocula had not yet started using custom domains by the time my contract with them finished.)
+Finally, I have included using a custom domain in the flow charts but I have not tested this. (Ocula had not yet started using a custom domain by the time my contract with them finished.)
 
 ## Background
 
@@ -97,17 +98,17 @@ If 'Refresh Token Rotation' is enabled on the Application then there are also a 
 
 This first flow chart covers the following scenario: the user is logged in, and the SPA needs to make a request to the backend API. To do this, the SPA uses the Auth0 Client SDK to get a valid Access Token.
 
-![](/images/2022-06-07-useful-flowcharts-when-integrating-auth0-in-an-spa/flow-chart-1-1x.png "Flow chart 1: Obtaining an Access Token")
+![](/images/2022-06-07-useful-flowcharts-when-integrating-auth0-in-an-spa/flow-chart-1v2-2x.png "Flow chart 1: Obtaining an Access Token")
 
-[Original Excalidraw document](/images/2022-06-07-useful-flowcharts-when-integrating-auth0-in-an-spa/flow-chart-1.excalidraw)
+[Original Excalidraw document](/images/2022-06-07-useful-flowcharts-when-integrating-auth0-in-an-spa/flow-chart-1v2.excalidraw)
 
 ## Second flow chart: The user refreshes the page or opens the SPA in a second tab
 
 This second flow chart covers the following scenario: the user is logged in, and they refresh the current SPA page or open the SPA in a second tab. They may or may not continue to be logged in after this action.
 
-![](/images/2022-06-07-useful-flowcharts-when-integrating-auth0-in-an-spa/flow-chart-2-1x.png "Flow chart 2: The user refreshes the page or opens the SPA in a second tab")
+![](/images/2022-06-07-useful-flowcharts-when-integrating-auth0-in-an-spa/flow-chart-2v2-2x.png "Flow chart 2: The user refreshes the page or opens the SPA in a second tab")
 
-[Original Excalidraw document](/images/2022-06-07-useful-flowcharts-when-integrating-auth0-in-an-spa/flow-chart-2.excalidraw)
+[Original Excalidraw document](/images/2022-06-07-useful-flowcharts-when-integrating-auth0-in-an-spa/flow-chart-2v2.excalidraw)
 
 ## Conclusion
 
@@ -118,3 +119,4 @@ Auth0 is straightforward to integrate with an SPA but fine-tuning its behaviour 
 ## Changelog
 
 - 2022-06-07 Initial version
+- 2022-06-21 Made the flowcharts flow vertically for better display in the browser, and added extra link.
