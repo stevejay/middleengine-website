@@ -69,7 +69,7 @@ D3 makes animating charts incredibly easy. This includes the animation of exitin
 
 You can see the result in the first section of [this Web page](https://dataviz.middle-engine.com/axis). For each of the scale types of continuous, time and ordinal, I have rendered a D3 axis and its equivalent React version. You can use the update buttons to test them out. The code for the React axis component can be viewed [here](https://github.com/stevejay/react-and-d3/blob/c6bea0c8deb8e5c6235749bccbbb86c531c855a7/src/components/SvgAxis.tsx).
 
-Note: I did originally use Framer Motion for the React axis animations. However, I found that it was slower to begin animating compared to the D3 axis. This lag was greatly reduced by switching to react-spring.
+(I did originally use Framer Motion for the React axis animations. I found that it was slower to begin animating compared to the D3 axis. This lag was greatly reduced by switching to react-spring.)
 
 A significant difference in behavior between the D3 and React axes occurs when the animation is interrupted. You can see this further down that page, in Example 4. The ticks animate differently in the D3 and React axes when the animation is interrupted. In the React axis, the negative value ticks fly off to the right. In the D3 axis, they stop and reverse direction.
 
@@ -79,10 +79,11 @@ Regardless, I do not think the issue is actually very important. I can only real
 
 ## Conclusion
 
-react-spring is an excellent library to use to animate data visualisations that are rendered using React. I was able to use it to create a React-rendered version of the D3 axis component. The techniques used to create the React axis should translate well to the other chart components, such as the bars in a bar chart. I did find an issue with how exiting components animate when the transition to a new state is interrupted. However, the issue is unlikely to be of concern in normal usage.
+The react-spring library is excellent for animating data visualisations that are rendered using React. I was able to use it to create a React-rendered version of the D3 axis component. The techniques used to create the React axis should translate well to the other chart components, such as the bars in a bar chart. I did find an issue with how exiting components animate when the transition to a new state is interrupted, but the issue is unlikely to be of concern in normal usage.
 
 ---
 
 ## Changelog
 
 - 2021-12-30 Initial version
+- 2022-06-21 Minor rewordings
