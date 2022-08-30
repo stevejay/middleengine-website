@@ -33,7 +33,7 @@ This episode demonstrates that it is possible in React to write code that is fra
 
 I find misunderstandings in React tend to be around the lifecycle methods and when they get invoked. The situation was complicated by the changes to the React component lifecycle that debuted in [React 16.3](https://reactjs.org/blog/2018/03/29/react-v-16-3.html#component-lifecycle-changes). These were necessary for the [React Fibre](https://github.com/acdlite/react-fiber-architecture) project, in particular to support incremental rendering.
 
-When React decides that the subtree needs to be rendered, it performs the work in two phases: the render phase and the commit phase. The render phase is when React works out how the browser DOM needs to change to reflect the current state of the app. It does this by creating the new virtual DOM state and diffing it with the current virtual DOM state. The commit phase is when React applies those changes to the browser DOM. React Fibre required supporting incremental rendering in React and this lead to the lifecycle changes in React 16.3. The invocation guarantees for certain render-phase lifecycle methods could no longer be maintained. One such guarantee was that `componentWillReceiveProps` only gets called when a component's props change.
+When React decides that the subtree needs to be rendered, it performs the work in two phases: the render phase and the commit phase. The render phase is when React works out how the browser DOM needs to change to reflect the current state of the app. It does this by creating the new virtual DOM state and diffing it with the current virtual DOM state. The commit phase is when React applies those changes to the browser DOM. React Fibre required supporting incremental rendering in React and this led to the lifecycle changes in React 16.3. The invocation guarantees for certain render-phase lifecycle methods could no longer be maintained. One such guarantee was that `componentWillReceiveProps` only gets called when a component's props change.
 
 I am only aware of the following guarantees around lifecycle method invocations:
 
@@ -52,3 +52,4 @@ In summary, you should create boring components whenever possible. Use lifecycle
 ## Changelog
 
 - 2020-08-28 Plain English and structure improvements
+- 2022-08-30 Spelling fix
