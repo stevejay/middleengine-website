@@ -786,7 +786,7 @@ Does not update any flags.
 | --------------- | ---------------------------- |
 | Absolute        | `STX $0000`{lang=asm6502}    |
 | Zero Page       | `STX $00`{lang=asm6502}      |
-| Absolute, Y     | `STX $0000, Y`{lang=asm6502} |
+| Zero Page, Y    | `STX $00, Y`{lang=asm6502}   |
 
 :::
 
@@ -806,7 +806,7 @@ Does not update any flags.
 | --------------- | ---------------------------- |
 | Absolute        | `STY $0000`{lang=asm6502}    |
 | Zero Page       | `STY $00`{lang=asm6502}      |
-| Absolute, X     | `STY $0000, X`{lang=asm6502} |
+| Zero Page, X    | `STY $00, X`{lang=asm6502}   |
 
 :::
 
@@ -2382,3 +2382,4 @@ If you have not done any low-level programming before then writing games for the
 - 2020-08-02 A substantial rework of the explanations for addition and subtraction.
 - 2020-08-26 Plain English improvements
 - 2021-10-21 Fixed a link
+- 2024-04-10 Fixed bugs in STX and STY descriptions

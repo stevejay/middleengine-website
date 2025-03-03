@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Testing components that use the Jotai atomWithHash function"
+title: "Testing components that use atomWithHash from Jotai"
 summary: How to configure JSDOM to ensure test isolation when testing React components that use atomWithHash from the Jotai npm package.
 date: 2022-08-30
 author:
@@ -22,7 +22,7 @@ beforeEach(() => {
 });
 ```
 
-This technique also allows you to set as starting hash state for an individual test:
+This technique also allows you to set an initial hash state for an individual test:
 
 ```ts
 it('allows for deep-linking to a search', async () => {
@@ -36,3 +36,4 @@ it('allows for deep-linking to a search', async () => {
 ## Changelog
 
 - 2022-08-30 Initial version
+- 2022-08-31 Title change and spelling fix

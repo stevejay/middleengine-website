@@ -49,7 +49,7 @@ $destContext.drawImage($destCanvas, 0, 0, 1, 1, 0, 0, 1, 1);
 
 I still found issues with the page freezing in Chrome on macOS. More importantly, I saw significant variance in execution time of greater than ±100% for the first test. I looked for another way to force a flush. I thought of reading from the destination canvas immediately after the `drawImage` call. There are two ways that I know of to read pixel data from a canvas:
 
-- [`CanvasRenderingContext2D.getImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData).
+- [`getImageData`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData).
 - [`createImageBitmap`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap) (not supported in Safari).
 
 Using `createImageBitmap` works and the resulting performance test suite is [here](https://jsbench.me/ooke36wtsw/1). The following is an example test from that test suite:
@@ -129,3 +129,4 @@ Performance testing in general can be difficult to do well. In the case of the C
 
 - 2020-08-24 Initial version
 - 2020-08-25 Plain English improvements
+- 2022-08-30 Mobile page fix

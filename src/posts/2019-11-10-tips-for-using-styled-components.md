@@ -99,7 +99,7 @@ const StyledExample = styled.div(
 );
 ```
 
-You might find this version easier to read. The technique is in the Styled Components documentation in the section on [writing CSS as JavaScript objects](https://styled-components.com/docs/advanced#style-objects). Note that the `css` function is not required in the above example. I use it here to trigger highlighting of the enclosed CSS when using the [vscode-styled-components extension](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components).
+You might find this version easier to read. The technique is in the Styled Components documentation in the section on [writing CSS as JavaScript objects](https://styled-components.com/docs/advanced#style-objects). Note that the `css` function is not required in the above example. I use it here to trigger highlighting of the enclosed CSS when using the [vscode-styled-components extension](https://marketplace.visualstudio.com/items?itemName=styled-components.vscode-styled-components).
 
 ## Helper libraries
 
@@ -442,7 +442,7 @@ const visuallyHidden = () => css`
 `;
 ```
 
-Note that the `css` function is not required in the above example. It is being used to trigger highlighting of the enclosed CSS when using the [vscode-styled-components extension](https://marketplace.visualstudio.com/items?itemName=jpoissonnier.vscode-styled-components).
+Note that the `css` function is not required in the above example. It is being used to trigger highlighting of the enclosed CSS when using the [vscode-styled-components extension](https://marketplace.visualstudio.com/items?itemName=styled-components.vscode-styled-components).
 
 You can use this `visuallyHidden` mixin like so:
 
@@ -484,3 +484,4 @@ Styled Components is a popular library for CSS-in-JS and it has a rich ecosystem
 - 2020-06-28 Minor formatting and grammatical changes
 - 2020-08-27 Plain English improvements
 - 2021-10-21 Added a note about the new version of xstyled
+- 2022-08-30 Fix 404 links

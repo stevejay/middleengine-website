@@ -43,7 +43,7 @@ Hiding content is not as simple as adding `display: none` or `visibility: hidden
 }
 ```
 
-The `sr` prefix means screen reader. The technique they use is an update to one [described here in 2011](https://snook.ca/archives/html_and_css/hiding-content-for-accessibility).
+The `sr` prefix means screen reader. The technique they use is an update to one [described here in 2011](https://web.archive.org/web/20220515135225/https://snook.ca/archives/html_and_css/hiding-content-for-accessibility).
 
 Bootstrap also has the following mixin for content that should become visible on focus:
 
@@ -184,3 +184,4 @@ There are two variations for creating visually hidden content on a Web page. The
 ## Changelog
 
 - 2020-08-28 Plain English and structure improvements
+- 2022-08-30 Fix 404 link
